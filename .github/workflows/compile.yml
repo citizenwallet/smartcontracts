@@ -34,6 +34,9 @@ jobs:
         # uses: gacts/install-geth-tools@52e9b9a18008405eb9551a69c856256bdbe9d115
         uses: gacts/install-geth-tools@v1.1.0
 
+      - name: Install solc
+        run: sudo snap install solc
+
       - name: Compile
         run: scripts/compile_contracts.sh
 
