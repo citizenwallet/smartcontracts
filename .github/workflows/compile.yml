@@ -39,13 +39,17 @@ jobs:
         run: |
           git config --local user.email "bot@citizenwallet.xyz"
           git config --local user.name "citizenwallet-bot"
-          git add .
+
+      - uses: phish108/autotag-action@v1.1.55
+        id: tagger
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN}}
+          with-v: "true"
+          dry-run: "true"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "[action] compile contracts"
-
-      - uses: phish108/autotag-action@v1.1.55
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN}}
-          with-v: "true"
+          commit_user_name: citizenwallet-bot
+          commit_user_email: bot@citizenwallet.xyz
+          tagging_message: "${{ steps.tagger.outputs.new-tag }}"
