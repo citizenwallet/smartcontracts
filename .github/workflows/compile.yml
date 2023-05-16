@@ -43,6 +43,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Navigate to the repo
+        run: cd "$GITHUB_WORKSPACE/go/src/github.com/${{ github.repository }}"
+
       - name: Install node modules
         run: npm install
 
