@@ -35,6 +35,12 @@ jobs:
       - name: Compile
         run: scripts/compile_contracts.sh
 
+      - name: Commit changes
+        run: |
+          git config --local user.email "
+          git config --local user.name "github-actions[bot]"
+          git add .
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "[action] compile contracts"
