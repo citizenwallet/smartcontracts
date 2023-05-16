@@ -35,7 +35,7 @@ jobs:
         uses: gacts/install-geth-tools@v1.1.0
 
       - name: Install
-        run: go install ./...
+        run: go get ./...
 
       - name: Compile
         run: scripts/compile_contracts.sh
