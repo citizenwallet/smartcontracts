@@ -19,16 +19,6 @@ contract Gateway is EntryPoint, Initializable, Ownable {
         _disableInitializers();
     }
 
-    modifier onlyOwner() override {
-        _onlyOwner(); // Modifier to restrict access to functions to only the owner of the contract
-        _;
-    }
-
-    function _onlyOwner() internal view {
-        //directly from EOA owner, or through the account itself (which gets redirected through execute())
-        require(msg.sender == owner(), "only owner"); // Internal function to check if the caller is the owner of the contract or the contract itself
-    }
-
     // Internal function to initialize the contract with an owner address
     function _initialize(address _owner) public initializer {
         transferOwnership(_owner); // Transfer the ownership of the contract to the specified address

@@ -10,10 +10,11 @@ import "./Account/TokenCallbackHandler.sol";
 
 // https://github.com/guizostudios/ERC-4337/blob/main/contracts/SimpleAccount.sol
 // Account,
-contract Account is BaseAccount, TokenCallbackHandler, Initializable, Ownable {
+contract Account is BaseAccount, TokenCallbackHandler, Initializable {
     using ECDSA for bytes32;
 
     IEntryPoint private immutable _entryPoint; // Private immutable variable to store the entry point contract address
+    address public owner; // Public variable to store the owner's address
 
     event AccountInitialized(
         IEntryPoint indexed entryPoint,
@@ -26,7 +27,7 @@ contract Account is BaseAccount, TokenCallbackHandler, Initializable, Ownable {
         _disableInitializers();
     }
 
-    modifier onlyOwner() override {
+    modifier onlyOwner() {
         _onlyOwner(); // Modifier to restrict access to functions to only the owner of the contract
         _;
     }
@@ -34,21 +35,21 @@ contract Account is BaseAccount, TokenCallbackHandler, Initializable, Ownable {
     function _onlyOwner() internal view {
         //directly from EOA owner, or through the account itself (which gets redirected through execute())
         require(
-            msg.sender == owner() || msg.sender == address(this),
+            msg.sender == owner || msg.sender == address(this),
             "only owner"
         ); // Internal function to check if the caller is the owner of the contract or the contract itself
     }
 
     // Internal function to initialize the contract with an owner address
     function _initialize(address _owner) public initializer {
-        transferOwnership(_owner); // Transfer the ownership of the contract to the specified address
+        owner = _owner; // Transfer the ownership of the contract to the specified address
         emit AccountInitialized(_entryPoint, _owner); // Emit an event to indicate that the Account contract has been initialized with the entry point contract address and the owner address
     }
 
     // Modifier to require the function call to be made from the entry point contract or the owner
     function _requireFromEntryPointOrOwner() internal view {
         require(
-            msg.sender == address(entryPoint()) || msg.sender == owner(),
+            msg.sender == address(entryPoint()) || msg.sender == owner,
             "account: not Owner or EntryPoint"
         ); // Check if the caller is the entry point contract or the owner
     }
@@ -59,7 +60,7 @@ contract Account is BaseAccount, TokenCallbackHandler, Initializable, Ownable {
         bytes32 userOpHash
     ) internal virtual override returns (uint256 validationData) {
         bytes32 hash = userOpHash.toEthSignedMessageHash(); // Convert the user operation hash to an Ethereum signed message hash
-        if (owner() != hash.recover(userOp.signature))
+        if (owner != hash.recover(userOp.signature))
             // Check if the owner address matches the recovered address from the signature
             return SIG_VALIDATION_FAILED; // Return an error code if the signature validation fails
         return 0; // Return success code if the signature validation is successful
@@ -131,6 +132,6 @@ contract Account is BaseAccount, TokenCallbackHandler, Initializable, Ownable {
     }
 
     function setOwner(address _owner) public onlyOwner {
-        transferOwnership(_owner);
+        owner = _owner;
     }
 }
