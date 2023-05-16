@@ -10,7 +10,7 @@ import "./Account/TokenCallbackHandler.sol";
 
 // https://github.com/guizostudios/ERC-4337/blob/main/contracts/SimpleAccount.sol
 // Account,
-contract Account is BaseAccount, TokenCallbackHandler, Ownable {
+contract Account is BaseAccount, TokenCallbackHandler, Initializable, Ownable {
     using ECDSA for bytes32;
 
     IEntryPoint private immutable _entryPoint; // Private immutable variable to store the entry point contract address
@@ -21,13 +21,27 @@ contract Account is BaseAccount, TokenCallbackHandler, Ownable {
     ); // Event to indicate when the Account contract has been initialized
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IEntryPoint anEntryPoint, address _owner) {
+    constructor(IEntryPoint anEntryPoint) {
         _entryPoint = anEntryPoint; // Constructor to set the entry point contract address during deployment
-        _initialize(_owner); // Call the internal _initialize function with the provided input parameter
+        _disableInitializers();
+    }
+
+    modifier onlyOwner() override {
+        _onlyOwner(); // Modifier to restrict access to functions to only the owner of the contract
+        _;
+    }
+
+    function _onlyOwner() internal view {
+        //directly from EOA owner, or through the account itself (which gets redirected through execute())
+        require(
+            msg.sender == owner() || msg.sender == address(this),
+            "only owner"
+        ); // Internal function to check if the caller is the owner of the contract or the contract itself
     }
 
     // Internal function to initialize the contract with an owner address
-    function _initialize(address _owner) internal virtual {
+    function _initialize(address _owner) public initializer {
+        transferOwnership(_owner); // Transfer the ownership of the contract to the specified address
         emit AccountInitialized(_entryPoint, _owner); // Emit an event to indicate that the Account contract has been initialized with the entry point contract address and the owner address
     }
 
