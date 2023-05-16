@@ -74,4 +74,4 @@ jobs:
           commit_message: "[action] compile contracts"
           commit_user_name: citizenwallet-bot
           commit_user_email: bot@citizenwallet.xyz
-          tagging_message: "${{ steps.tagger.outputs.new-tag }}"
+          tagging_message: "v${{ steps.tagger.outputs.new-tag }}"
