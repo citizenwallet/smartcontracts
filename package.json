@@ -11,6 +11,7 @@
   "author": "Xavier Damman",
   "license": "MIT",
   "devDependencies": {
+    "@account-abstraction/contracts": "^0.6.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.5",
     "@openzeppelin/contracts": "^4.8.3",
