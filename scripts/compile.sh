@@ -56,7 +56,7 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
                 echo "Compiling $CW_CONTRACT_ACCOUNT_PATH/$file.sol..."
 
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
-                solc --abi --bin --optimize --optimize-runs 1 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
+                solc --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
                 echo "[.abi] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
                 echo "[.bin] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
 
