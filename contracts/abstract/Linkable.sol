@@ -10,11 +10,13 @@ abstract contract Linkable {
         string meta;
     }
 
+    LinkData internal _tempLink;
+
     LinkData[] public links;
 
-    modifier onlyOwner() virtual;
-
-    function _onlyOwner() internal view virtual;
+    modifier onlyOwner() virtual {
+        _;
+    }
 
     // addLink adds a new link to the links array
     function addLink(
@@ -58,9 +60,9 @@ abstract contract Linkable {
         delete links[index];
     }
 
-    // replaceLinks replaces the links array with a new array
-    function replaceLinks(LinkData[] memory newLinks) public onlyOwner {
-        links = newLinks;
+    // clearLinks clears the links array
+    function clearLinks() public onlyOwner {
+        delete links;
     }
 
     // getLinks returns the links array
