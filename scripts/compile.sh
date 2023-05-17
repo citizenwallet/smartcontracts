@@ -26,11 +26,12 @@ CW_CONTRACT_APP_PATH='contracts/apps'
 # package = golang package name
 # file = solidity file name
 CW_ACCOUNT_CONTRACTS=('account,Account' \ 
-        'factory,AccountFactory' \ 
+        'accfactory,AccountFactory' \ 
         'gateway,Gateway' \
         'paymaster,Paymaster')
 
-CW_APP_CONTRACTS=('gratitude,GratitudeToken')
+CW_APP_CONTRACTS=('appfactory,AppFactory' \
+        'gratitude,GratitudeToken')
 
 # Clean build folder
 echo "Cleaning build folder..."

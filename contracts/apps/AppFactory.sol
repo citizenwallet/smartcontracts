@@ -13,7 +13,7 @@ import "./GratitudeToken.sol";
  * The factory's createGratitudeToken returns the target account address even if it is already installed.
  * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
  */
-contract AccountFactory {
+contract AppFactory {
     GratitudeToken public immutable accountImplementation;
 
     constructor(IEntryPoint _entryPoint) {
