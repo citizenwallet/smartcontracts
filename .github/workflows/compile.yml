@@ -55,7 +55,7 @@ jobs:
           sudo apt-get install solc
 
       - name: Compile
-        run: scripts/compile_contracts.sh
+        run: scripts/compile.sh
 
       - name: Commit changes
         run: |

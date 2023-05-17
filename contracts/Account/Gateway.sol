@@ -6,8 +6,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@account-abstraction/contracts/core/EntryPoint.sol";
 
-import "./Account/TokenCallbackHandler.sol";
-
 // Gateway,
 contract Gateway is EntryPoint, Initializable, Ownable {
     using ECDSA for bytes32;
