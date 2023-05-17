@@ -31,7 +31,8 @@ CW_ACCOUNT_CONTRACTS=('account,Account' \
         'paymaster,Paymaster')
 
 CW_APP_CONTRACTS=('appfactory,AppFactory' \
-        'gratitude,GratitudeToken')
+        'gratitude,GratitudeToken' \
+        'profile,Profile')
 
 # Clean build folder
 echo "Cleaning build folder..."

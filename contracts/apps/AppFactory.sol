@@ -10,21 +10,21 @@ import "./GratitudeToken.sol";
 /**
  * A sample factory contract for GratitudeToken
  * A UserOperations "initCode" holds the address of the factory, and a method call (to createGratitudeToken, in this sample factory).
- * The factory's createGratitudeToken returns the target account address even if it is already installed.
- * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
+ * The factory's createGratitudeToken returns the target app address even if it is already installed.
+ * This way, the entryPoint.getSenderAddress() can be called either before or after the app is created.
  */
 contract AppFactory {
-    GratitudeToken public immutable accountImplementation;
+    GratitudeToken public immutable gratitudeImplementation;
 
     constructor(IEntryPoint _entryPoint) {
-        accountImplementation = new GratitudeToken(_entryPoint);
+        gratitudeImplementation = new GratitudeToken(_entryPoint);
     }
 
     /**
-     * create an account, and return its address.
-     * returns the address even if the account is already deployed.
-     * Note that during UserOperation execution, this method is called only if the account is not deployed.
-     * This method returns an existing account address so that entryPoint.getSenderAddress() would work even after account creation
+     * create an app, and return its address.
+     * returns the address even if the app is already deployed.
+     * Note that during UserOperation execution, this method is called only if the app is not deployed.
+     * This method returns an existing app address so that entryPoint.getSenderAddress() would work even after app creation
      */
     function createGratitudeToken(
         address owner,
@@ -38,7 +38,7 @@ contract AppFactory {
         ret = GratitudeToken(
             payable(
                 new ERC1967Proxy{salt: bytes32(salt)}(
-                    address(accountImplementation),
+                    address(gratitudeImplementation),
                     abi.encodeCall(GratitudeToken.initialize, (owner))
                 )
             )
@@ -46,7 +46,7 @@ contract AppFactory {
     }
 
     /**
-     * calculate the counterfactual address of this account as it would be returned by createGratitudeToken()
+     * calculate the counterfactual address of this app as it would be returned by createGratitudeToken()
      */
     function getGratitudeTokenAddress(
         address owner,
@@ -59,7 +59,7 @@ contract AppFactory {
                     abi.encodePacked(
                         type(ERC1967Proxy).creationCode,
                         abi.encode(
-                            address(accountImplementation),
+                            address(gratitudeImplementation),
                             abi.encodeCall(GratitudeToken.initialize, (owner))
                         )
                     )
