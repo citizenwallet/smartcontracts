@@ -6,24 +6,51 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20Burnable
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 contract GratitudeToken is
     Initializable,
     ERC20Upgradeable,
     ERC20BurnableUpgradeable,
-    OwnableUpgradeable,
     UUPSUpgradeable
 {
+    IEntryPoint private immutable _entryPoint;
+
+    address public owner;
+
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
+    constructor(IEntryPoint entryPoint) {
+        _entryPoint = entryPoint;
         _disableInitializers();
     }
 
-    function initialize() public initializer {
+    modifier onlyOwner() {
+        _onlyOwner();
+        _;
+    }
+
+    /**
+     * @dev The _entryPoint member is immutable, to reduce gas consumption.  To upgrade EntryPoint,
+     * a new implementation of SimpleAccount must be deployed with the new EntryPoint address, then upgrading
+     * the implementation by calling `upgradeTo()`
+     */
+    function initialize(address anOwner) public virtual initializer {
+        _initialize(anOwner);
+    }
+
+    function _initialize(address anOwner) internal virtual {
+        owner = anOwner;
         __ERC20_init("GratitudeToken", "GTT");
         __ERC20Burnable_init();
-        __Ownable_init();
         __UUPSUpgradeable_init();
+    }
+
+    function _onlyOwner() internal view {
+        //directly from EOA owner, or through the account itself (which gets redirected through execute())
+        require(
+            msg.sender == owner || msg.sender == address(this),
+            "only owner"
+        );
     }
 
     function mint(address to, uint256 amount) public onlyOwner {
