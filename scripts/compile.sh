@@ -35,12 +35,14 @@ CW_APP_CONTRACTS=('gratitude,GratitudeToken')
 # Clean build folder
 echo "Cleaning build folder..."
 
-rm -rf "$CW_CONTRACT_OUTPUT_PATH/*"
+rm -rf "$CW_CONTRACT_OUTPUT_PATH"
+mkdir "$CW_CONTRACT_OUTPUT_PATH"
 
 # Clean pkg folder
 echo "Cleaning pkg folder..."
 
-rm -rf "$CW_CONTRACT_PKG_PATH/*"
+rm -rf "$CW_CONTRACT_PKG_PATH"
+mkdir "$CW_CONTRACT_PKG_PATH"
 
 # Compile the contracts
 echo "[account] Compiling the contracts..."

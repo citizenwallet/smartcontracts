@@ -23,7 +23,7 @@ import "./interfaces/IOracle.sol";
  * It can only be used if it is "whitelisted" by the bundler.
  * (technically, it can be used by an "oracle" which returns a static value, without accessing any storage)
  */
-contract DepositPaymaster is BasePaymaster {
+contract Paymaster is BasePaymaster {
     using UserOperationLib for UserOperation;
     using SafeERC20 for IERC20;
 
@@ -118,7 +118,7 @@ contract DepositPaymaster is BasePaymaster {
         require(
             unlockBlock[msg.sender] != 0 &&
                 block.number > unlockBlock[msg.sender],
-            "DepositPaymaster: must unlockTokenDeposit"
+            "Paymaster: must unlockTokenDeposit"
         );
         balances[token][msg.sender] -= amount;
         token.safeTransfer(target, amount);
@@ -135,7 +135,7 @@ contract DepositPaymaster is BasePaymaster {
         uint256 ethBought
     ) internal view virtual returns (uint256 requiredTokens) {
         IOracle oracle = oracles[token];
-        require(oracle != NULL_ORACLE, "DepositPaymaster: unsupported token");
+        require(oracle != NULL_ORACLE, "Paymaster: unsupported token");
         return oracle.getTokenValueOfEth(ethBought);
     }
 
@@ -159,25 +159,22 @@ contract DepositPaymaster is BasePaymaster {
         // verificationGasLimit is dual-purposed, as gas limit for postOp. make sure it is high enough
         require(
             userOp.verificationGasLimit > COST_OF_POST,
-            "DepositPaymaster: gas too low for postOp"
+            "Paymaster: gas too low for postOp"
         );
 
         bytes calldata paymasterAndData = userOp.paymasterAndData;
         require(
             paymasterAndData.length == 20 + 20,
-            "DepositPaymaster: paymasterAndData must specify token"
+            "Paymaster: paymasterAndData must specify token"
         );
         IERC20 token = IERC20(address(bytes20(paymasterAndData[20:])));
         address account = userOp.getSender();
         uint256 maxTokenCost = getTokenValueOfEth(token, maxCost);
         uint256 gasPriceUserOp = userOp.gasPrice();
-        require(
-            unlockBlock[account] == 0,
-            "DepositPaymaster: deposit not locked"
-        );
+        require(unlockBlock[account] == 0, "Paymaster: deposit not locked");
         require(
             balances[token][account] >= maxTokenCost,
-            "DepositPaymaster: deposit too low"
+            "Paymaster: deposit too low"
         );
         return (
             abi.encode(account, token, gasPriceUserOp, maxTokenCost, maxCost),
