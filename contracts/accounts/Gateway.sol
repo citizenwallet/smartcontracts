@@ -19,12 +19,7 @@ import "@account-abstraction/contracts/core/NonceManager.sol";
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract EntryPoint is
-    IEntryPoint,
-    StakeManager,
-    NonceManager,
-    ReentrancyGuard
-{
+contract Gateway is IEntryPoint, StakeManager, NonceManager, ReentrancyGuard {
     using UserOperationLib for UserOperation;
 
     SenderCreator private immutable senderCreator = new SenderCreator();
