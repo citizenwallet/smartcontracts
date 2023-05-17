@@ -19,8 +19,8 @@
 
 CW_CONTRACT_OUTPUT_PATH='build/contracts'
 CW_CONTRACT_PKG_PATH='pkg/contracts'
-CW_CONTRACT_ACCOUNT_PATH='contracts/account'
-CW_CONTRACT_APP_PATH='contracts/app'
+CW_CONTRACT_ACCOUNT_PATH='contracts/accounts'
+CW_CONTRACT_APP_PATH='contracts/apps'
 
 # List of contracts to compile (package,file)
 # package = golang package name
