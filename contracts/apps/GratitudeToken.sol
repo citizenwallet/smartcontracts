@@ -17,6 +17,11 @@ contract GratitudeToken is
 
     address public owner;
 
+    event GratitudeTokenInitialized(
+        IEntryPoint indexed entryPoint,
+        address indexed owner
+    );
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IEntryPoint entryPoint) {
         _entryPoint = entryPoint;
@@ -39,6 +44,7 @@ contract GratitudeToken is
 
     function _initialize(address anOwner) internal virtual {
         owner = anOwner;
+        emit GratitudeTokenInitialized(_entryPoint, owner);
         __ERC20_init("GratitudeToken", "GTT");
         __ERC20Burnable_init();
         __UUPSUpgradeable_init();
