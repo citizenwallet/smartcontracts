@@ -18,6 +18,10 @@ abstract contract Linkable {
         _;
     }
 
+    modifier onlyOwnerOrEntryPoint() virtual {
+        _;
+    }
+
     // addLink adds a new link to the links array
     function addLink(
         string memory name,
@@ -25,7 +29,7 @@ abstract contract Linkable {
         string memory description,
         string memory linkType,
         string memory meta
-    ) public onlyOwner {
+    ) public onlyOwnerOrEntryPoint {
         LinkData memory newLink = LinkData(
             name,
             link,
@@ -44,7 +48,7 @@ abstract contract Linkable {
         string memory description,
         string memory linkType,
         string memory meta
-    ) public onlyOwner {
+    ) public onlyOwnerOrEntryPoint {
         LinkData memory updatedLink = LinkData(
             name,
             link,
@@ -56,12 +60,12 @@ abstract contract Linkable {
     }
 
     // removeLink removes a link from the links array
-    function removeLink(uint256 index) public onlyOwner {
+    function removeLink(uint256 index) public onlyOwnerOrEntryPoint {
         delete links[index];
     }
 
     // clearLinks clears the links array
-    function clearLinks() public onlyOwner {
+    function clearLinks() public onlyOwnerOrEntryPoint {
         delete links;
     }
 

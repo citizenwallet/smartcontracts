@@ -33,6 +33,27 @@ contract GratitudeToken is
         _;
     }
 
+    modifier onlyOwnerOrEntryPoint() {
+        _requireFromEntryPointOrOwner();
+        _;
+    }
+
+    function _onlyOwner() internal view {
+        //directly from EOA owner, or through the account itself (which gets redirected through execute())
+        require(
+            msg.sender == owner || msg.sender == address(this),
+            "only owner"
+        );
+    }
+
+    // Require the function call went through EntryPoint or owner
+    function _requireFromEntryPointOrOwner() internal view {
+        require(
+            msg.sender == address(_entryPoint) || msg.sender == owner,
+            "account: not Owner or EntryPoint"
+        );
+    }
+
     /**
      * @dev The _entryPoint member is immutable, to reduce gas consumption.  To upgrade EntryPoint,
      * a new implementation of SimpleAccount must be deployed with the new EntryPoint address, then upgrading
@@ -50,22 +71,14 @@ contract GratitudeToken is
         __UUPSUpgradeable_init();
     }
 
-    function _onlyOwner() internal view {
-        //directly from EOA owner, or through the account itself (which gets redirected through execute())
-        require(
-            msg.sender == owner || msg.sender == address(this),
-            "only owner"
-        );
-    }
-
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) public onlyOwnerOrEntryPoint {
         _mint(to, amount);
     }
 
     function mintToMany(
         address[] memory recipients,
         uint256 amount
-    ) public onlyOwner {
+    ) public onlyOwnerOrEntryPoint {
         for (uint256 i = 0; i < recipients.length; i++) {
             address recipient = recipients[i];
             _mint(recipient, amount);
@@ -75,7 +88,7 @@ contract GratitudeToken is
     function mintToMany(
         address[] memory recipients,
         uint256[] memory amounts
-    ) public onlyOwner {
+    ) public onlyOwnerOrEntryPoint {
         require(
             recipients.length == amounts.length,
             "recipients and amounts arrays must have the same length"
@@ -88,7 +101,9 @@ contract GratitudeToken is
         }
     }
 
-    function mintToMany(address[] memory recipients) public onlyOwner {
+    function mintToMany(
+        address[] memory recipients
+    ) public onlyOwnerOrEntryPoint {
         mintToMany(recipients, 10 ** 18);
     }
 
@@ -96,7 +111,7 @@ contract GratitudeToken is
     function transfer(
         address recipient,
         uint256 amount
-    ) public override onlyOwner returns (bool) {
+    ) public override onlyOwnerOrEntryPoint returns (bool) {
         return super.transfer(recipient, amount);
     }
 
@@ -104,11 +119,11 @@ contract GratitudeToken is
         address sender,
         address recipient,
         uint256 amount
-    ) public override onlyOwner returns (bool) {
+    ) public override onlyOwnerOrEntryPoint returns (bool) {
         return super.transferFrom(sender, recipient, amount);
     }
 
     function _authorizeUpgrade(
         address newImplementation
-    ) internal override onlyOwner {}
+    ) internal override onlyOwnerOrEntryPoint {}
 }

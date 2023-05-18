@@ -31,6 +31,27 @@ contract Profile is Initializable, Linkable {
         _;
     }
 
+    modifier onlyOwnerOrEntryPoint() override {
+        _requireFromEntryPointOrOwner();
+        _;
+    }
+
+    function _onlyOwner() internal view {
+        //directly from EOA owner, or through the account itself (which gets redirected through execute())
+        require(
+            msg.sender == owner || msg.sender == address(this),
+            "only owner"
+        );
+    }
+
+    // Require the function call went through EntryPoint or owner
+    function _requireFromEntryPointOrOwner() internal view {
+        require(
+            msg.sender == address(_entryPoint) || msg.sender == owner,
+            "account: not Owner or EntryPoint"
+        );
+    }
+
     /**
      * @dev The _entryPoint member is immutable, to reduce gas consumption.  To upgrade EntryPoint,
      * a new implementation of SimpleAccount must be deployed with the new EntryPoint address, then upgrading
@@ -44,25 +65,17 @@ contract Profile is Initializable, Linkable {
         owner = anOwner;
     }
 
-    function _onlyOwner() internal view {
-        //directly from EOA owner, or through the account itself (which gets redirected through execute())
-        require(
-            msg.sender == owner || msg.sender == address(this),
-            "only owner"
-        );
-    }
-
     // updateProfile updates the profile data
     function updateProfile(
         string memory name,
         string memory description,
         string memory meta
-    ) public onlyOwner {
+    ) public onlyOwnerOrEntryPoint {
         profile = ProfileData(name, description, meta);
     }
 
     // clearProfile clears the profile data
-    function clearProfile() public onlyOwner {
+    function clearProfile() public onlyOwnerOrEntryPoint {
         profile = ProfileData("", "", "");
     }
 
