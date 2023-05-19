@@ -20,8 +20,8 @@ contract Profile is Initializable, Linkable {
     ProfileData public profile;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IEntryPoint entryPoint) {
-        _entryPoint = entryPoint;
+    constructor(IEntryPoint anEntryPoint) {
+        _entryPoint = anEntryPoint;
         profile = ProfileData("", "", "");
         _disableInitializers();
     }
@@ -63,6 +63,10 @@ contract Profile is Initializable, Linkable {
 
     function _initialize(address anOwner) internal virtual {
         owner = anOwner;
+    }
+
+    function entryPoint() public view virtual returns (IEntryPoint) {
+        return _entryPoint;
     }
 
     // updateProfile updates the profile data

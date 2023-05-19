@@ -23,8 +23,8 @@ contract GratitudeToken is
     );
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IEntryPoint entryPoint) {
-        _entryPoint = entryPoint;
+    constructor(IEntryPoint anEntryPoint) {
+        _entryPoint = anEntryPoint;
         _disableInitializers();
     }
 
@@ -69,6 +69,10 @@ contract GratitudeToken is
         __ERC20_init("GratitudeToken", "GTT");
         __ERC20Burnable_init();
         __UUPSUpgradeable_init();
+    }
+
+    function entryPoint() public view virtual returns (IEntryPoint) {
+        return _entryPoint;
     }
 
     function mint(address to, uint256 amount) public onlyOwnerOrEntryPoint {
