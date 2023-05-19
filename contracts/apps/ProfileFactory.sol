@@ -28,11 +28,11 @@ contract ProfileFactory {
      * Note that during UserOperation execution, this method is called only if the app is not deployed.
      * This method returns an existing app address so that entryPoint.getSenderAddress() would work even after app creation
      */
-    function createGratitudeToken(
+    function createProfile(
         address owner,
         uint256 salt
     ) public returns (Profile ret) {
-        address addr = getGratitudeTokenAddress(owner, salt);
+        address addr = getProfileAddress(owner, salt);
         uint codeSize = addr.code.length;
         if (codeSize > 0) {
             return Profile(payable(addr));
@@ -52,7 +52,7 @@ contract ProfileFactory {
     /**
      * calculate the counterfactual address of this app as it would be returned by createGratitudeToken()
      */
-    function getGratitudeTokenAddress(
+    function getProfileAddress(
         address owner,
         uint256 salt
     ) public view returns (address) {
