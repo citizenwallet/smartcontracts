@@ -16,6 +16,8 @@ import "./Profile.sol";
 contract ProfileFactory {
     Profile public immutable gratitudeImplementation;
 
+    event ProfileCreated(address indexed owner);
+
     constructor(IEntryPoint _entryPoint) {
         gratitudeImplementation = new Profile(_entryPoint);
     }
@@ -35,6 +37,8 @@ contract ProfileFactory {
         if (codeSize > 0) {
             return Profile(payable(addr));
         }
+
+        emit ProfileCreated(owner);
         ret = Profile(
             payable(
                 new ERC1967Proxy{salt: bytes32(salt)}(

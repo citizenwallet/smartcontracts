@@ -16,6 +16,8 @@ import "./GratitudeToken.sol";
 contract GratitudeTokenFactory {
     GratitudeToken public immutable gratitudeImplementation;
 
+    event GratitudeTokenCreated(address indexed owner);
+
     constructor(IEntryPoint _entryPoint) {
         gratitudeImplementation = new GratitudeToken(_entryPoint);
     }
@@ -35,6 +37,8 @@ contract GratitudeTokenFactory {
         if (codeSize > 0) {
             return GratitudeToken(payable(addr));
         }
+
+        emit GratitudeTokenCreated(owner);
         ret = GratitudeToken(
             payable(
                 new ERC1967Proxy{salt: bytes32(salt)}(
