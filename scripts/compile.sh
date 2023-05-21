@@ -18,6 +18,8 @@
 # - Optimization runs: 200
 
 CW_CONTRACT_OUTPUT_PATH='build/contracts'
+CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH='contracts/accounts'
+CW_CONTRACT_DART_APP_OUTPUT_PATH='contracts/apps'
 CW_CONTRACT_PKG_PATH='pkg/contracts'
 CW_CONTRACT_ACCOUNT_PATH='contracts/accounts'
 CW_CONTRACT_APP_PATH='contracts/apps'
@@ -47,6 +49,44 @@ echo "Cleaning pkg folder..."
 rm -rf "$CW_CONTRACT_PKG_PATH"
 mkdir "$CW_CONTRACT_PKG_PATH"
 
+# Clean lib folder
+echo "Cleaning lib folder..."
+
+rm -rf "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH"
+mkdir "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH"
+
+rm -rf "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH"
+mkdir "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH"
+
+# Generate export file
+echo "Generating dart library export file..."
+
+rm -rf "lib/accounts.dart"
+touch "lib/accounts.dart"
+echo "/// Account contracts" >> "lib/accounts.dart"
+echo "///" >> "lib/accounts.dart"
+echo "/// This file is auto-generated, edit scripts/compile.sh to modify" >> "lib/accounts.dart"
+echo "library;" >> "lib/accounts.dart"
+echo "" >> "lib/accounts.dart"
+
+rm -rf "lib/apps.dart"
+touch "lib/apps.dart"
+echo "/// Account contracts" >> "lib/apps.dart"
+echo "///" >> "lib/apps.dart"
+echo "/// This file is auto-generated, edit scripts/compile.sh to modify" >> "lib/apps.dart"
+echo "library;" >> "lib/apps.dart"
+echo "" >> "lib/apps.dart"
+
+rm -rf "lib/smartcontracts.dart"
+touch "lib/smartcontracts.dart"
+echo "/// ERC4337 Smart Contracts for Citizen Wallet App" >> "lib/smartcontracts.dart"
+echo "///" >> "lib/smartcontracts.dart"
+echo "/// This file is auto-generated, edit scripts/compile.sh to modify" >> "lib/smartcontracts.dart"
+echo "library;" >> "lib/smartcontracts.dart"
+echo "" >> "lib/smartcontracts.dart"
+echo "export 'accounts.dart';" >> "lib/smartcontracts.dart"
+echo "export 'apps.dart';" >> "lib/smartcontracts.dart"
+
 # Compile the contracts
 echo "[account] Compiling the contracts..."
 
@@ -58,6 +98,8 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
 
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
                 solc --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
+                cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
+                echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart';" >> "lib/accounts.dart"
                 echo "[.abi] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
                 echo "[.bin] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
 
@@ -80,6 +122,8 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
 
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
                 solc --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_APP_PATH/$file.sol"
+                cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.abi.json"
+                echo "export '$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.g.dart';" >> "lib/apps.dart"
                 echo "[.abi] $CW_CONTRACT_APP_PATH/$file ✅";
                 echo "[.bin] $CW_CONTRACT_APP_PATH/$file ✅";
 
@@ -90,6 +134,11 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
     done
 
 echo "[app] Done compiling the contracts."
+
+# Compile dart bindings for contracts
+echo "Compiling dart bindings for contracts..."
+
+dart run build_runner build --delete-conflicting-outputs
 
 # Install dependencies
 echo "Installing dependencies..."

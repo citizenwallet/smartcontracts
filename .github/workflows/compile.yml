@@ -54,6 +54,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install solc
 
+      - name: Install dart dependencies
+        run: dart pub get
+
       - name: Compile
         run: scripts/compile.sh
 
