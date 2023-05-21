@@ -54,6 +54,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install solc
 
+      - uses: dart-lang/setup-dart@v1
+
       - name: Install dart dependencies
         run: dart pub get
 
