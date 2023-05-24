@@ -13,7 +13,7 @@ describe("RegensUniteTokens", function () {
   before(async function () {
     // Get the ContractFactory and Signers here.
     RegensUniteTokens = await ethers.getContractFactory("RegensUniteTokens");
-    [admin1, admin2, user1, user2, ...minters] = await ethers.getSigners();
+    [admin1, admin2, admin3, user1, user2, ...minters] = await ethers.getSigners();
 
     // Deploy the contract and set minters
     regensUniteTokens = await RegensUniteTokens.deploy([admin1.address, admin2.address]);
@@ -24,6 +24,25 @@ describe("RegensUniteTokens", function () {
       expect(await regensUniteTokens.hasRole(MINTER_ROLE, admin1.address)).to.equal(true);
       expect(await regensUniteTokens.hasRole(MINTER_ROLE, admin2.address)).to.equal(true);
       expect(await regensUniteTokens.hasRole(MINTER_ROLE, user1.address)).to.equal(false);
+    });
+  });
+
+  describe("Role management", function () {
+    it('allows admin1 to add a new admin who can mint tokens', async function () {
+      // admin1 adds a new admin (admin3).
+      await regensUniteTokens.connect(admin1).grantRole(MINTER_ROLE, admin3.address);
+
+      // Check that admin3 is now a minter.
+      expect(await regensUniteTokens.hasRole(MINTER_ROLE, admin3.address)).to.equal(true);
+
+      // admin3 mints 1000 REGENCOINs.
+      await regensUniteTokens.connect(admin3).mintCoin(user1.address, 1000, []);
+
+      // Check that user1 now has 1000 REGENCOINs.
+      expect(await regensUniteTokens.balanceOf(user1.address, 1)).to.equal(1000);
+
+      // Clean
+      await regensUniteTokens.connect(user1).burn(1, 1000);
     });
   });
 
@@ -61,8 +80,34 @@ describe("RegensUniteTokens", function () {
     });
 
     it("User1 can burn voucher", async function () {
-      await regensUniteTokens.connect(user1).burn(user1.address, 10001, 1);
+      await regensUniteTokens.connect(user1).burn(10001, 1);
       expect(await regensUniteTokens.balanceOf(user1.address, 10001)).to.equal(0);
+    });
+  });
+
+  describe("Transferring", function() {
+    it('should not allow GRATITUDE tokens to be transferred', async function () {
+      // Mint a GRATITUDE token for user1
+      await regensUniteTokens.connect(user1).mintGratitude(user1.address);
+
+      // Try to transfer the GRATITUDE token to user2
+      await expect(regensUniteTokens.connect(user1).safeTransferFrom(user1.address, user2.address, 2, 1, []))
+        .to.be.revertedWith('GRATITUDE tokens cannot be transferred');
+
+      // Ensure the GRATITUDE token is still with user1
+      expect(await regensUniteTokens.balanceOf(user1.address, 2)).to.equal(1);
+    });
+  });
+
+  describe("Burning", function() {
+    it('should not allow GRATITUDE tokens to be burnt', async function () {
+      // Mint a GRATITUDE token for user1
+      await regensUniteTokens.connect(user1).mintGratitude(user1.address);
+
+      // Try to transfer the GRATITUDE token to user2
+      await expect(regensUniteTokens.connect(user1).burn(2, 1))
+        .to.be.revertedWith('GRATITUDE tokens cannot be burnt');
+
     });
   });
 });
