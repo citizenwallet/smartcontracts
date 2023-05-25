@@ -4,7 +4,7 @@
 import 'package:web3dart/web3dart.dart' as _i1;
 
 final _contractAbi = _i1.ContractAbi.fromJson(
-  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"anEntryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint8","name":"version","type":"uint8"}],"name":"Initialized","type":"event"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"addLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"clearLinks","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"clearProfile","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"entryPoint","outputs":[{"internalType":"contract IEntryPoint","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getLinks","outputs":[{"components":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"internalType":"struct Linkable.LinkData[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getProfile","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"anOwner","type":"address"}],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"links","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"profile","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"removeLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"updateLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"updateProfile","outputs":[],"stateMutability":"nonpayable","type":"function"}]',
+  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"anEntryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint8","name":"version","type":"uint8"}],"name":"Initialized","type":"event"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"addLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"clearLinks","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"clearProfile","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"entryPoint","outputs":[{"internalType":"contract IEntryPoint","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getLinks","outputs":[{"components":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"internalType":"struct Linkable.LinkData[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getProfile","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"anOwner","type":"address"}],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"links","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"profile","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"icon","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"removeLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"updateLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"icon","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"updateProfile","outputs":[],"stateMutability":"nonpayable","type":"function"}]',
   'Profile',
 );
 
@@ -255,15 +255,17 @@ class Profile extends _i1.GeneratedContract {
   Future<String> updateProfile(
     String name,
     String description,
+    String icon,
     String meta, {
     required _i1.Credentials credentials,
     _i1.Transaction? transaction,
   }) async {
     final function = self.abi.functions[13];
-    assert(checkSignature(function, '1105a5eb'));
+    assert(checkSignature(function, '9483f25c'));
     final params = [
       name,
       description,
+      icon,
       meta,
     ];
     return write(
@@ -335,11 +337,14 @@ class Profile {
   Profile(List<dynamic> response)
       : name = (response[0] as String),
         description = (response[1] as String),
-        meta = (response[2] as String);
+        icon = (response[2] as String),
+        meta = (response[3] as String);
 
   final String name;
 
   final String description;
+
+  final String icon;
 
   final String meta;
 }
