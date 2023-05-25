@@ -27,16 +27,19 @@ CW_CONTRACT_APP_PATH='contracts/apps'
 # List of contracts to compile (package,file)
 # package = golang package name
 # file = solidity file name
-CW_ACCOUNT_CONTRACTS=('account,Account' \ 
-        'accfactory,AccountFactory' \ 
-        'gateway,Gateway' \
-        'paymaster,Paymaster')
+# TODO: fix contract compilation to not have duplicate package names
+# CW_ACCOUNT_CONTRACTS=('account,Account' \ 
+#         'accfactory,AccountFactory' \ 
+#         'gateway,Gateway' \
+#         'paymaster,Paymaster')
 
-CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
-        'gratitude,GratitudeToken' \
-        'profactory,ProfileFactory' \
-        'profile,Profile' \
-        'regensToken,RegensUniteTokens')
+# CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
+#         'gratitude,GratitudeToken' \
+#         'profactory,ProfileFactory' \
+#         'profile,Profile' \
+#         'regensToken,RegensUniteTokens')
+
+CW_APP_CONTRACTS=('regensToken,RegensUniteTokens')
 
 # Clean build folder
 echo "Cleaning build folder..."
@@ -89,28 +92,28 @@ echo "export 'accounts.dart';" >> "lib/smartcontracts.dart"
 echo "export 'apps.dart';" >> "lib/smartcontracts.dart"
 
 # Compile the contracts
-echo "[account] Compiling the contracts..."
+# echo "[account] Compiling the contracts..."
 
-for contract in ${CW_ACCOUNT_CONTRACTS[@]} ; 
-    do
-        while IFS=',' read -r pkg file; 
-            do
-                echo "Compiling $CW_CONTRACT_ACCOUNT_PATH/$file.sol..."
+# for contract in ${CW_ACCOUNT_CONTRACTS[@]} ; 
+#     do
+#         while IFS=',' read -r pkg file; 
+#             do
+#                 echo "Compiling $CW_CONTRACT_ACCOUNT_PATH/$file.sol..."
 
-                mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
-                solc --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
-                cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
-                echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart';" >> "lib/accounts.dart"
-                echo "[.abi] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
-                echo "[.bin] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
+#                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
+#                 solc --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
+#                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
+#                 echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart';" >> "lib/accounts.dart"
+#                 echo "[.abi] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
+#                 echo "[.bin] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
 
-                mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
-                echo "[.go] $CW_CONTRACT_ACCOUNT_PATH/$file package $pkg ✅";
-        done <<< "$contract"
-    done
+#                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
+#                 abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+#                 echo "[.go] $CW_CONTRACT_ACCOUNT_PATH/$file package $pkg ✅";
+#         done <<< "$contract"
+#     done
 
-echo "[account] Done compiling the contracts."
+# echo "[account] Done compiling the contracts."
 
 # Compile the contracts
 echo "[app] Compiling the contracts..."
