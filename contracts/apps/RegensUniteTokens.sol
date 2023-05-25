@@ -11,7 +11,18 @@ contract RegensUniteTokens is ERC1155, AccessControl {
     mapping(uint256 => bool) private _mintedTokens;
     mapping(uint256 => string) private _tokenURIs;
 
-    constructor(address[] memory admins) ERC1155("") {
+    // Contract name
+    string public name;
+    // Contract symbol
+    string public symbol;
+
+    constructor(
+        address[] memory admins,
+        string memory _name,
+        string memory _symbol
+    ) ERC1155("") {
+        name = _name;
+        symbol = _symbol;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender); // The deployer can manage Minter roles
         for (uint256 i = 0; i < admins.length; i++) {
             _setupRole(MINTER_ROLE, admins[i]);
