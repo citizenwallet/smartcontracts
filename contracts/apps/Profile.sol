@@ -14,6 +14,7 @@ contract Profile is Initializable, Linkable {
     struct ProfileData {
         string name;
         string description;
+        string icon;
         string meta;
     }
 
@@ -22,7 +23,7 @@ contract Profile is Initializable, Linkable {
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(IEntryPoint anEntryPoint) {
         _entryPoint = anEntryPoint;
-        profile = ProfileData("", "", "");
+        profile = ProfileData("", "", "", "");
         _disableInitializers();
     }
 
@@ -73,14 +74,15 @@ contract Profile is Initializable, Linkable {
     function updateProfile(
         string memory name,
         string memory description,
+        string memory icon,
         string memory meta
     ) public onlyOwnerOrEntryPoint {
-        profile = ProfileData(name, description, meta);
+        profile = ProfileData(name, description, icon, meta);
     }
 
     // clearProfile clears the profile data
     function clearProfile() public onlyOwnerOrEntryPoint {
-        profile = ProfileData("", "", "");
+        profile = ProfileData("", "", "", "");
     }
 
     // getProfile returns the profile data

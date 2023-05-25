@@ -35,7 +35,8 @@ CW_ACCOUNT_CONTRACTS=('account,Account' \
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \
         'profactory,ProfileFactory' \
-        'profile,Profile')
+        'profile,Profile' \
+        'regensToken,RegensUniteTokens')
 
 # Clean build folder
 echo "Cleaning build folder..."
