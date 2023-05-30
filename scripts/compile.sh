@@ -37,7 +37,8 @@ CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \
         'profactory,ProfileFactory' \
         'profile,Profile' \
-        'regensToken,RegensUniteTokens')
+        'regensToken,RegensUniteTokens' \
+        'erc20,ERC20')
 
 # CW_APP_CONTRACTS=('regensToken,RegensUniteTokens')
 
