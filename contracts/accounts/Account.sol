@@ -3,7 +3,6 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
@@ -11,12 +10,7 @@ import "./callback/TokenCallbackHandler.sol";
 
 // https://github.com/guizostudios/ERC-4337/blob/main/contracts/SimpleAccount.sol
 // Account,
-contract Account is
-    BaseAccount,
-    TokenCallbackHandler,
-    UUPSUpgradeable,
-    Initializable
-{
+contract Account is BaseAccount, TokenCallbackHandler, Initializable {
     using ECDSA for bytes32;
 
     address public owner;
@@ -146,12 +140,5 @@ contract Account is
         uint256 amount
     ) public onlyOwner {
         entryPoint().withdrawTo(withdrawAddress, amount);
-    }
-
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal view override {
-        (newImplementation);
-        _onlyOwner();
     }
 }

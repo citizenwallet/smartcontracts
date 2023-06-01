@@ -103,9 +103,7 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
 
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
 
-                # rm "$CW_CONTRACT_ACCOUNT_PATH/$file.flat.sol"
-                # npx hardhat flat "$CW_CONTRACT_ACCOUNT_PATH/$file.sol" > "$CW_CONTRACT_ACCOUNT_PATH/$file.flat.sol"
-
+                # https://ethereum.stackexchange.com/a/84719
                 docker run -v $(pwd):/root --platform linux/amd64  ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
                 echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart';" >> "lib/accounts.dart"
@@ -130,10 +128,8 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
                 echo "Compiling $CW_CONTRACT_APP_PATH/$file.sol..."
 
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
-                
-                # rm "$CW_CONTRACT_APP_PATH/$file.flat.sol"
-                # npx hardhat flat "$CW_CONTRACT_APP_PATH/$file.sol" > "$CW_CONTRACT_APP_PATH/$file.flat.sol"
 
+                # https://ethereum.stackexchange.com/a/84719
                 docker run -v $(pwd):/root --platform linux/amd64 ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_APP_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.abi.json"
                 echo "export '$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.g.dart';" >> "lib/apps.dart"
