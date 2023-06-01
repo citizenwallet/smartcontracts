@@ -102,7 +102,11 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
                 echo "Compiling $CW_CONTRACT_ACCOUNT_PATH/$file.sol..."
 
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
-                solc --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
+
+                rm "$CW_CONTRACT_ACCOUNT_PATH/$file.flat.sol"
+                npx hardhat flat "$CW_CONTRACT_ACCOUNT_PATH/$file.sol" > "$CW_CONTRACT_ACCOUNT_PATH/$file.flat.sol"
+
+                solc --evm-version london --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_ACCOUNT_PATH/$file.flat.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
                 echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart';" >> "lib/accounts.dart"
                 echo "[.abi] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
@@ -126,7 +130,10 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
                 echo "Compiling $CW_CONTRACT_APP_PATH/$file.sol..."
 
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
-                solc --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_APP_PATH/$file.sol"
+                
+                npx hardhat flat "$CW_CONTRACT_APP_PATH/$file.sol" > "$CW_CONTRACT_APP_PATH/$file.flat.sol"
+
+                solc --evm-version london --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path node_modules/ --base-path . --overwrite --output-dir "$CW_CONTRACT_OUTPUT_PATH/$pkg/" "$CW_CONTRACT_APP_PATH/$file.flat.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.abi.json"
                 echo "export '$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.g.dart';" >> "lib/apps.dart"
                 echo "[.abi] $CW_CONTRACT_APP_PATH/$file ✅";
