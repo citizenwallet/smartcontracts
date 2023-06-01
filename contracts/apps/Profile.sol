@@ -89,7 +89,7 @@ contract Profile is Initializable, Linkable {
     function getProfile()
         public
         view
-        returns (string memory, string memory, string icon, string memory)
+        returns (string memory, string memory, string memory, string memory)
     {
         return (profile.name, profile.description, profile.icon, profile.meta);
     }
