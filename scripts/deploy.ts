@@ -1,6 +1,9 @@
 import { ethers } from "hardhat";
+import { config } from "dotenv";
 
 async function main() {
+  config();
+
   const Gateway = await ethers.getContractFactory("Gateway");
   const gateway = await Gateway.deploy();
 
