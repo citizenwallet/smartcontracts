@@ -46,12 +46,6 @@ jobs:
         # uses: gacts/install-geth-tools@52e9b9a18008405eb9551a69c856256bdbe9d115
         uses: gacts/install-geth-tools@v1.1.0
 
-      - name: Install solc
-        run: |
-          sudo add-apt-repository ppa:ethereum/ethereum
-          sudo apt-get update
-          sudo apt-get install solc=0.8.20
-
       - uses: dart-lang/setup-dart@v1
 
       - name: Install dart dependencies
