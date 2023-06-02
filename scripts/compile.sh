@@ -20,9 +20,11 @@
 CW_CONTRACT_OUTPUT_PATH='build/contracts'
 CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH='contracts/accounts'
 CW_CONTRACT_DART_APP_OUTPUT_PATH='contracts/apps'
+CW_CONTRACT_DART_EXT_OUTPUT_PATH='contracts/external'
 CW_CONTRACT_PKG_PATH='pkg/contracts'
 CW_CONTRACT_ACCOUNT_PATH='contracts/accounts'
 CW_CONTRACT_APP_PATH='contracts/apps'
+CW_CONTRACT_EXT_PATH='contracts/external'
 
 # List of contracts to compile (package,file)
 # package = golang package name
@@ -39,6 +41,8 @@ CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'profile,Profile' \
         'regensToken,RegensUniteTokens' \
         'erc20,ERC20')
+
+CW_EXTERNAL_CONTRACTS=('simpleaccount,SimpleAccount')
 
 # CW_APP_CONTRACTS=('regensToken,RegensUniteTokens')
 
@@ -63,6 +67,9 @@ mkdir "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH"
 rm -rf "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH"
 mkdir "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH"
 
+rm -rf "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH"
+mkdir "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH"
+
 # Generate export file
 echo "Generating dart library export file..."
 
@@ -82,6 +89,14 @@ echo "/// This file is auto-generated, edit scripts/compile.sh to modify" >> "li
 echo "library;" >> "lib/apps.dart"
 echo "" >> "lib/apps.dart"
 
+rm -rf "lib/external.dart"
+touch "lib/external.dart"
+echo "/// External contracts" >> "lib/external.dart"
+echo "///" >> "lib/external.dart"
+echo "/// This file is auto-generated, edit scripts/compile.sh to modify" >> "lib/external.dart"
+echo "library;" >> "lib/external.dart"
+echo "" >> "lib/external.dart"
+
 rm -rf "lib/smartcontracts.dart"
 touch "lib/smartcontracts.dart"
 echo "/// ERC4337 Smart Contracts for Citizen Wallet App" >> "lib/smartcontracts.dart"
@@ -91,6 +106,7 @@ echo "library;" >> "lib/smartcontracts.dart"
 echo "" >> "lib/smartcontracts.dart"
 echo "export 'accounts.dart';" >> "lib/smartcontracts.dart"
 echo "export 'apps.dart';" >> "lib/smartcontracts.dart"
+echo "export 'external.dart';" >> "lib/smartcontracts.dart"
 
 # Compile the contracts
 echo "[account] Compiling the contracts..."
@@ -143,6 +159,30 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
     done
 
 echo "[app] Done compiling the contracts."
+
+# Compile the contracts
+echo "[external] Compiling the contracts..."
+
+for contract in ${CW_EXTERNAL_CONTRACTS[@]} ; 
+    do
+        while IFS=',' read -r pkg file; 
+            do
+                echo "Compiling $CW_CONTRACT_EXT_PATH/$file.sol..."
+
+                mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
+
+                cp "$CW_CONTRACT_EXT_PATH/$file.abi" "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.abi.json"
+                echo "export '$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.g.dart';" >> "lib/external.dart"
+                echo "[.abi] $CW_CONTRACT_EXT_PATH/$file ✅";
+                echo "[.bin] $CW_CONTRACT_EXT_PATH/$file ✅";
+
+                mkdir $CW_CONTRACT_PKG_PATH/$pkg
+                abigen --bin="$CW_CONTRACT_EXT_PATH/$file.bin" --abi="$CW_CONTRACT_EXT_PATH/$file.abi" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                echo "[.go] $CW_CONTRACT_EXT_PATH/$file package $pkg ✅";
+        done <<< "$contract"
+    done
+
+echo "[external] Done compiling the contracts."
 
 # Compile dart bindings for contracts
 echo "Compiling dart bindings for contracts..."
