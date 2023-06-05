@@ -5,3 +5,4 @@ library;
 
 export 'contracts/external/SimpleAccountFactory.g.dart';
 export 'contracts/external/DERC20.g.dart';
+export 'contracts/external/SimpleAccount.g.dart';
