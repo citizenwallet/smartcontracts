@@ -40,7 +40,9 @@ CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'profactory,ProfileFactory' \
         'profile,Profile' \
         'regensToken,RegensUniteTokens' \
-        'erc20,ERC20')
+        'erc20,ERC20' \
+        'erc721,ERC721' \
+        'erc1155,ERC1155')
 
 CW_EXTERNAL_CONTRACTS=('simpleaccountfactory,SimpleAccountFactory' \
         'derc20,DERC20' \

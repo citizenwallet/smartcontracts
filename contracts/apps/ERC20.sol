@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
-
-contract ERC20 is ERC20Upgradeable, ERC20BurnableUpgradeable {}
+contract ERC20 {
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Approval(
+        address indexed _owner,
+        address indexed _spender,
+        uint256 _value
+    );
+}
