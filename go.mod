@@ -1,4 +1,4 @@
-module github.com/daobrussels/smartcontracts
+module github.com/citizenwallet/smartcontracts
 
 go 1.20
 
