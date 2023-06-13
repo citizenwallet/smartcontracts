@@ -32,7 +32,7 @@ contract RegensUniteTokens is ERC1155, AccessControl {
     function mintCoin(address to, uint256 amount, bytes memory data) public {
         require(
             hasRole(MINTER_ROLE, msg.sender),
-            "Must have minter role to mint"
+            "Must have minter role to mint token"
         );
         _mint(to, 1, amount, data);
     }
