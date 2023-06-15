@@ -31,34 +31,12 @@ var (
 
 // Erc20MetaData contains all meta data concerning the Erc20 contract.
 var Erc20MetaData = &bind.MetaData{
-	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_spender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"_value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"}]",
-	Bin: "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea2646970667358221220983cdc483caff2cbfbea7917272c8820f4e727c2c5d819c504b1d581b7bfb6a964736f6c63430008140033",
+	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Approval\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"}],\"name\":\"Transfer\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"}],\"name\":\"allowance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"balanceOf\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transferFrom\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // Erc20ABI is the input ABI used to generate the binding from.
 // Deprecated: Use Erc20MetaData.ABI instead.
 var Erc20ABI = Erc20MetaData.ABI
-
-// Erc20Bin is the compiled bytecode used for deploying new contracts.
-// Deprecated: Use Erc20MetaData.Bin instead.
-var Erc20Bin = Erc20MetaData.Bin
-
-// DeployErc20 deploys a new Ethereum contract, binding an instance of Erc20 to it.
-func DeployErc20(auth *bind.TransactOpts, backend bind.ContractBackend) (common.Address, *types.Transaction, *Erc20, error) {
-	parsed, err := Erc20MetaData.GetAbi()
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	if parsed == nil {
-		return common.Address{}, nil, nil, errors.New("GetABI returned nil")
-	}
-
-	address, tx, contract, err := bind.DeployContract(auth, *parsed, common.FromHex(Erc20Bin), backend)
-	if err != nil {
-		return common.Address{}, nil, nil, err
-	}
-	return address, tx, &Erc20{Erc20Caller: Erc20Caller{contract: contract}, Erc20Transactor: Erc20Transactor{contract: contract}, Erc20Filterer: Erc20Filterer{contract: contract}}, nil
-}
 
 // Erc20 is an auto generated Go binding around an Ethereum contract.
 type Erc20 struct {
@@ -202,6 +180,162 @@ func (_Erc20 *Erc20TransactorRaw) Transact(opts *bind.TransactOpts, method strin
 	return _Erc20.Contract.contract.Transact(opts, method, params...)
 }
 
+// Allowance is a free data retrieval call binding the contract method 0xdd62ed3e.
+//
+// Solidity: function allowance(address owner, address spender) view returns(uint256)
+func (_Erc20 *Erc20Caller) Allowance(opts *bind.CallOpts, owner common.Address, spender common.Address) (*big.Int, error) {
+	var out []interface{}
+	err := _Erc20.contract.Call(opts, &out, "allowance", owner, spender)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// Allowance is a free data retrieval call binding the contract method 0xdd62ed3e.
+//
+// Solidity: function allowance(address owner, address spender) view returns(uint256)
+func (_Erc20 *Erc20Session) Allowance(owner common.Address, spender common.Address) (*big.Int, error) {
+	return _Erc20.Contract.Allowance(&_Erc20.CallOpts, owner, spender)
+}
+
+// Allowance is a free data retrieval call binding the contract method 0xdd62ed3e.
+//
+// Solidity: function allowance(address owner, address spender) view returns(uint256)
+func (_Erc20 *Erc20CallerSession) Allowance(owner common.Address, spender common.Address) (*big.Int, error) {
+	return _Erc20.Contract.Allowance(&_Erc20.CallOpts, owner, spender)
+}
+
+// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
+//
+// Solidity: function balanceOf(address account) view returns(uint256)
+func (_Erc20 *Erc20Caller) BalanceOf(opts *bind.CallOpts, account common.Address) (*big.Int, error) {
+	var out []interface{}
+	err := _Erc20.contract.Call(opts, &out, "balanceOf", account)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
+//
+// Solidity: function balanceOf(address account) view returns(uint256)
+func (_Erc20 *Erc20Session) BalanceOf(account common.Address) (*big.Int, error) {
+	return _Erc20.Contract.BalanceOf(&_Erc20.CallOpts, account)
+}
+
+// BalanceOf is a free data retrieval call binding the contract method 0x70a08231.
+//
+// Solidity: function balanceOf(address account) view returns(uint256)
+func (_Erc20 *Erc20CallerSession) BalanceOf(account common.Address) (*big.Int, error) {
+	return _Erc20.Contract.BalanceOf(&_Erc20.CallOpts, account)
+}
+
+// TotalSupply is a free data retrieval call binding the contract method 0x18160ddd.
+//
+// Solidity: function totalSupply() view returns(uint256)
+func (_Erc20 *Erc20Caller) TotalSupply(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _Erc20.contract.Call(opts, &out, "totalSupply")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// TotalSupply is a free data retrieval call binding the contract method 0x18160ddd.
+//
+// Solidity: function totalSupply() view returns(uint256)
+func (_Erc20 *Erc20Session) TotalSupply() (*big.Int, error) {
+	return _Erc20.Contract.TotalSupply(&_Erc20.CallOpts)
+}
+
+// TotalSupply is a free data retrieval call binding the contract method 0x18160ddd.
+//
+// Solidity: function totalSupply() view returns(uint256)
+func (_Erc20 *Erc20CallerSession) TotalSupply() (*big.Int, error) {
+	return _Erc20.Contract.TotalSupply(&_Erc20.CallOpts)
+}
+
+// Approve is a paid mutator transaction binding the contract method 0x095ea7b3.
+//
+// Solidity: function approve(address spender, uint256 amount) returns(bool)
+func (_Erc20 *Erc20Transactor) Approve(opts *bind.TransactOpts, spender common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.contract.Transact(opts, "approve", spender, amount)
+}
+
+// Approve is a paid mutator transaction binding the contract method 0x095ea7b3.
+//
+// Solidity: function approve(address spender, uint256 amount) returns(bool)
+func (_Erc20 *Erc20Session) Approve(spender common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.Contract.Approve(&_Erc20.TransactOpts, spender, amount)
+}
+
+// Approve is a paid mutator transaction binding the contract method 0x095ea7b3.
+//
+// Solidity: function approve(address spender, uint256 amount) returns(bool)
+func (_Erc20 *Erc20TransactorSession) Approve(spender common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.Contract.Approve(&_Erc20.TransactOpts, spender, amount)
+}
+
+// Transfer is a paid mutator transaction binding the contract method 0xa9059cbb.
+//
+// Solidity: function transfer(address to, uint256 amount) returns(bool)
+func (_Erc20 *Erc20Transactor) Transfer(opts *bind.TransactOpts, to common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.contract.Transact(opts, "transfer", to, amount)
+}
+
+// Transfer is a paid mutator transaction binding the contract method 0xa9059cbb.
+//
+// Solidity: function transfer(address to, uint256 amount) returns(bool)
+func (_Erc20 *Erc20Session) Transfer(to common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.Contract.Transfer(&_Erc20.TransactOpts, to, amount)
+}
+
+// Transfer is a paid mutator transaction binding the contract method 0xa9059cbb.
+//
+// Solidity: function transfer(address to, uint256 amount) returns(bool)
+func (_Erc20 *Erc20TransactorSession) Transfer(to common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.Contract.Transfer(&_Erc20.TransactOpts, to, amount)
+}
+
+// TransferFrom is a paid mutator transaction binding the contract method 0x23b872dd.
+//
+// Solidity: function transferFrom(address from, address to, uint256 amount) returns(bool)
+func (_Erc20 *Erc20Transactor) TransferFrom(opts *bind.TransactOpts, from common.Address, to common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.contract.Transact(opts, "transferFrom", from, to, amount)
+}
+
+// TransferFrom is a paid mutator transaction binding the contract method 0x23b872dd.
+//
+// Solidity: function transferFrom(address from, address to, uint256 amount) returns(bool)
+func (_Erc20 *Erc20Session) TransferFrom(from common.Address, to common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.Contract.TransferFrom(&_Erc20.TransactOpts, from, to, amount)
+}
+
+// TransferFrom is a paid mutator transaction binding the contract method 0x23b872dd.
+//
+// Solidity: function transferFrom(address from, address to, uint256 amount) returns(bool)
+func (_Erc20 *Erc20TransactorSession) TransferFrom(from common.Address, to common.Address, amount *big.Int) (*types.Transaction, error) {
+	return _Erc20.Contract.TransferFrom(&_Erc20.TransactOpts, from, to, amount)
+}
+
 // Erc20ApprovalIterator is returned from FilterApproval and is used to iterate over the raw logs and unpacked data for Approval events raised by the Erc20 contract.
 type Erc20ApprovalIterator struct {
 	Event *Erc20Approval // Event containing the contract specifics and raw log
@@ -279,19 +413,19 @@ type Erc20Approval struct {
 
 // FilterApproval is a free log retrieval operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
 //
-// Solidity: event Approval(address indexed _owner, address indexed _spender, uint256 _value)
-func (_Erc20 *Erc20Filterer) FilterApproval(opts *bind.FilterOpts, _owner []common.Address, _spender []common.Address) (*Erc20ApprovalIterator, error) {
+// Solidity: event Approval(address indexed owner, address indexed spender, uint256 value)
+func (_Erc20 *Erc20Filterer) FilterApproval(opts *bind.FilterOpts, owner []common.Address, spender []common.Address) (*Erc20ApprovalIterator, error) {
 
-	var _ownerRule []interface{}
-	for _, _ownerItem := range _owner {
-		_ownerRule = append(_ownerRule, _ownerItem)
+	var ownerRule []interface{}
+	for _, ownerItem := range owner {
+		ownerRule = append(ownerRule, ownerItem)
 	}
-	var _spenderRule []interface{}
-	for _, _spenderItem := range _spender {
-		_spenderRule = append(_spenderRule, _spenderItem)
+	var spenderRule []interface{}
+	for _, spenderItem := range spender {
+		spenderRule = append(spenderRule, spenderItem)
 	}
 
-	logs, sub, err := _Erc20.contract.FilterLogs(opts, "Approval", _ownerRule, _spenderRule)
+	logs, sub, err := _Erc20.contract.FilterLogs(opts, "Approval", ownerRule, spenderRule)
 	if err != nil {
 		return nil, err
 	}
@@ -300,19 +434,19 @@ func (_Erc20 *Erc20Filterer) FilterApproval(opts *bind.FilterOpts, _owner []comm
 
 // WatchApproval is a free log subscription operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
 //
-// Solidity: event Approval(address indexed _owner, address indexed _spender, uint256 _value)
-func (_Erc20 *Erc20Filterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *Erc20Approval, _owner []common.Address, _spender []common.Address) (event.Subscription, error) {
+// Solidity: event Approval(address indexed owner, address indexed spender, uint256 value)
+func (_Erc20 *Erc20Filterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *Erc20Approval, owner []common.Address, spender []common.Address) (event.Subscription, error) {
 
-	var _ownerRule []interface{}
-	for _, _ownerItem := range _owner {
-		_ownerRule = append(_ownerRule, _ownerItem)
+	var ownerRule []interface{}
+	for _, ownerItem := range owner {
+		ownerRule = append(ownerRule, ownerItem)
 	}
-	var _spenderRule []interface{}
-	for _, _spenderItem := range _spender {
-		_spenderRule = append(_spenderRule, _spenderItem)
+	var spenderRule []interface{}
+	for _, spenderItem := range spender {
+		spenderRule = append(spenderRule, spenderItem)
 	}
 
-	logs, sub, err := _Erc20.contract.WatchLogs(opts, "Approval", _ownerRule, _spenderRule)
+	logs, sub, err := _Erc20.contract.WatchLogs(opts, "Approval", ownerRule, spenderRule)
 	if err != nil {
 		return nil, err
 	}
@@ -346,7 +480,7 @@ func (_Erc20 *Erc20Filterer) WatchApproval(opts *bind.WatchOpts, sink chan<- *Er
 
 // ParseApproval is a log parse operation binding the contract event 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925.
 //
-// Solidity: event Approval(address indexed _owner, address indexed _spender, uint256 _value)
+// Solidity: event Approval(address indexed owner, address indexed spender, uint256 value)
 func (_Erc20 *Erc20Filterer) ParseApproval(log types.Log) (*Erc20Approval, error) {
 	event := new(Erc20Approval)
 	if err := _Erc20.contract.UnpackLog(event, "Approval", log); err != nil {
@@ -433,19 +567,19 @@ type Erc20Transfer struct {
 
 // FilterTransfer is a free log retrieval operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
 //
-// Solidity: event Transfer(address indexed _from, address indexed _to, uint256 _value)
-func (_Erc20 *Erc20Filterer) FilterTransfer(opts *bind.FilterOpts, _from []common.Address, _to []common.Address) (*Erc20TransferIterator, error) {
+// Solidity: event Transfer(address indexed from, address indexed to, uint256 value)
+func (_Erc20 *Erc20Filterer) FilterTransfer(opts *bind.FilterOpts, from []common.Address, to []common.Address) (*Erc20TransferIterator, error) {
 
-	var _fromRule []interface{}
-	for _, _fromItem := range _from {
-		_fromRule = append(_fromRule, _fromItem)
+	var fromRule []interface{}
+	for _, fromItem := range from {
+		fromRule = append(fromRule, fromItem)
 	}
-	var _toRule []interface{}
-	for _, _toItem := range _to {
-		_toRule = append(_toRule, _toItem)
+	var toRule []interface{}
+	for _, toItem := range to {
+		toRule = append(toRule, toItem)
 	}
 
-	logs, sub, err := _Erc20.contract.FilterLogs(opts, "Transfer", _fromRule, _toRule)
+	logs, sub, err := _Erc20.contract.FilterLogs(opts, "Transfer", fromRule, toRule)
 	if err != nil {
 		return nil, err
 	}
@@ -454,19 +588,19 @@ func (_Erc20 *Erc20Filterer) FilterTransfer(opts *bind.FilterOpts, _from []commo
 
 // WatchTransfer is a free log subscription operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
 //
-// Solidity: event Transfer(address indexed _from, address indexed _to, uint256 _value)
-func (_Erc20 *Erc20Filterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *Erc20Transfer, _from []common.Address, _to []common.Address) (event.Subscription, error) {
+// Solidity: event Transfer(address indexed from, address indexed to, uint256 value)
+func (_Erc20 *Erc20Filterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *Erc20Transfer, from []common.Address, to []common.Address) (event.Subscription, error) {
 
-	var _fromRule []interface{}
-	for _, _fromItem := range _from {
-		_fromRule = append(_fromRule, _fromItem)
+	var fromRule []interface{}
+	for _, fromItem := range from {
+		fromRule = append(fromRule, fromItem)
 	}
-	var _toRule []interface{}
-	for _, _toItem := range _to {
-		_toRule = append(_toRule, _toItem)
+	var toRule []interface{}
+	for _, toItem := range to {
+		toRule = append(toRule, toItem)
 	}
 
-	logs, sub, err := _Erc20.contract.WatchLogs(opts, "Transfer", _fromRule, _toRule)
+	logs, sub, err := _Erc20.contract.WatchLogs(opts, "Transfer", fromRule, toRule)
 	if err != nil {
 		return nil, err
 	}
@@ -500,7 +634,7 @@ func (_Erc20 *Erc20Filterer) WatchTransfer(opts *bind.WatchOpts, sink chan<- *Er
 
 // ParseTransfer is a log parse operation binding the contract event 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef.
 //
-// Solidity: event Transfer(address indexed _from, address indexed _to, uint256 _value)
+// Solidity: event Transfer(address indexed from, address indexed to, uint256 value)
 func (_Erc20 *Erc20Filterer) ParseTransfer(log types.Log) (*Erc20Transfer, error) {
 	event := new(Erc20Transfer)
 	if err := _Erc20.contract.UnpackLog(event, "Transfer", log); err != nil {
