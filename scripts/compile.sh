@@ -20,10 +20,12 @@
 CW_CONTRACT_OUTPUT_PATH='build/contracts'
 CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH='contracts/accounts'
 CW_CONTRACT_DART_APP_OUTPUT_PATH='contracts/apps'
+CW_CONTRACT_DART_STD_OUTPUT_PATH='contracts/standards'
 CW_CONTRACT_DART_EXT_OUTPUT_PATH='contracts/external'
 CW_CONTRACT_PKG_PATH='pkg/contracts'
 CW_CONTRACT_ACCOUNT_PATH='contracts/accounts'
 CW_CONTRACT_APP_PATH='contracts/apps'
+CW_CONTRACT_STD_PATH='contracts/standards'
 CW_CONTRACT_EXT_PATH='contracts/external'
 
 # List of contracts to compile (package,file)
@@ -39,8 +41,9 @@ CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \
         'profactory,ProfileFactory' \
         'profile,Profile' \
-        'regensToken,RegensUniteTokens' \
-        'erc20,ERC20' \
+        'regensToken,RegensUniteTokens')
+
+CW_STD_CONTRACTS=('erc20,ERC20' \
         'erc721,ERC721' \
         'erc1155,ERC1155')
 
@@ -48,8 +51,6 @@ CW_EXTERNAL_CONTRACTS=('simpleaccountfactory,SimpleAccountFactory' \
         'derc20,DERC20' \
         'simpleaccount,SimpleAccount' \
         'entrypoint,EntryPoint')
-
-# CW_APP_CONTRACTS=('regensToken,RegensUniteTokens')
 
 # Clean build folder
 echo "Cleaning build folder..."
@@ -71,6 +72,9 @@ mkdir "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH"
 
 rm -rf "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH"
 mkdir "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH"
+
+rm -rf "lib/$CW_CONTRACT_DART_STD_OUTPUT_PATH"
+mkdir "lib/$CW_CONTRACT_DART_STD_OUTPUT_PATH"
 
 rm -rf "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH"
 mkdir "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH"
@@ -94,6 +98,14 @@ echo "/// This file is auto-generated, edit scripts/compile.sh to modify" >> "li
 echo "library;" >> "lib/apps.dart"
 echo "" >> "lib/apps.dart"
 
+rm -rf "lib/standards.dart"
+touch "lib/standards.dart"
+echo "/// Account contracts" >> "lib/standards.dart"
+echo "///" >> "lib/standards.dart"
+echo "/// This file is auto-generated, edit scripts/compile.sh to modify" >> "lib/standards.dart"
+echo "library;" >> "lib/standards.dart"
+echo "" >> "lib/standards.dart"
+
 rm -rf "lib/external.dart"
 touch "lib/external.dart"
 echo "/// External contracts" >> "lib/external.dart"
@@ -111,6 +123,7 @@ echo "library;" >> "lib/smartcontracts.dart"
 echo "" >> "lib/smartcontracts.dart"
 echo "export 'accounts.dart';" >> "lib/smartcontracts.dart"
 echo "export 'apps.dart';" >> "lib/smartcontracts.dart"
+echo "export 'standards.dart';" >> "lib/smartcontracts.dart"
 echo "export 'external.dart';" >> "lib/smartcontracts.dart"
 
 # Compile the contracts
@@ -164,6 +177,32 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
     done
 
 echo "[app] Done compiling the contracts."
+
+# Compile the contracts
+echo "[standards] Compiling the contracts..."
+
+for contract in ${CW_STD_CONTRACTS[@]} ; 
+    do
+        while IFS=',' read -r pkg file; 
+            do
+                echo "Compiling $CW_CONTRACT_STD_PATH/$file.sol..."
+
+                mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
+
+                # https://ethereum.stackexchange.com/a/84719
+                docker run -v $(pwd):/root --platform linux/amd64 ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_STD_PATH/$file.sol"
+                cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_STD_OUTPUT_PATH/$file.abi.json"
+                echo "export '$CW_CONTRACT_DART_STD_OUTPUT_PATH/$file.g.dart';" >> "lib/standards.dart"
+                echo "[.abi] $CW_CONTRACT_STD_PATH/$file ✅";
+                echo "[.bin] $CW_CONTRACT_STD_PATH/$file ✅";
+
+                mkdir $CW_CONTRACT_PKG_PATH/$pkg
+                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                echo "[.go] $CW_CONTRACT_STD_PATH/$file package $pkg ✅";
+        done <<< "$contract"
+    done
+
+echo "[standards] Done compiling the contracts."
 
 # Compile the contracts
 echo "[external] Compiling the contracts..."
