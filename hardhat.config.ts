@@ -17,7 +17,7 @@ const hhconfig: HardhatUserConfig = {
     },
   },
   networks: {
-    chainstack: {
+    polygon: {
       url: process.env.CHAINSTACK_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
     },
@@ -25,6 +25,7 @@ const hhconfig: HardhatUserConfig = {
   etherscan: {
     apiKey: {
       polygonMumbai: process.env.POLYGON_MUMBAI_ETHERSCAN_API_KEY || "",
+      polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
     },
   },
 };
