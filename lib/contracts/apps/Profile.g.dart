@@ -2,9 +2,10 @@
 // @dart=2.12
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:web3dart/web3dart.dart' as _i1;
+import 'dart:typed_data' as _i2;
 
 final _contractAbi = _i1.ContractAbi.fromJson(
-  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"anEntryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint8","name":"version","type":"uint8"}],"name":"Initialized","type":"event"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"addLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"clearLinks","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"clearProfile","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"entryPoint","outputs":[{"internalType":"contract IEntryPoint","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getLinks","outputs":[{"components":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"internalType":"struct Linkable.LinkData[]","name":"","type":"tuple[]"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"getProfile","outputs":[{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"anOwner","type":"address"}],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"links","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"profile","outputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"icon","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"removeLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"},{"internalType":"string","name":"name","type":"string"},{"internalType":"address","name":"link","type":"address"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"linkType","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"updateLink","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"icon","type":"string"},{"internalType":"string","name":"meta","type":"string"}],"name":"updateProfile","outputs":[],"stateMutability":"nonpayable","type":"function"}]',
+  '[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"previousAdmin","type":"address"},{"indexed":false,"internalType":"address","name":"newAdmin","type":"address"}],"name":"AdminChanged","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"_fromTokenId","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"_toTokenId","type":"uint256"}],"name":"BatchMetadataUpdate","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"beacon","type":"address"}],"name":"BeaconUpgraded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint8","name":"version","type":"uint8"}],"name":"Initialized","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"_tokenId","type":"uint256"}],"name":"MetadataUpdate","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"implementation","type":"address"}],"name":"Upgraded","type":"event"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"burn","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"profile","type":"address"}],"name":"get","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"initialize","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"proxiableUUID","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"profile","type":"address"},{"internalType":"string","name":"_uri","type":"string"}],"name":"set","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newImplementation","type":"address"}],"name":"upgradeTo","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newImplementation","type":"address"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"upgradeToAndCall","outputs":[],"stateMutability":"payable","type":"function"}]',
   'Profile',
 );
 
@@ -25,23 +26,17 @@ class Profile extends _i1.GeneratedContract {
   /// The optional [transaction] parameter can be used to override parameters
   /// like the gas price, nonce and max gas. The `data` and `to` fields will be
   /// set by the contract.
-  Future<String> addLink(
-    String name,
-    _i1.EthereumAddress link,
-    String description,
-    String linkType,
-    String meta, {
+  Future<String> approve(
+    _i1.EthereumAddress to,
+    BigInt tokenId, {
     required _i1.Credentials credentials,
     _i1.Transaction? transaction,
   }) async {
     final function = self.abi.functions[1];
-    assert(checkSignature(function, '6510c584'));
+    assert(checkSignature(function, '095ea7b3'));
     final params = [
-      name,
-      link,
-      description,
-      linkType,
-      meta,
+      to,
+      tokenId,
     ];
     return write(
       credentials,
@@ -51,34 +46,35 @@ class Profile extends _i1.GeneratedContract {
     );
   }
 
-  /// The optional [transaction] parameter can be used to override parameters
-  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
-  /// set by the contract.
-  Future<String> clearLinks({
-    required _i1.Credentials credentials,
-    _i1.Transaction? transaction,
+  /// The optional [atBlock] parameter can be used to view historical data. When
+  /// set, the function will be evaluated in the specified block. By default, the
+  /// latest on-chain block will be used.
+  Future<BigInt> balanceOf(
+    _i1.EthereumAddress owner, {
+    _i1.BlockNum? atBlock,
   }) async {
     final function = self.abi.functions[2];
-    assert(checkSignature(function, '75ca64fe'));
-    final params = [];
-    return write(
-      credentials,
-      transaction,
+    assert(checkSignature(function, '70a08231'));
+    final params = [owner];
+    final response = await read(
       function,
       params,
+      atBlock,
     );
+    return (response[0] as BigInt);
   }
 
   /// The optional [transaction] parameter can be used to override parameters
   /// like the gas price, nonce and max gas. The `data` and `to` fields will be
   /// set by the contract.
-  Future<String> clearProfile({
+  Future<String> burn(
+    BigInt tokenId, {
     required _i1.Credentials credentials,
     _i1.Transaction? transaction,
   }) async {
     final function = self.abi.functions[3];
-    assert(checkSignature(function, '8ccec7b6'));
-    final params = [];
+    assert(checkSignature(function, '42966c68'));
+    final params = [tokenId];
     return write(
       credentials,
       transaction,
@@ -90,10 +86,31 @@ class Profile extends _i1.GeneratedContract {
   /// The optional [atBlock] parameter can be used to view historical data. When
   /// set, the function will be evaluated in the specified block. By default, the
   /// latest on-chain block will be used.
-  Future<_i1.EthereumAddress> entryPoint({_i1.BlockNum? atBlock}) async {
+  Future<String> get(
+    _i1.EthereumAddress profile, {
+    _i1.BlockNum? atBlock,
+  }) async {
     final function = self.abi.functions[4];
-    assert(checkSignature(function, 'b0d691fe'));
-    final params = [];
+    assert(checkSignature(function, 'c2bc2efc'));
+    final params = [profile];
+    final response = await read(
+      function,
+      params,
+      atBlock,
+    );
+    return (response[0] as String);
+  }
+
+  /// The optional [atBlock] parameter can be used to view historical data. When
+  /// set, the function will be evaluated in the specified block. By default, the
+  /// latest on-chain block will be used.
+  Future<_i1.EthereumAddress> getApproved(
+    BigInt tokenId, {
+    _i1.BlockNum? atBlock,
+  }) async {
+    final function = self.abi.functions[5];
+    assert(checkSignature(function, '081812fc'));
+    final params = [tokenId];
     final response = await read(
       function,
       params,
@@ -102,47 +119,16 @@ class Profile extends _i1.GeneratedContract {
     return (response[0] as _i1.EthereumAddress);
   }
 
-  /// The optional [atBlock] parameter can be used to view historical data. When
-  /// set, the function will be evaluated in the specified block. By default, the
-  /// latest on-chain block will be used.
-  Future<List<dynamic>> getLinks({_i1.BlockNum? atBlock}) async {
-    final function = self.abi.functions[5];
-    assert(checkSignature(function, 'f66ddcbb'));
-    final params = [];
-    final response = await read(
-      function,
-      params,
-      atBlock,
-    );
-    return (response[0] as List<dynamic>).cast<dynamic>();
-  }
-
-  /// The optional [atBlock] parameter can be used to view historical data. When
-  /// set, the function will be evaluated in the specified block. By default, the
-  /// latest on-chain block will be used.
-  Future<GetProfile> getProfile({_i1.BlockNum? atBlock}) async {
-    final function = self.abi.functions[6];
-    assert(checkSignature(function, 'd6afc9b1'));
-    final params = [];
-    final response = await read(
-      function,
-      params,
-      atBlock,
-    );
-    return GetProfile(response);
-  }
-
   /// The optional [transaction] parameter can be used to override parameters
   /// like the gas price, nonce and max gas. The `data` and `to` fields will be
   /// set by the contract.
-  Future<String> initialize(
-    _i1.EthereumAddress anOwner, {
+  Future<String> initialize({
     required _i1.Credentials credentials,
     _i1.Transaction? transaction,
   }) async {
-    final function = self.abi.functions[7];
-    assert(checkSignature(function, 'c4d66de8'));
-    final params = [anOwner];
+    final function = self.abi.functions[6];
+    assert(checkSignature(function, '8129fc1c'));
+    final params = [];
     return write(
       credentials,
       transaction,
@@ -154,19 +140,38 @@ class Profile extends _i1.GeneratedContract {
   /// The optional [atBlock] parameter can be used to view historical data. When
   /// set, the function will be evaluated in the specified block. By default, the
   /// latest on-chain block will be used.
-  Future<Links> links(
-    BigInt $param6, {
+  Future<bool> isApprovedForAll(
+    _i1.EthereumAddress owner,
+    _i1.EthereumAddress operator, {
     _i1.BlockNum? atBlock,
   }) async {
-    final function = self.abi.functions[8];
-    assert(checkSignature(function, '881d8a40'));
-    final params = [$param6];
+    final function = self.abi.functions[7];
+    assert(checkSignature(function, 'e985e9c5'));
+    final params = [
+      owner,
+      operator,
+    ];
     final response = await read(
       function,
       params,
       atBlock,
     );
-    return Links(response);
+    return (response[0] as bool);
+  }
+
+  /// The optional [atBlock] parameter can be used to view historical data. When
+  /// set, the function will be evaluated in the specified block. By default, the
+  /// latest on-chain block will be used.
+  Future<String> name({_i1.BlockNum? atBlock}) async {
+    final function = self.abi.functions[8];
+    assert(checkSignature(function, '06fdde03'));
+    final params = [];
+    final response = await read(
+      function,
+      params,
+      atBlock,
+    );
+    return (response[0] as String);
   }
 
   /// The optional [atBlock] parameter can be used to view historical data. When
@@ -187,59 +192,70 @@ class Profile extends _i1.GeneratedContract {
   /// The optional [atBlock] parameter can be used to view historical data. When
   /// set, the function will be evaluated in the specified block. By default, the
   /// latest on-chain block will be used.
-  Future<Profile> profile({_i1.BlockNum? atBlock}) async {
+  Future<_i1.EthereumAddress> ownerOf(
+    BigInt tokenId, {
+    _i1.BlockNum? atBlock,
+  }) async {
     final function = self.abi.functions[10];
-    assert(checkSignature(function, 'ab60636c'));
+    assert(checkSignature(function, '6352211e'));
+    final params = [tokenId];
+    final response = await read(
+      function,
+      params,
+      atBlock,
+    );
+    return (response[0] as _i1.EthereumAddress);
+  }
+
+  /// The optional [atBlock] parameter can be used to view historical data. When
+  /// set, the function will be evaluated in the specified block. By default, the
+  /// latest on-chain block will be used.
+  Future<_i2.Uint8List> proxiableUUID({_i1.BlockNum? atBlock}) async {
+    final function = self.abi.functions[11];
+    assert(checkSignature(function, '52d1902d'));
     final params = [];
     final response = await read(
       function,
       params,
       atBlock,
     );
-    return Profile(response);
+    return (response[0] as _i2.Uint8List);
   }
 
   /// The optional [transaction] parameter can be used to override parameters
   /// like the gas price, nonce and max gas. The `data` and `to` fields will be
   /// set by the contract.
-  Future<String> removeLink(
-    BigInt index, {
-    required _i1.Credentials credentials,
-    _i1.Transaction? transaction,
-  }) async {
-    final function = self.abi.functions[11];
-    assert(checkSignature(function, 'b080ae4f'));
-    final params = [index];
-    return write(
-      credentials,
-      transaction,
-      function,
-      params,
-    );
-  }
-
-  /// The optional [transaction] parameter can be used to override parameters
-  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
-  /// set by the contract.
-  Future<String> updateLink(
-    BigInt index,
-    String name,
-    _i1.EthereumAddress link,
-    String description,
-    String linkType,
-    String meta, {
+  Future<String> renounceOwnership({
     required _i1.Credentials credentials,
     _i1.Transaction? transaction,
   }) async {
     final function = self.abi.functions[12];
-    assert(checkSignature(function, '4bd13de6'));
+    assert(checkSignature(function, '715018a6'));
+    final params = [];
+    return write(
+      credentials,
+      transaction,
+      function,
+      params,
+    );
+  }
+
+  /// The optional [transaction] parameter can be used to override parameters
+  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
+  /// set by the contract.
+  Future<String> safeTransferFrom(
+    _i1.EthereumAddress from,
+    _i1.EthereumAddress to,
+    BigInt tokenId, {
+    required _i1.Credentials credentials,
+    _i1.Transaction? transaction,
+  }) async {
+    final function = self.abi.functions[13];
+    assert(checkSignature(function, '42842e0e'));
     final params = [
-      index,
-      name,
-      link,
-      description,
-      linkType,
-      meta,
+      from,
+      to,
+      tokenId,
     ];
     return write(
       credentials,
@@ -252,21 +268,21 @@ class Profile extends _i1.GeneratedContract {
   /// The optional [transaction] parameter can be used to override parameters
   /// like the gas price, nonce and max gas. The `data` and `to` fields will be
   /// set by the contract.
-  Future<String> updateProfile(
-    String name,
-    String description,
-    String icon,
-    String meta, {
+  Future<String> safeTransferFrom$2(
+    _i1.EthereumAddress from,
+    _i1.EthereumAddress to,
+    BigInt tokenId,
+    _i2.Uint8List data, {
     required _i1.Credentials credentials,
     _i1.Transaction? transaction,
   }) async {
-    final function = self.abi.functions[13];
-    assert(checkSignature(function, '9483f25c'));
+    final function = self.abi.functions[14];
+    assert(checkSignature(function, 'b88d4fde'));
     final params = [
-      name,
-      description,
-      icon,
-      meta,
+      from,
+      to,
+      tokenId,
+      data,
     ];
     return write(
       credentials,
@@ -274,6 +290,309 @@ class Profile extends _i1.GeneratedContract {
       function,
       params,
     );
+  }
+
+  /// The optional [transaction] parameter can be used to override parameters
+  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
+  /// set by the contract.
+  Future<String> set(
+    _i1.EthereumAddress profile,
+    String _uri, {
+    required _i1.Credentials credentials,
+    _i1.Transaction? transaction,
+  }) async {
+    final function = self.abi.functions[15];
+    assert(checkSignature(function, '5a82d100'));
+    final params = [
+      profile,
+      _uri,
+    ];
+    return write(
+      credentials,
+      transaction,
+      function,
+      params,
+    );
+  }
+
+  /// The optional [transaction] parameter can be used to override parameters
+  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
+  /// set by the contract.
+  Future<String> setApprovalForAll(
+    _i1.EthereumAddress operator,
+    bool approved, {
+    required _i1.Credentials credentials,
+    _i1.Transaction? transaction,
+  }) async {
+    final function = self.abi.functions[16];
+    assert(checkSignature(function, 'a22cb465'));
+    final params = [
+      operator,
+      approved,
+    ];
+    return write(
+      credentials,
+      transaction,
+      function,
+      params,
+    );
+  }
+
+  /// The optional [atBlock] parameter can be used to view historical data. When
+  /// set, the function will be evaluated in the specified block. By default, the
+  /// latest on-chain block will be used.
+  Future<bool> supportsInterface(
+    _i2.Uint8List interfaceId, {
+    _i1.BlockNum? atBlock,
+  }) async {
+    final function = self.abi.functions[17];
+    assert(checkSignature(function, '01ffc9a7'));
+    final params = [interfaceId];
+    final response = await read(
+      function,
+      params,
+      atBlock,
+    );
+    return (response[0] as bool);
+  }
+
+  /// The optional [atBlock] parameter can be used to view historical data. When
+  /// set, the function will be evaluated in the specified block. By default, the
+  /// latest on-chain block will be used.
+  Future<String> symbol({_i1.BlockNum? atBlock}) async {
+    final function = self.abi.functions[18];
+    assert(checkSignature(function, '95d89b41'));
+    final params = [];
+    final response = await read(
+      function,
+      params,
+      atBlock,
+    );
+    return (response[0] as String);
+  }
+
+  /// The optional [atBlock] parameter can be used to view historical data. When
+  /// set, the function will be evaluated in the specified block. By default, the
+  /// latest on-chain block will be used.
+  Future<String> tokenURI(
+    BigInt tokenId, {
+    _i1.BlockNum? atBlock,
+  }) async {
+    final function = self.abi.functions[19];
+    assert(checkSignature(function, 'c87b56dd'));
+    final params = [tokenId];
+    final response = await read(
+      function,
+      params,
+      atBlock,
+    );
+    return (response[0] as String);
+  }
+
+  /// The optional [transaction] parameter can be used to override parameters
+  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
+  /// set by the contract.
+  Future<String> transferFrom(
+    _i1.EthereumAddress from,
+    _i1.EthereumAddress to,
+    BigInt tokenId, {
+    required _i1.Credentials credentials,
+    _i1.Transaction? transaction,
+  }) async {
+    final function = self.abi.functions[20];
+    assert(checkSignature(function, '23b872dd'));
+    final params = [
+      from,
+      to,
+      tokenId,
+    ];
+    return write(
+      credentials,
+      transaction,
+      function,
+      params,
+    );
+  }
+
+  /// The optional [transaction] parameter can be used to override parameters
+  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
+  /// set by the contract.
+  Future<String> transferOwnership(
+    _i1.EthereumAddress newOwner, {
+    required _i1.Credentials credentials,
+    _i1.Transaction? transaction,
+  }) async {
+    final function = self.abi.functions[21];
+    assert(checkSignature(function, 'f2fde38b'));
+    final params = [newOwner];
+    return write(
+      credentials,
+      transaction,
+      function,
+      params,
+    );
+  }
+
+  /// The optional [transaction] parameter can be used to override parameters
+  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
+  /// set by the contract.
+  Future<String> upgradeTo(
+    _i1.EthereumAddress newImplementation, {
+    required _i1.Credentials credentials,
+    _i1.Transaction? transaction,
+  }) async {
+    final function = self.abi.functions[22];
+    assert(checkSignature(function, '3659cfe6'));
+    final params = [newImplementation];
+    return write(
+      credentials,
+      transaction,
+      function,
+      params,
+    );
+  }
+
+  /// The optional [transaction] parameter can be used to override parameters
+  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
+  /// set by the contract.
+  Future<String> upgradeToAndCall(
+    _i1.EthereumAddress newImplementation,
+    _i2.Uint8List data, {
+    required _i1.Credentials credentials,
+    _i1.Transaction? transaction,
+  }) async {
+    final function = self.abi.functions[23];
+    assert(checkSignature(function, '4f1ef286'));
+    final params = [
+      newImplementation,
+      data,
+    ];
+    return write(
+      credentials,
+      transaction,
+      function,
+      params,
+    );
+  }
+
+  /// Returns a live stream of all AdminChanged events emitted by this contract.
+  Stream<AdminChanged> adminChangedEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('AdminChanged');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return AdminChanged(
+        decoded,
+        result,
+      );
+    });
+  }
+
+  /// Returns a live stream of all Approval events emitted by this contract.
+  Stream<Approval> approvalEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('Approval');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return Approval(
+        decoded,
+        result,
+      );
+    });
+  }
+
+  /// Returns a live stream of all ApprovalForAll events emitted by this contract.
+  Stream<ApprovalForAll> approvalForAllEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('ApprovalForAll');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return ApprovalForAll(
+        decoded,
+        result,
+      );
+    });
+  }
+
+  /// Returns a live stream of all BatchMetadataUpdate events emitted by this contract.
+  Stream<BatchMetadataUpdate> batchMetadataUpdateEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('BatchMetadataUpdate');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return BatchMetadataUpdate(
+        decoded,
+        result,
+      );
+    });
+  }
+
+  /// Returns a live stream of all BeaconUpgraded events emitted by this contract.
+  Stream<BeaconUpgraded> beaconUpgradedEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('BeaconUpgraded');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return BeaconUpgraded(
+        decoded,
+        result,
+      );
+    });
   }
 
   /// Returns a live stream of all Initialized events emitted by this contract.
@@ -299,57 +618,175 @@ class Profile extends _i1.GeneratedContract {
       );
     });
   }
+
+  /// Returns a live stream of all MetadataUpdate events emitted by this contract.
+  Stream<MetadataUpdate> metadataUpdateEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('MetadataUpdate');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return MetadataUpdate(
+        decoded,
+        result,
+      );
+    });
+  }
+
+  /// Returns a live stream of all OwnershipTransferred events emitted by this contract.
+  Stream<OwnershipTransferred> ownershipTransferredEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('OwnershipTransferred');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return OwnershipTransferred(
+        decoded,
+        result,
+      );
+    });
+  }
+
+  /// Returns a live stream of all Transfer events emitted by this contract.
+  Stream<Transfer> transferEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('Transfer');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return Transfer(
+        decoded,
+        result,
+      );
+    });
+  }
+
+  /// Returns a live stream of all Upgraded events emitted by this contract.
+  Stream<Upgraded> upgradedEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('Upgraded');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
+    );
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return Upgraded(
+        decoded,
+        result,
+      );
+    });
+  }
 }
 
-class GetProfile {
-  GetProfile(List<dynamic> response)
-      : var1 = (response[0] as String),
-        var2 = (response[1] as String),
-        var3 = (response[2] as String),
-        var4 = (response[3] as String);
+class AdminChanged {
+  AdminChanged(
+    List<dynamic> response,
+    this.event,
+  )   : previousAdmin = (response[0] as _i1.EthereumAddress),
+        newAdmin = (response[1] as _i1.EthereumAddress);
 
-  final String var1;
+  final _i1.EthereumAddress previousAdmin;
 
-  final String var2;
+  final _i1.EthereumAddress newAdmin;
 
-  final String var3;
-
-  final String var4;
+  final _i1.FilterEvent event;
 }
 
-class Links {
-  Links(List<dynamic> response)
-      : name = (response[0] as String),
-        link = (response[1] as _i1.EthereumAddress),
-        description = (response[2] as String),
-        linkType = (response[3] as String),
-        meta = (response[4] as String);
+class Approval {
+  Approval(
+    List<dynamic> response,
+    this.event,
+  )   : owner = (response[0] as _i1.EthereumAddress),
+        approved = (response[1] as _i1.EthereumAddress),
+        tokenId = (response[2] as BigInt);
 
-  final String name;
+  final _i1.EthereumAddress owner;
 
-  final _i1.EthereumAddress link;
+  final _i1.EthereumAddress approved;
 
-  final String description;
+  final BigInt tokenId;
 
-  final String linkType;
-
-  final String meta;
+  final _i1.FilterEvent event;
 }
 
-class Profile {
-  Profile(List<dynamic> response)
-      : name = (response[0] as String),
-        description = (response[1] as String),
-        icon = (response[2] as String),
-        meta = (response[3] as String);
+class ApprovalForAll {
+  ApprovalForAll(
+    List<dynamic> response,
+    this.event,
+  )   : owner = (response[0] as _i1.EthereumAddress),
+        operator = (response[1] as _i1.EthereumAddress),
+        approved = (response[2] as bool);
 
-  final String name;
+  final _i1.EthereumAddress owner;
 
-  final String description;
+  final _i1.EthereumAddress operator;
 
-  final String icon;
+  final bool approved;
 
-  final String meta;
+  final _i1.FilterEvent event;
+}
+
+class BatchMetadataUpdate {
+  BatchMetadataUpdate(
+    List<dynamic> response,
+    this.event,
+  )   : fromTokenId = (response[0] as BigInt),
+        toTokenId = (response[1] as BigInt);
+
+  final BigInt fromTokenId;
+
+  final BigInt toTokenId;
+
+  final _i1.FilterEvent event;
+}
+
+class BeaconUpgraded {
+  BeaconUpgraded(
+    List<dynamic> response,
+    this.event,
+  ) : beacon = (response[0] as _i1.EthereumAddress);
+
+  final _i1.EthereumAddress beacon;
+
+  final _i1.FilterEvent event;
 }
 
 class Initialized {
@@ -359,6 +796,59 @@ class Initialized {
   ) : version = (response[0] as BigInt);
 
   final BigInt version;
+
+  final _i1.FilterEvent event;
+}
+
+class MetadataUpdate {
+  MetadataUpdate(
+    List<dynamic> response,
+    this.event,
+  ) : tokenId = (response[0] as BigInt);
+
+  final BigInt tokenId;
+
+  final _i1.FilterEvent event;
+}
+
+class OwnershipTransferred {
+  OwnershipTransferred(
+    List<dynamic> response,
+    this.event,
+  )   : previousOwner = (response[0] as _i1.EthereumAddress),
+        newOwner = (response[1] as _i1.EthereumAddress);
+
+  final _i1.EthereumAddress previousOwner;
+
+  final _i1.EthereumAddress newOwner;
+
+  final _i1.FilterEvent event;
+}
+
+class Transfer {
+  Transfer(
+    List<dynamic> response,
+    this.event,
+  )   : from = (response[0] as _i1.EthereumAddress),
+        to = (response[1] as _i1.EthereumAddress),
+        tokenId = (response[2] as BigInt);
+
+  final _i1.EthereumAddress from;
+
+  final _i1.EthereumAddress to;
+
+  final BigInt tokenId;
+
+  final _i1.FilterEvent event;
+}
+
+class Upgraded {
+  Upgraded(
+    List<dynamic> response,
+    this.event,
+  ) : implementation = (response[0] as _i1.EthereumAddress);
+
+  final _i1.EthereumAddress implementation;
 
   final _i1.FilterEvent event;
 }
