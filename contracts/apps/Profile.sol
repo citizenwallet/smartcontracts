@@ -1,96 +1,83 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-import "../abstract/Linkable.sol";
-
-contract Profile is Initializable, Linkable {
-    IEntryPoint private immutable _entryPoint;
-
-    address public owner;
-
-    struct ProfileData {
-        string name;
-        string description;
-        string icon;
-        string meta;
-    }
-
-    ProfileData public profile;
-
+contract Profile is
+    Initializable,
+    ERC721URIStorageUpgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(IEntryPoint anEntryPoint) {
-        _entryPoint = anEntryPoint;
-        profile = ProfileData("", "", "", "");
+    constructor() {
         _disableInitializers();
     }
 
-    modifier onlyOwner() override {
-        _onlyOwner();
-        _;
+    function initialize() public initializer {
+        __ERC721_init("Profile", "PRF");
+        __Ownable_init();
+        __UUPSUpgradeable_init();
     }
 
-    modifier onlyOwnerOrEntryPoint() override {
-        _requireFromEntryPointOrOwner();
-        _;
+    function set(address profile, string memory _uri) public returns (uint256) {
+        require(profile == msg.sender, "Only the profile owner can set it.");
+
+        uint256 newProfileId = _fromAddressToId(profile);
+        if (_exists(newProfileId)) {
+            _setTokenURI(newProfileId, _uri);
+            return newProfileId;
+        }
+        _mint(profile, newProfileId);
+        _setTokenURI(newProfileId, _uri);
+
+        return newProfileId;
     }
 
-    function _onlyOwner() internal view {
-        //directly from EOA owner, or through the account itself (which gets redirected through execute())
+    function get(address profile) public view returns (string memory) {
+        uint256 profileId = _fromAddressToId(profile);
+        return tokenURI(profileId);
+    }
+
+    function burn(uint256 tokenId) external {
+        address profileOwner = _fromIdToAddress(tokenId);
         require(
-            msg.sender == owner || msg.sender == address(this),
-            "only owner"
+            owner() == msg.sender || profileOwner == msg.sender,
+            "Only the owner of the token or profile can burn it."
+        );
+        _burn(tokenId);
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 firstTokenId,
+        uint256 batchSize
+    ) internal pure override {
+        require(
+            from == address(0) || to == address(0),
+            "This a Soulbound token. It cannot be transferred. It can only be burned by the token owner."
         );
     }
 
-    // Require the function call went through EntryPoint or owner
-    function _requireFromEntryPointOrOwner() internal view {
-        require(
-            msg.sender == address(_entryPoint) || msg.sender == owner,
-            "account: not Owner or EntryPoint"
-        );
+    function _burn(
+        uint256 tokenId
+    ) internal override(ERC721URIStorageUpgradeable) {
+        super._burn(tokenId);
     }
 
-    /**
-     * @dev The _entryPoint member is immutable, to reduce gas consumption.  To upgrade EntryPoint,
-     * a new implementation of SimpleAccount must be deployed with the new EntryPoint address, then upgrading
-     * the implementation by calling `upgradeTo()`
-     */
-    function initialize(address anOwner) public virtual initializer {
-        _initialize(anOwner);
+    function _fromIdToAddress(uint256 tokenId) internal pure returns (address) {
+        return address(uint160(uint256(tokenId)));
     }
 
-    function _initialize(address anOwner) internal virtual {
-        owner = anOwner;
+    function _fromAddressToId(address profile) internal pure returns (uint256) {
+        return uint256(uint160(profile));
     }
 
-    function entryPoint() public view virtual returns (IEntryPoint) {
-        return _entryPoint;
-    }
-
-    // updateProfile updates the profile data
-    function updateProfile(
-        string memory name,
-        string memory description,
-        string memory icon,
-        string memory meta
-    ) public onlyOwnerOrEntryPoint {
-        profile = ProfileData(name, description, icon, meta);
-    }
-
-    // clearProfile clears the profile data
-    function clearProfile() public onlyOwnerOrEntryPoint {
-        profile = ProfileData("", "", "", "");
-    }
-
-    // getProfile returns the profile data
-    function getProfile()
-        public
-        view
-        returns (string memory, string memory, string memory, string memory)
-    {
-        return (profile.name, profile.description, profile.icon, profile.meta);
-    }
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
 }

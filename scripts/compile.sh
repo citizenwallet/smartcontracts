@@ -39,7 +39,6 @@ CW_ACCOUNT_CONTRACTS=('account,Account' \
 
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \
-        'profactory,ProfileFactory' \
         'profile,Profile' \
         'regensToken,RegensUniteTokens')
 

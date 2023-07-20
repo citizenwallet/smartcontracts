@@ -2,14 +2,16 @@ import { ethers } from "hardhat";
 import { config } from "dotenv";
 
 async function main() {
+  console.log("reading config...");
   config();
 
-  const Gateway = await ethers.getContractFactory("Gateway");
-  const gateway = await Gateway.deploy();
+  console.log("deploying...");
+  const profile = await ethers.deployContract("Profile");
 
-  await gateway.deployed();
+  console.log("request sent...");
+  await profile.deployed();
 
-  console.log(`Gateway deployed to ${gateway.address}`);
+  console.log(`Profile deployed to ${profile.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
