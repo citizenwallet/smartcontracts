@@ -51,6 +51,15 @@ jobs:
       - name: Install dart dependencies
         run: dart pub get
 
+      - name: Install hardhat
+        run: npm install --save-dev hardhat
+
+      - name: Compile contracts
+        run: npx hardhat compile
+
+      - name: Test contracts
+        run: npx hardhat test
+
       - name: Compile
         run: scripts/compile.sh
 
