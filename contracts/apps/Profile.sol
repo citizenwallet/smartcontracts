@@ -45,8 +45,11 @@ contract Profile is
         bytes32 currentUsername = usernames[profile];
 
         require(
-            (currentUsername == NULL) || // username is not set
-                (currentUsername != NULL && profiles[currentUsername] == profile), // username is set but belongs to the profile
+            (currentUsername == NULL &&
+                (profiles[_username] == address(0) ||
+                    profiles[_username] == profile)) || // username is not set and is also not reserved
+                (currentUsername != NULL &&
+                    profiles[currentUsername] == profile), // username is set but belongs to the profile
             "This username is already taken."
         );
 
@@ -57,9 +60,12 @@ contract Profile is
         if (currentUsername != _username) {
             _setUsername(profile, _username);
         }
-        if (keccak256(abi.encodePacked(tokenURI(newProfileId))) != keccak256(abi.encodePacked(_uri))) {
+        if (
+            keccak256(abi.encodePacked(tokenURI(newProfileId))) !=
+            keccak256(abi.encodePacked(_uri))
+        ) {
             _setTokenURI(newProfileId, _uri);
-        } 
+        }
 
         return newProfileId;
     }
