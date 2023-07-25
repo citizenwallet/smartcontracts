@@ -51,13 +51,9 @@ contract Profile is
         );
 
         uint256 newProfileId = _fromAddressToId(profile);
-        if (_exists(newProfileId)) {
-            _setTokenURI(newProfileId, _uri);
-
-            _setUsername(profile, _username);
-            return newProfileId;
+        if (!_exists(newProfileId)) {
+            _mint(profile, newProfileId);
         }
-        _mint(profile, newProfileId);
         _setTokenURI(newProfileId, _uri);
 
         _setUsername(profile, _username);
