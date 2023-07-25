@@ -213,7 +213,7 @@ describe("Profile", function () {
     });
 
     // set a username, then set another one, the old username should be available again
-    it("Should replace the username to the new one when set a second time", async function () {
+    it("Should replace the username to the new one and the old one should be available again", async function () {
       const { profile, owner, friend1, friend2 } = await loadFixture(
         deployProfileFixture
       );
@@ -222,7 +222,7 @@ describe("Profile", function () {
         .connect(friend1)
         .set(friend1.address, friend1UsernameA, "https://test.com");
 
-      expect(
+      await expect(
         await profile
           .connect(friend2)
           .set(friend2.address, friend1UsernameA, "https://test2.com")
