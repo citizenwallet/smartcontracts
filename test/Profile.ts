@@ -183,7 +183,7 @@ describe("Profile", function () {
         .set(friend1.address, friend1UsernameA, "https://test.com");
 
       await expect(
-        await profile
+        profile
           .connect(friend2)
           .set(friend2.address, friend1UsernameA, "https://test2.com")
       ).to.be.revertedWith("This username is already taken.");
@@ -223,7 +223,7 @@ describe("Profile", function () {
         .set(friend1.address, friend1UsernameA, "https://test.com");
 
       await expect(
-        await profile
+        profile
           .connect(friend2)
           .set(friend2.address, friend1UsernameA, "https://test2.com")
       ).to.be.revertedWith("This username is already taken.");
