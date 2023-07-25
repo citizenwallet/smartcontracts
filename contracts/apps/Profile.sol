@@ -42,25 +42,31 @@ contract Profile is
     ) public returns (uint256) {
         require(profile == msg.sender, "Only the profile owner can set it.");
 
-        bytes32 username = usernames[profile];
+        bytes32 currentUsername = usernames[profile];
 
         require(
-            (username == NULL) || // username is not set
-                (username != NULL && profiles[username] == profile), // username is set but belongs to the profile
+            (currentUsername == NULL &&
+                (profiles[_username] == address(0) ||
+                    profiles[_username] == profile)) || // username is not set and is also not reserved
+                (currentUsername != NULL &&
+                    profiles[currentUsername] == profile), // username is set but belongs to the profile
             "This username is already taken."
         );
 
         uint256 newProfileId = _fromAddressToId(profile);
-        if (_exists(newProfileId)) {
-            _setTokenURI(newProfileId, _uri);
-
-            _setUsername(profile, _username);
-            return newProfileId;
+        if (!_exists(newProfileId)) {
+            _mint(profile, newProfileId);
         }
-        _mint(profile, newProfileId);
-        _setTokenURI(newProfileId, _uri);
+        if (currentUsername != _username) {
+            _setUsername(profile, _username);
+        }
+        if (
+            keccak256(abi.encodePacked(tokenURI(newProfileId))) !=
+            keccak256(abi.encodePacked(_uri))
+        ) {
+            _setTokenURI(newProfileId, _uri);
+        }
 
-        _setUsername(profile, _username);
         return newProfileId;
     }
 
