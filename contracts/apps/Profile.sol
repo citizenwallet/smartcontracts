@@ -14,12 +14,14 @@ contract Profile is
 {
     bytes32 constant NULL = "";
 
-    // only a single username per address
-    // allows us to check which username was already reserved by a profile
+    /// only a single username per address
+    ///
+    /// allows us to check which username was already reserved by a profile
     mapping(address profile => bytes32 username) public usernames;
 
-    // only a single username per profile
-    // allows us to easily fetch a profile from a username
+    /// only a single username per profile
+    ///
+    /// allows us to easily fetch a profile from a username
     mapping(bytes32 username => address profile) public profiles;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -107,11 +109,8 @@ contract Profile is
 
     function _setUsername(address profile, bytes32 username) internal {
         if (usernames[profile] != NULL) {
+            // clean up old username if it exists
             delete profiles[usernames[profile]];
-        }
-
-        if (profiles[username] != address(0)) {
-            delete usernames[profiles[username]];
         }
 
         profiles[username] = profile;
