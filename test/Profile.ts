@@ -182,7 +182,7 @@ describe("Profile", function () {
         .connect(friend1)
         .set(friend1.address, friend1UsernameA, "https://test.com");
 
-      expect(
+      await expect(
         await profile
           .connect(friend2)
           .set(friend2.address, friend1UsernameA, "https://test2.com")
