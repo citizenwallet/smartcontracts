@@ -15,4 +15,4 @@ dev_dependencies:
   test: ^1.21.0
   web3dart_builders: ^0.0.7
 dependencies:
-  web3dart: ^2.6.1
+  web3dart: ^2.7.0
