@@ -22,7 +22,7 @@ contract RegensUniteToken is
     event Minted(address indexed to, uint256 amount, string description);
 
     function initialize(address[] memory minters) public initializer {
-        __ERC20_init("Regens Unite Coin", "RGNU");
+        __ERC20_init("Regens Unite Token", "RGNU");
         __ERC20Burnable_init();
         __Ownable_init();
         __AccessControl_init();
