@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-contract RegensUniteCoinV2Test is
+contract RegensUniteTokenV2Test is
     Initializable,
     ERC20Upgradeable,
     ERC20BurnableUpgradeable,
