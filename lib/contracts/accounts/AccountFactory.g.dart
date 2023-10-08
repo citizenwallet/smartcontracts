@@ -4,7 +4,7 @@
 import 'package:web3dart/web3dart.dart' as _i1;
 
 final _contractAbi = _i1.ContractAbi.fromJson(
-  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"_entryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"}],"name":"AccountCreated","type":"event"},{"inputs":[],"name":"accountImplementation","outputs":[{"internalType":"contract Account","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"createAccount","outputs":[{"internalType":"contract Account","name":"ret","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"getAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}]',
+  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"_entryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"accountImplementation","outputs":[{"internalType":"contract Account","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"createAccount","outputs":[{"internalType":"contract Account","name":"ret","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"getAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}]',
   'AccountFactory',
 );
 
@@ -82,39 +82,4 @@ class AccountFactory extends _i1.GeneratedContract {
     );
     return (response[0] as _i1.EthereumAddress);
   }
-
-  /// Returns a live stream of all AccountCreated events emitted by this contract.
-  Stream<AccountCreated> accountCreatedEvents({
-    _i1.BlockNum? fromBlock,
-    _i1.BlockNum? toBlock,
-  }) {
-    final event = self.event('AccountCreated');
-    final filter = _i1.FilterOptions.events(
-      contract: self,
-      event: event,
-      fromBlock: fromBlock,
-      toBlock: toBlock,
-    );
-    return client.events(filter).map((_i1.FilterEvent result) {
-      final decoded = event.decodeResults(
-        result.topics!,
-        result.data!,
-      );
-      return AccountCreated(
-        decoded,
-        result,
-      );
-    });
-  }
-}
-
-class AccountCreated {
-  AccountCreated(
-    List<dynamic> response,
-    this.event,
-  ) : owner = (response[0] as _i1.EthereumAddress);
-
-  final _i1.EthereumAddress owner;
-
-  final _i1.FilterEvent event;
 }
