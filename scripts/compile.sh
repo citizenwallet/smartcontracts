@@ -13,7 +13,7 @@
 
 # The script also assumes that the contracts are compiled with the following
 # compiler settings:
-# - Compiler version: 0.8.19
+# - Compiler version: 0.8.20
 # - Optimization: Enabled
 # - Optimization runs: 200
 

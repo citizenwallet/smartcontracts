@@ -16,8 +16,6 @@ import "./Account.sol";
 contract AccountFactory {
     Account public immutable accountImplementation;
 
-    event AccountCreated(address indexed owner);
-
     constructor(IEntryPoint _entryPoint) {
         accountImplementation = new Account(_entryPoint);
     }
@@ -37,8 +35,6 @@ contract AccountFactory {
         if (codeSize > 0) {
             return Account(payable(addr));
         }
-
-        emit AccountCreated(owner);
         ret = Account(
             payable(
                 new ERC1967Proxy{salt: bytes32(salt)}(
