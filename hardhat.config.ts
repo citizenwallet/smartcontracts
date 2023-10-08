@@ -18,15 +18,46 @@ const hhconfig: HardhatUserConfig = {
   },
   networks: {
     polygon: {
-      url: process.env.CHAINSTACK_URL,
+      url: process.env.POLYGON_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+      gasPrice: 90000000000, // this is 30 Gwei
+    },
+    base: {
+      url: process.env.BASE_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+      gasPrice: 30000000, // this is 30 Gwei
+    },
+    celo: {
+      url: process.env.CELO_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+      gasPrice: 30000000, // this is 30 Gwei
     },
   },
   etherscan: {
     apiKey: {
       polygonMumbai: process.env.POLYGON_MUMBAI_ETHERSCAN_API_KEY || "",
       polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
+      base: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
+      celo: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
     },
+    customChains: [
+      {
+        network: "base",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org",
+        },
+      },
+      {
+        network: "celo",
+        chainId: 42220,
+        urls: {
+          apiURL: "https://api.celoscan.io",
+          browserURL: "https://celoscan.io",
+        },
+      },
+    ],
   },
 };
 
