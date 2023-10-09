@@ -17,6 +17,11 @@ const hhconfig: HardhatUserConfig = {
     },
   },
   networks: {
+    mainnet: {
+      url: process.env.ETHEREUM_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+      gasPrice: 9000000000, // this is 30 Gwei
+    },
     polygon: {
       url: process.env.POLYGON_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
@@ -35,6 +40,7 @@ const hhconfig: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
+      mainnet: process.env.ETEHREUM_MAINNET_ETHERSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYGON_MUMBAI_ETHERSCAN_API_KEY || "",
       polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
       base: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
