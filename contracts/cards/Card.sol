@@ -3,18 +3,29 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
-import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
-import "../callback/TokenCallbackHandler.sol";
+import "./interfaces/ICard.sol";
+import "./interfaces/IWhitelistReader.sol";
+import "../accounts/callback/TokenCallbackHandler.sol";
 
-// https://github.com/guizostudios/ERC-4337/blob/main/contracts/SimpleAccount.sol
-// Account,
-contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
+import "./utils/Timestamps.sol";
+
+// https://github.com/eth-infinitism/account-abstraction/blob/develop/contracts/samples/SimpleAccount.sol
+// Card,
+contract Card is
+    BaseAccount,
+    ICard,
+    TokenCallbackHandler,
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
+    // ERC4337 implementation
     using ECDSA for bytes32;
-
-    address public owner;
 
     IEntryPoint private immutable _entryPoint;
 
@@ -22,11 +33,6 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         IEntryPoint indexed entryPoint,
         address indexed owner
     );
-
-    modifier onlyOwner() {
-        _onlyOwner();
-        _;
-    }
 
     /// @inheritdoc BaseAccount
     function entryPoint() public view virtual override returns (IEntryPoint) {
@@ -36,17 +42,11 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    constructor(IEntryPoint anEntryPoint) {
+    constructor(IEntryPoint anEntryPoint, IWhitelistReader aWhitelist) {
+        _expiration = Timestamps.getTimestampAfterXYears(3);
         _entryPoint = anEntryPoint;
+        _whitelist = aWhitelist;
         _disableInitializers();
-    }
-
-    function _onlyOwner() internal view {
-        //directly from EOA owner, or through the account itself (which gets redirected through execute())
-        require(
-            msg.sender == owner || msg.sender == address(this),
-            "only owner"
-        );
     }
 
     /**
@@ -57,7 +57,7 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         uint256 value,
         bytes calldata func
     ) external {
-        _requireFromEntryPointOrOwner();
+        _requireFromEntryPointOrOwnerOrWhitelist();
         _call(dest, value, func);
     }
 
@@ -70,7 +70,7 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         uint256[] calldata value,
         bytes[] calldata func
     ) external {
-        _requireFromEntryPointOrOwner();
+        _requireFromEntryPointOrOwnerOrWhitelist();
         require(
             dest.length == func.length &&
                 (value.length == 0 || value.length == func.length),
@@ -97,16 +97,24 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
     }
 
     function _initialize(address anOwner) internal virtual {
-        owner = anOwner;
-        emit SimpleAccountInitialized(_entryPoint, owner);
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+
+        transferOwnership(anOwner);
+
+        emit SimpleAccountInitialized(_entryPoint, owner());
     }
 
     // Require the function call went through EntryPoint or owner
-    function _requireFromEntryPointOrOwner() internal view {
+    function _requireFromEntryPointOrOwnerOrWhitelist() internal view {
         require(
-            msg.sender == address(entryPoint()) || msg.sender == owner,
-            "account: not Owner or EntryPoint"
+            msg.sender == address(entryPoint()) ||
+                msg.sender == owner() ||
+                _isWhitelisted(),
+            "card: not Whitelisted or Owner or EntryPoint"
         );
+
+        require(hasExpired() == false, "card: expired");
     }
 
     /// implement template method of BaseAccount
@@ -115,7 +123,7 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         bytes32 userOpHash
     ) internal virtual override returns (uint256 validationData) {
         bytes32 hash = userOpHash.toEthSignedMessageHash();
-        if (owner != hash.recover(userOp.signature))
+        if (owner() != hash.recover(userOp.signature))
             return SIG_VALIDATION_FAILED;
         return 0;
     }
@@ -155,11 +163,30 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         entryPoint().withdrawTo(withdrawAddress, amount);
     }
 
-    function _authorizeUpgrade(address newImplementation) internal view {
-        (newImplementation);
-        _onlyOwner();
+    // ************************
+
+    // Card implementation
+    uint256 private immutable _expiration;
+
+    IWhitelistReader private _whitelist;
+
+    function whitelist() public view virtual returns (IWhitelistReader) {
+        return _whitelist;
     }
 
+    function hasExpired() public view override returns (bool) {
+        uint256 currentTimestamp = Timestamps.getCurrentTimestamp();
+
+        return currentTimestamp > _expiration;
+    }
+
+    function _isWhitelisted() internal view virtual returns (bool) {
+        return IWhitelistReader(whitelist()).isAllowed(address(this));
+    }
+
+    // ************************
+
+    // ERC1271 implementation
     bytes4 internal constant MAGICVALUE = 0x1626ba7e;
 
     /**
@@ -169,8 +196,10 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         bytes32 _hash,
         bytes calldata _signature
     ) external view override returns (bytes4) {
+        address signer = recoverSigner(_hash, _signature);
+
         // Validate signatures
-        if (recoverSigner(_hash, _signature) == owner) {
+        if (signer == owner()) {
             return MAGICVALUE;
         } else {
             return 0xffffffff;
@@ -246,4 +275,10 @@ contract Card is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
 
         return signer;
     }
+
+    // ************************
+
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
 }

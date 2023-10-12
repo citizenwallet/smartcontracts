@@ -9,6 +9,8 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
+import "../interfaces/ICard.sol";
+import "../interfaces/IWhitelistReader.sol";
 import "./Card.sol";
 
 /**
@@ -18,15 +20,18 @@ import "./Card.sol";
  * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
  */
 contract CardFactory is Initializable, OwnableUpgradeable, UUPSUpgradeable {
-    Card public accountImplementation;
+    ICard public accountImplementation;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
-    function initialize(IEntryPoint _entryPoint) public initializer {
-        accountImplementation = new Card(_entryPoint);
+    function initialize(
+        IEntryPoint _entryPoint,
+        IWhitelistReader _whitelist
+    ) public initializer {
+        accountImplementation = new Card(_entryPoint, _whitelist);
 
         __Ownable_init();
         __UUPSUpgradeable_init();
@@ -41,7 +46,7 @@ contract CardFactory is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     function createAccount(
         address owner,
         uint256 salt
-    ) public returns (Card ret) {
+    ) public returns (ICard ret) {
         address addr = getAddress(owner, salt);
         uint codeSize = addr.code.length;
         if (codeSize > 0) {
