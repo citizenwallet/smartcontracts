@@ -9,8 +9,8 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
-import "../interfaces/ICard.sol";
-import "../interfaces/IWhitelistReader.sol";
+import "./interfaces/ICard.sol";
+import "./interfaces/IWhitelistReader.sol";
 import "./Card.sol";
 
 /**
