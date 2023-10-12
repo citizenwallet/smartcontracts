@@ -8,9 +8,37 @@
 
 ## Cards
 
-...
+### Card ownership
+
+.
+
+### Allow transactions
+
+.
+
+### Expiry
+
+.
+
+### Ownership verification
+
+ERC1271 + Traditional owner
 
 ## Whitelist
 
-...
+### Allow
+
+.
+
+### Freeze
+
+.
+
+### General whitelist
+
+.
+
+### Personal whitelist
+
+.
 
