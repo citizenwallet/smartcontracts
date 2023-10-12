@@ -6,43 +6,15 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./interfaces/IWhitelistReader.sol";
+import "./interfaces/IWhitelistAdmin.sol";
 
 contract Whitelist is
     IWhitelistReader,
+    IWhitelistAdmin,
     Initializable,
     OwnableUpgradeable,
     UUPSUpgradeable
 {
-    // maximum number of personal whitelist addresses allowed
-    uint256 public constant MAX_PERSONAL = 20;
-
-    // global list of addresses that are allowed to use the card
-    address[] private _authorized;
-
-    // personal list of addresses that are allowed to use the card
-    mapping(address owner => address[] personal) private _personal;
-
-    // freeze all transfers
-    bool private _frozen = false;
-
-    function frozen() public view returns (bool) {
-        return _frozen;
-    }
-
-    function freeze() public onlyOwner {
-        _frozen = true;
-    }
-
-    function unfreeze() public onlyOwner {
-        _frozen = false;
-    }
-
-    // ********************
-
-    function authorized() public view virtual returns (address[] memory) {
-        return _authorized;
-    }
-
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -51,6 +23,18 @@ contract Whitelist is
     function initialize() public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
+    }
+
+    // Public controls
+
+    // maximum number of personal whitelist addresses allowed
+    uint256 public MAX_PERSONAL = 20;
+
+    // personal list of addresses that are allowed to use the card
+    mapping(address owner => address[] personal) private _personal;
+
+    function authorized() public view virtual returns (address[] memory) {
+        return _authorized;
     }
 
     function isAllowed(address from) public view override returns (bool) {
@@ -73,7 +57,7 @@ contract Whitelist is
         return _containsAddress(personalList, to);
     }
 
-    function maxPersonal() public pure override returns (uint256) {
+    function maxPersonal() public view override returns (uint256) {
         return MAX_PERSONAL;
     }
 
@@ -98,6 +82,43 @@ contract Whitelist is
         // return the new personal list
         return _personal[owner];
     }
+
+    // ********************
+
+    // Admin controls
+
+    // global list of addresses that are allowed to use the card
+    address[] private _authorized;
+
+    bool private _frozen = false;
+
+    function frozen() public view override returns (bool) {
+        return _frozen;
+    }
+
+    function freeze() public override onlyOwner {
+        _frozen = true;
+    }
+
+    function unfreeze() public override onlyOwner {
+        _frozen = false;
+    }
+
+    function updateMaxPersonal(uint256 _maxPersonal) public override onlyOwner {
+        MAX_PERSONAL = _maxPersonal;
+    }
+
+    function updateWhitelist(
+        address[] calldata newAuthorized
+    ) public override onlyOwner returns (address[] memory) {
+        // update the global list
+        _authorized = newAuthorized;
+
+        // return the new global list
+        return _authorized;
+    }
+
+    // ********************
 
     function _containsAddress(
         address[] memory list,
