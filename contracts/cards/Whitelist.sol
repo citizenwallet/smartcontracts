@@ -23,12 +23,15 @@ contract Whitelist is
     function initialize() public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
+
+        MAX_PERSONAL = 20;
+        _frozen = false;
     }
 
     // Public controls
 
     // maximum number of personal whitelist addresses allowed
-    uint256 public MAX_PERSONAL = 20;
+    uint256 public MAX_PERSONAL;
 
     // personal list of addresses that are allowed to use the card
     mapping(address owner => address[] personal) private _personal;
@@ -90,7 +93,7 @@ contract Whitelist is
     // global list of addresses that are allowed to use the card
     address[] private _authorized;
 
-    bool private _frozen = false;
+    bool private _frozen;
 
     function frozen() public view override returns (bool) {
         return _frozen;

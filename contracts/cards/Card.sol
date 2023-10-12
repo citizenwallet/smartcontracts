@@ -10,9 +10,8 @@ import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 import "./interfaces/ICard.sol";
 import "./interfaces/IWhitelistReader.sol";
+import "./interfaces/ITimestamps.sol";
 import "../accounts/callback/TokenCallbackHandler.sol";
-
-import "./utils/Timestamps.sol";
 
 // https://github.com/eth-infinitism/account-abstraction/blob/develop/contracts/samples/SimpleAccount.sol
 // Card,
@@ -24,6 +23,19 @@ contract Card is
     OwnableUpgradeable,
     UUPSUpgradeable
 {
+    constructor(
+        IEntryPoint anEntryPoint,
+        IWhitelistReader aWhitelist,
+        ITimestamps aTimestamps
+    ) {
+        _entryPoint = anEntryPoint;
+        _whitelist = aWhitelist;
+        _timestamps = aTimestamps;
+
+        _expiration = ITimestamps(timestamps()).getTimestampAfterXYears(3);
+        _disableInitializers();
+    }
+
     // ERC4337 implementation
     using ECDSA for bytes32;
 
@@ -41,13 +53,6 @@ contract Card is
 
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
-
-    constructor(IEntryPoint anEntryPoint, IWhitelistReader aWhitelist) {
-        _expiration = Timestamps.getTimestampAfterXYears(3);
-        _entryPoint = anEntryPoint;
-        _whitelist = aWhitelist;
-        _disableInitializers();
-    }
 
     /**
      * execute a transaction (called directly from owner, or by entryPoint)
@@ -165,19 +170,33 @@ contract Card is
 
     // ************************
 
+    // Timestamps implementation
+    ITimestamps private immutable _timestamps;
+
+    function timestamps() public view virtual returns (ITimestamps) {
+        return _timestamps;
+    }
+
+    // ************************
+
     // Card implementation
     uint256 private immutable _expiration;
 
-    IWhitelistReader private _whitelist;
+    IWhitelistReader private immutable _whitelist;
 
     function whitelist() public view virtual returns (IWhitelistReader) {
         return _whitelist;
     }
 
     function hasExpired() public view override returns (bool) {
-        uint256 currentTimestamp = Timestamps.getCurrentTimestamp();
+        uint256 currentTimestamp = ITimestamps(timestamps())
+            .getCurrentTimestamp();
 
         return currentTimestamp > _expiration;
+    }
+
+    function expiresAt() external view returns (uint256) {
+        return _expiration;
     }
 
     function _isWhitelisted() internal view virtual returns (bool) {

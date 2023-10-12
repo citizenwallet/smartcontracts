@@ -16,4 +16,6 @@ interface ICard is
     IERC1155Receiver
 {
     function hasExpired() external view returns (bool);
+
+    function expiresAt() external view returns (uint256);
 }
