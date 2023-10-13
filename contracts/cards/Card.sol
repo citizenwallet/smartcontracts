@@ -10,7 +10,7 @@ import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 import "./interfaces/ICard.sol";
 import "./interfaces/IWhitelistReader.sol";
-import "./interfaces/ITimestamps.sol";
+import "./utils/TimestampLib.sol";
 import "../accounts/callback/TokenCallbackHandler.sol";
 
 // https://github.com/eth-infinitism/account-abstraction/blob/develop/contracts/samples/SimpleAccount.sol
@@ -23,16 +23,16 @@ contract Card is
     OwnableUpgradeable,
     UUPSUpgradeable
 {
-    constructor(
-        IEntryPoint anEntryPoint,
-        IWhitelistReader aWhitelist,
-        ITimestamps aTimestamps
-    ) {
+    // Timestamps implementation
+    using TimestampLib for uint256;
+
+    // ************************
+
+    constructor(IEntryPoint anEntryPoint, IWhitelistReader aWhitelist) {
         _entryPoint = anEntryPoint;
         _whitelist = aWhitelist;
-        _timestamps = aTimestamps;
 
-        _expiration = ITimestamps(timestamps()).getTimestampAfterXYears(3);
+        _expiration = uint256(3).getTimestampAfterXYears();
         _disableInitializers();
     }
 
@@ -170,15 +170,6 @@ contract Card is
 
     // ************************
 
-    // Timestamps implementation
-    ITimestamps private immutable _timestamps;
-
-    function timestamps() public view virtual returns (ITimestamps) {
-        return _timestamps;
-    }
-
-    // ************************
-
     // Card implementation
     uint256 private immutable _expiration;
 
@@ -189,8 +180,7 @@ contract Card is
     }
 
     function hasExpired() public view override returns (bool) {
-        uint256 currentTimestamp = ITimestamps(timestamps())
-            .getCurrentTimestamp();
+        uint256 currentTimestamp = TimestampLib.getCurrentTimestamp();
 
         return currentTimestamp > _expiration;
     }

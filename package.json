@@ -27,5 +27,8 @@
     "mocha": "^10.2.0",
     "typechain": "^8.1.1",
     "waffle": "^0.0.4"
+  },
+  "dependencies": {
+    "userop": "^0.3.3"
   }
 }

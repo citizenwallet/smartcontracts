@@ -11,7 +11,6 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 import "./interfaces/ICard.sol";
 import "./interfaces/IWhitelistReader.sol";
-import "./interfaces/ITimestamps.sol";
 import "./Card.sol";
 
 /**
@@ -30,10 +29,9 @@ contract CardFactory is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     function initialize(
         IEntryPoint _entryPoint,
-        IWhitelistReader _whitelist,
-        ITimestamps _timestamps
+        IWhitelistReader _whitelist
     ) public initializer {
-        accountImplementation = new Card(_entryPoint, _whitelist, _timestamps);
+        accountImplementation = new Card(_entryPoint, _whitelist);
 
         __Ownable_init();
         __UUPSUpgradeable_init();
