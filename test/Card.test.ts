@@ -1,9 +1,13 @@
+import fs from "fs";
+import path from "path";
+import "@nomicfoundation/hardhat-toolbox";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers, upgrades, network } from "hardhat";
 import { config } from "dotenv";
-import { providers } from "ethers";
+import { providers, ContractFactory } from "ethers";
 import { UserOperationBuilder, Presets } from "userop";
+import { keccak256 } from "ethers/lib/utils";
 
 const accountABI = ["function execute(address to, uint256 value, bytes data)"];
 
@@ -16,26 +20,13 @@ const partialERC20TokenABI = [
 const account = new ethers.utils.Interface(accountABI);
 const erc20Token = new ethers.utils.Interface(partialERC20TokenABI);
 
-// sould bound ERC721 with profile metadata uri
+// cards with paymaster and whitelist
 describe("Card", function () {
   config();
 
   async function deployCardFactoryFixture() {
-    const [owner, friend1, friend2] = await ethers.getSigners();
-
-    // console.log(await friend1.getBalance());
-
-    // await network.provider.send("hardhat_setBalance", [
-    //   friend1.address,
-    //   "0x8AC7230489E80000",
-    // ]);
-
-    // await network.provider.send("hardhat_setBalance", [
-    //   friend2.address,
-    //   "0x8AC7230489E80000",
-    // ]);
-
-    // console.log(await friend1.getBalance());
+    const [owner, friend1, friend2, friend3, paymasterSigner] =
+      await ethers.getSigners();
 
     const TokenContract = await ethers.getContractFactory("RegensUniteToken", {
       signer: owner,
@@ -45,19 +36,39 @@ describe("Card", function () {
       initializer: "initialize",
     });
 
-    const EntryPointContract = await ethers.getContractFactory(
-      "EntryPointTest",
-      { signer: owner }
+    const entrypointBin = fs
+      .readFileSync(path.join(__dirname, "data", "entrypoint.bin"))
+      .toString();
+    const entrypointABI = JSON.parse(
+      fs
+        .readFileSync(path.join(__dirname, "data", "entrypoint.abi.json"))
+        .toString()
+    );
+
+    const EntryPointContract = new ContractFactory(
+      entrypointABI,
+      entrypointBin,
+      owner
     );
     const entrypoint = await EntryPointContract.deploy();
 
-    const VerifyingPaymasterContract = await ethers.getContractFactory(
-      "VerifyingPaymasterTest",
-      { signer: owner }
+    const paymasterBin = fs
+      .readFileSync(path.join(__dirname, "data", "paymaster.bin"))
+      .toString();
+    const paymasterABI = JSON.parse(
+      fs
+        .readFileSync(path.join(__dirname, "data", "paymaster.abi.json"))
+        .toString()
+    );
+
+    const VerifyingPaymasterContract = new ContractFactory(
+      paymasterABI,
+      paymasterBin,
+      paymasterSigner
     );
     const paymaster = await VerifyingPaymasterContract.deploy(
       entrypoint.address,
-      owner.address
+      paymasterSigner.address
     );
 
     const WhitelistContract = await ethers.getContractFactory("Whitelist", {
@@ -67,6 +78,8 @@ describe("Card", function () {
       kind: "uups",
       initializer: "initialize",
     });
+
+    await whitelist.updateWhitelist([friend2.address]);
 
     const CardFactoryContract = await ethers.getContractFactory("CardFactory", {
       signer: owner,
@@ -93,7 +106,13 @@ describe("Card", function () {
       await cardFactory.getAddress(friend2.address, ethers.BigNumber.from(0))
     );
 
+    await entrypoint.connect(owner).depositTo(owner.address, {
+      value: ethers.BigNumber.from("1000000000000000000"),
+    });
     await entrypoint.connect(owner).depositTo(paymaster.address, {
+      value: ethers.BigNumber.from("1000000000000000000"),
+    });
+    await entrypoint.connect(paymasterSigner).addStake(1, {
       value: ethers.BigNumber.from("1000000000000000000"),
     });
     await entrypoint.connect(owner).depositTo(friend1.address, {
@@ -103,28 +122,9 @@ describe("Card", function () {
       value: ethers.BigNumber.from("1000000000000000000"),
     });
 
-    console.log(await entrypoint.deposits(paymaster.address));
-
-    // add funds to paymaster
-    await paymaster
-      .connect(owner)
-      .deposit({ value: ethers.BigNumber.from("1000000000000000000") });
-    await paymaster
-      .connect(friend1)
-      .deposit({ value: ethers.BigNumber.from("1000000000000000000") });
-
     // add funds
     await token.connect(owner).mint(card1.address, 1000000000, "owner");
     await token.connect(owner).mint(friend2.address, 1000000000, "friend1");
-
-    await network.provider.send("hardhat_setBalance", [
-      card1.address,
-      "0x8AC7230489E80000",
-    ]);
-
-    await card1
-      .connect(friend1)
-      .addDeposit({ value: ethers.BigNumber.from("1000000000000000000") });
 
     return {
       entrypoint,
@@ -135,8 +135,10 @@ describe("Card", function () {
       owner,
       friend1,
       friend2,
+      friend3,
       card1,
       card2,
+      paymasterSigner,
     };
   }
 
@@ -148,40 +150,117 @@ describe("Card", function () {
     });
 
     it("Should be able to handle ops", async function () {
-      const { entrypoint, paymaster, token, owner, friend1, friend2, card1 } =
-        await loadFixture(deployCardFactoryFixture);
+      const {
+        entrypoint,
+        paymaster,
+        token,
+        owner,
+        friend1,
+        friend2,
+        friend3,
+        card1,
+        paymasterSigner,
+        cardFactory,
+      } = await loadFixture(deployCardFactoryFixture);
+
+      const cardAddress = await cardFactory.getAddress(
+        friend3.address,
+        ethers.BigNumber.from(0)
+      );
+
+      // await cardFactory.createAccount(
+      //   friend3.address,
+      //   ethers.BigNumber.from(0)
+      // );
+
+      console.log(`card: ${cardAddress}`);
+
+      await token.connect(owner).mint(cardAddress, 1000000000, "owner");
+
+      console.log(await token.balanceOf(cardAddress));
 
       const addSender = async (ctx: any) => {
-        ctx.op.sender = card1.address;
+        ctx.op.sender = cardAddress;
       };
 
       const resolveAccount = async (ctx: any) => {
         // Fetch the latest nonce and initCode if required.
-        ctx.op.nonce = await card1.getNonce();
+        const nonce = await entrypoint.getNonce(cardAddress, 0n);
+        ctx.op.nonce = nonce;
+
+        const abi = ethers.utils.defaultAbiCoder;
+
+        const initCode = keccak256(
+          abi.encode(["address", "uint256"], [cardAddress, nonce])
+        );
+
+        // const initCode = cardFactory.interface.encodeFunctionData(
+        //   "createAccount",
+        //   [cardAddress, nonce]
+        // );
+
+        console.log("initCode: ", initCode);
+
         ctx.op.initCode = "0x";
+
+        // ctx.op.initCode = `${cardFactory.address}${initCode.replace("0x", "")}`;
       };
 
       const constructCallData = async (ctx: any) => {
         ctx.op.callData = account.encodeFunctionData("execute", [
           token.address,
           ethers.constants.Zero,
-          erc20Token.encodeFunctionData("transfer", [friend2.address, 0]),
+          erc20Token.encodeFunctionData("transfer", [friend2.address, 100n]),
         ]);
       };
 
       const addDefaultGasPrices = async (ctx: any) => {
-        ctx.op.callGasLimit = "0x88b8";
-        ctx.op.verificationGasLimit = "0x11170";
-        ctx.op.preVerificationGas = "0x5208";
-        ctx.op.maxFeePerGas = "0x47a4b601a";
-        ctx.op.maxPriorityFeePerGas = "0xac6ca0";
+        ctx.op.callGasLimit = "0x989680";
+        ctx.op.verificationGasLimit = "0x989680";
+        ctx.op.preVerificationGas = "0x1";
+        ctx.op.maxFeePerGas = "0x1";
+        ctx.op.maxPriorityFeePerGas = "0x1";
       };
 
       const constructPaymasterData = async (ctx: any) => {
         const current = (await time.latest()) + 86400;
         const hash = await paymaster.getHash(ctx.op, current, current + 86400);
 
-        ctx.op.paymasterAndData = hash;
+        console.log(`hash: ${hash}`);
+
+        const signature = await paymasterSigner.signMessage(hash);
+
+        const parsedSignature = ethers.utils.splitSignature(signature);
+        const joinedSignature = ethers.utils.joinSignature(parsedSignature);
+
+        console.log(
+          `signed hash: ${signature}`,
+          `length: ${joinedSignature.length}`
+        );
+
+        const abi = ethers.utils.defaultAbiCoder;
+
+        const encodedData = keccak256(
+          abi.encode(["uint48", "uint48"], [current, current + 86400])
+        );
+
+        console.log(
+          `encodedData: ${encodedData}`,
+          `length: ${encodedData.length}`
+        );
+
+        const paymasterAndData = `${paymaster.address}${encodedData.replace(
+          "0x",
+          ""
+        )}${signature.replace("0x", "")}`;
+
+        console.log(
+          `paymasterAndData: ${paymasterAndData}`,
+          `length: ${paymasterAndData.length}`
+        );
+
+        ctx.op.paymasterAndData = paymasterAndData;
+        // ctx.op.paymasterAndData = "0x";
       };
 
       const provider = new providers.JsonRpcProvider(
@@ -196,13 +275,27 @@ describe("Card", function () {
         // .useMiddleware(Presets.Middleware.getGasPrice(provider))
         .useMiddleware(addDefaultGasPrices)
         .useMiddleware(constructPaymasterData)
-        .useMiddleware(Presets.Middleware.EOASignature(friend1));
+        .useMiddleware(Presets.Middleware.EOASignature(friend3));
 
       const userop = await builder.buildOp(entrypoint.address, 1);
 
+      console.log("submitting user op");
       console.log(userop);
 
-      expect(await entrypoint.handleOps([userop], owner.address)).to.equal(1);
+      await entrypoint
+        .connect(owner)
+        .handleOps([userop], ethers.constants.AddressZero, {
+          gasLimit: 10000000,
+        });
+      // await entrypoint
+      //   .connect(entrypoint.signer)
+      //   .simulateHandleOp([userop], ethers.constants.AddressZero, "", {
+      //     gasLimit: 10000000,
+      //   });
+
+      console.log("submitted user op!");
+
+      // expect(await entrypoint.handleOps([userop], owner.address)).to.equal(1);
 
       builder.resetOp();
     });
