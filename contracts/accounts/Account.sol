@@ -129,7 +129,7 @@ contract Account is
         address anAuthorizer
     ) internal virtual {
         transferOwnership(anOwner);
-        authorizer = anAuthorizer; // at the initial stages, the authorizer is the owner
+        _authorizer = anAuthorizer; // at the initial stages, the authorizer is the owner
         emit AccountInitialized(_entryPoint, anOwner);
     }
 
@@ -138,7 +138,7 @@ contract Account is
         require(
             msg.sender == address(entryPoint()) ||
                 msg.sender == owner() ||
-                msg.sender == authorizer,
+                msg.sender == authorizer(),
             "account: not Owner or EntryPoint or Authorizer"
         );
     }
@@ -193,10 +193,14 @@ contract Account is
 
     // authorizer
 
-    address private authorizer;
+    address public _authorizer;
+
+    function authorizer() public view returns (address) {
+        return _authorizer;
+    }
 
     function updateAuthorizer(address newAuthorizer) public onlyOwner {
-        authorizer = newAuthorizer;
+        _authorizer = newAuthorizer;
     }
 
     // global list of addresses that are allowed to be called by this account
@@ -212,7 +216,7 @@ contract Account is
     // _requireWhitelistedIfAuthorizer checks if the given address is whitelisted for this account
     // if the sender is not the authorizer, the check is skipped
     function _requireWhitelistedIfAuthorizer(address dest) internal view {
-        if (msg.sender != authorizer) {
+        if (msg.sender != authorizer()) {
             // only applies to an authorizer
             return;
         }
