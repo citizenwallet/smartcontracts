@@ -15,6 +15,7 @@ async function main() {
   console.log("deploying...");
   const accFactory = await ethers.deployContract("AccountFactory", [
     process.env.ENTRYPOINT_ADDR,
+    process.env.PAYMASTER_ADDR,
   ]);
 
   console.log("request sent...");
