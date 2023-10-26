@@ -33,9 +33,7 @@ CW_CONTRACT_EXT_PATH='contracts/external'
 # file = solidity file name
 # TODO: fix contract compilation to not have duplicate package names
 CW_ACCOUNT_CONTRACTS=('account,Account' \ 
-        'accfactory,AccountFactory' \ 
-        'gateway,Gateway' \
-        'paymaster,Paymaster')
+        'accfactory,AccountFactory')
 
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \

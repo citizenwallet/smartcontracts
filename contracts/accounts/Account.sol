@@ -3,30 +3,44 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/interfaces/IERC1271.sol";
+
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
-import "@openzeppelin/contracts/interfaces/IERC1271.sol";
+import "@account-abstraction/contracts/core/NonceManager.sol";
 
 import "./callback/TokenCallbackHandler.sol";
 
-// https://github.com/guizostudios/ERC-4337/blob/main/contracts/SimpleAccount.sol
-// Account,
-contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
+/**
+ * minimal account with authorizer.
+ *  this is a minimal account which keeps all the standard ERC4337 support.
+ *  has execute, eth handling methods
+ *  has a single signer that can send requests through the entryPoint.
+ *  It adds a single authorizer, which can be used to run execute().
+ *  onlyOwner has been updated to be stricter and not allow entryPoint or authorizer to call it.
+ *  The authorizer can be only changed by the owner.
+ *
+ * https://github.com/eth-infinitism/account-abstraction/blob/develop/contracts/samples/SimpleAccount.sol
+ */
+contract Account is
+    IERC1271,
+    BaseAccount,
+    TokenCallbackHandler,
+    NonceManager,
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     using ECDSA for bytes32;
-
-    address public owner;
 
     IEntryPoint private immutable _entryPoint;
 
-    event SimpleAccountInitialized(
+    event AccountInitialized(
         IEntryPoint indexed entryPoint,
         address indexed owner
     );
-
-    modifier onlyOwner() {
-        _onlyOwner();
-        _;
-    }
 
     /// @inheritdoc BaseAccount
     function entryPoint() public view virtual override returns (IEntryPoint) {
@@ -41,14 +55,6 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         _disableInitializers();
     }
 
-    function _onlyOwner() internal view {
-        //directly from EOA owner, or through the account itself (which gets redirected through execute())
-        require(
-            msg.sender == owner || msg.sender == address(this),
-            "only owner"
-        );
-    }
-
     /**
      * execute a transaction (called directly from owner, or by entryPoint)
      */
@@ -57,7 +63,8 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         uint256 value,
         bytes calldata func
     ) external {
-        _requireFromEntryPointOrOwner();
+        _requireFromEntryPointOrOwnerOrAuthorizer();
+        _requireWhitelisted(dest);
         _call(dest, value, func);
     }
 
@@ -70,7 +77,7 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         uint256[] calldata value,
         bytes[] calldata func
     ) external {
-        _requireFromEntryPointOrOwner();
+        _requireFromEntryPointOrOwnerOrAuthorizer();
         require(
             dest.length == func.length &&
                 (value.length == 0 || value.length == func.length),
@@ -78,10 +85,12 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         );
         if (value.length == 0) {
             for (uint256 i = 0; i < dest.length; i++) {
+                _requireWhitelisted(dest[i]);
                 _call(dest[i], 0, func[i]);
             }
         } else {
             for (uint256 i = 0; i < dest.length; i++) {
+                _requireWhitelisted(dest[i]);
                 _call(dest[i], value[i], func[i]);
             }
         }
@@ -89,23 +98,28 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
 
     /**
      * @dev The _entryPoint member is immutable, to reduce gas consumption.  To upgrade EntryPoint,
-     * a new implementation of SimpleAccount must be deployed with the new EntryPoint address, then upgrading
+     * a new implementation of Account must be deployed with the new EntryPoint address, then upgrading
      * the implementation by calling `upgradeTo()`
      */
     function initialize(address anOwner) public virtual initializer {
+        __Ownable_init();
+
         _initialize(anOwner);
     }
 
     function _initialize(address anOwner) internal virtual {
-        owner = anOwner;
-        emit SimpleAccountInitialized(_entryPoint, owner);
+        transferOwnership(anOwner);
+        authorizer = anOwner; // at the initial stages, the authorizer is the owner
+        emit AccountInitialized(_entryPoint, anOwner);
     }
 
-    // Require the function call went through EntryPoint or owner
-    function _requireFromEntryPointOrOwner() internal view {
+    // Require the function call went through EntryPoint or owner or authorizer
+    function _requireFromEntryPointOrOwnerOrAuthorizer() internal view {
         require(
-            msg.sender == address(entryPoint()) || msg.sender == owner,
-            "account: not Owner or EntryPoint"
+            msg.sender == address(entryPoint()) ||
+                msg.sender == owner() ||
+                msg.sender == authorizer,
+            "account: not Owner or EntryPoint or Authorizer"
         );
     }
 
@@ -115,7 +129,7 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         bytes32 userOpHash
     ) internal virtual override returns (uint256 validationData) {
         bytes32 hash = userOpHash.toEthSignedMessageHash();
-        if (owner != hash.recover(userOp.signature))
+        if (owner() != hash.recover(userOp.signature))
             return SIG_VALIDATION_FAILED;
         return 0;
     }
@@ -155,11 +169,57 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         entryPoint().withdrawTo(withdrawAddress, amount);
     }
 
-    function _authorizeUpgrade(address newImplementation) internal view {
-        (newImplementation);
-        _onlyOwner();
+    // ************************
+
+    // authorizer
+
+    address private authorizer;
+
+    function updateAuthorizer(address newAuthorizer) public onlyOwner {
+        authorizer = newAuthorizer;
     }
 
+    // global list of addresses that are allowed to be called by this account
+    address[] private _whitelist;
+
+    function updateWhitelist(
+        address[] calldata newAuthorized
+    ) public onlyOwner {
+        // update the global list
+        _whitelist = newAuthorized;
+    }
+
+    // _requireWhitelisted checks if the given address is whitelisted for this account
+    // if the sender is not the authorizer, the check is skipped
+    function _requireWhitelisted(address dest) internal view {
+        if (msg.sender != authorizer) {
+            return;
+        }
+
+        // only the authorizer should be checked against the whitelist
+        require(
+            _containsAddress(_whitelist, dest),
+            "account: address not whitelisted"
+        );
+    }
+
+    function _containsAddress(
+        address[] memory list,
+        address value
+    ) internal pure returns (bool) {
+        for (uint256 i = 0; i < list.length; i++) {
+            if (list[i] == value) {
+                return true; // Value found in the list
+            }
+        }
+        return false; // Value not found in the list
+    }
+
+    // ************************
+
+    // ************************
+
+    // ERC1271 implementation
     bytes4 internal constant MAGICVALUE = 0x1626ba7e;
 
     /**
@@ -169,8 +229,10 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         bytes32 _hash,
         bytes calldata _signature
     ) external view override returns (bytes4) {
+        address signer = recoverSigner(_hash, _signature);
+
         // Validate signatures
-        if (recoverSigner(_hash, _signature) == owner) {
+        if (signer == owner()) {
             return MAGICVALUE;
         } else {
             return 0xffffffff;
@@ -245,5 +307,13 @@ contract Account is BaseAccount, IERC1271, TokenCallbackHandler, Initializable {
         );
 
         return signer;
+    }
+
+    // ************************
+
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal view override onlyOwner {
+        (newImplementation);
     }
 }

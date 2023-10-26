@@ -5,28 +5,22 @@ async function main() {
   console.log("reading config...");
   config();
 
-  // const overrides = {
-  //   nonce: 0,
-  // };
+  if (
+    process.env.ENTRYPOINT_ADDR === undefined ||
+    process.env.ENTRYPOINT_ADDR === ""
+  ) {
+    throw Error("ENTRYPOINT_ADDR is not set");
+  }
 
   console.log("deploying...");
-  // const accf = await ethers.deployContract("AccountFactory", [
-  //   "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
-  // ]);
-  const accf = await ethers.getContractFactory("AccountFactory");
-
-  const contract = await accf.deploy(
-    "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789"
-    // overrides
-  );
+  const accFactory = await ethers.deployContract("AccountFactory", [
+    process.env.ENTRYPOINT_ADDR,
+  ]);
 
   console.log("request sent...");
-  console.log(
-    `Account Factory will be deployed to ${contract.address} tx: ${contract.deployTransaction.hash}`
-  );
-  await contract.deployTransaction.wait();
+  await accFactory.deployed();
 
-  console.log("Account Factory deployed");
+  console.log(`Account Factory deployed to: ${accFactory.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
