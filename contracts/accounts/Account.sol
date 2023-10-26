@@ -193,7 +193,7 @@ contract Account is
 
     // authorizer
 
-    address public _authorizer;
+    address private _authorizer;
 
     function authorizer() public view returns (address) {
         return _authorizer;
