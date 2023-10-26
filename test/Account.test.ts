@@ -9,7 +9,15 @@ import { providers, ContractFactory } from "ethers";
 import { UserOperationBuilder, Presets } from "userop";
 import { keccak256 } from "ethers/lib/utils";
 
-const accountABI = ["function execute(address to, uint256 value, bytes data)"];
+const accountExecuteABI = [
+  "function execute(address to, uint256 value, bytes data)",
+];
+const accountUpdateAuthorizerABI = [
+  "function updateAuthorizer(address newAuthorizer)",
+];
+const accountUpdateWhitelistABI = [
+  "function updateWhitelist(address[] newWhitelist)",
+];
 
 // An ABI can be fragments and does not have to include the entire interface.
 // As long as it includes the parts we want to use.
@@ -17,7 +25,13 @@ const partialERC20TokenABI = [
   "function transfer(address to, uint amount) returns (bool)",
 ];
 
-const account = new ethers.utils.Interface(accountABI);
+const accountExecute = new ethers.utils.Interface(accountExecuteABI);
+const accountUpdateAuthorizer = new ethers.utils.Interface(
+  accountUpdateAuthorizerABI
+);
+const accountUpdateWhitelist = new ethers.utils.Interface(
+  accountUpdateWhitelistABI
+);
 const erc20Token = new ethers.utils.Interface(partialERC20TokenABI);
 
 // cards with paymaster and whitelist
@@ -58,23 +72,17 @@ describe("Account", function () {
         signer: owner,
       }
     );
+
     const accountFactory = await AccountFactoryContract.deploy(
-      entrypoint.address
+      entrypoint.address,
+      authorizer.address
     );
-    // const accountFactory = await upgrades.deployProxy(
-    //   AccountFactoryContract,
-    //   [],
-    //   {
-    //     kind: "uups",
-    //     initializer: "initialize",
-    //     constructorArgs: [entrypoint.address],
-    //   }
-    // );
 
     await accountFactory.createAccount(
       friend1.address,
       ethers.BigNumber.from(0)
     );
+
     await accountFactory.createAccount(
       friend2.address,
       ethers.BigNumber.from(0)
@@ -85,16 +93,30 @@ describe("Account", function () {
       await accountFactory.getAddress(friend1.address, ethers.BigNumber.from(0))
     );
 
-    await account1.connect(friend1).updateAuthorizer(authorizer.address);
-    await account1.connect(friend1).updateWhitelist([token.address]);
+    await account1
+      .connect(authorizer)
+      .execute(
+        account1.address,
+        ethers.constants.Zero,
+        accountUpdateWhitelist.encodeFunctionData("updateWhitelist", [
+          [token.address],
+        ])
+      );
 
     const account2 = await ethers.getContractAt(
       "Account",
       await accountFactory.getAddress(friend2.address, ethers.BigNumber.from(0))
     );
 
-    await account2.connect(friend2).updateAuthorizer(authorizer.address);
-    await account2.connect(friend2).updateWhitelist([token.address]);
+    await account2
+      .connect(authorizer)
+      .execute(
+        account2.address,
+        ethers.constants.Zero,
+        accountUpdateWhitelist.encodeFunctionData("updateWhitelist", [
+          [token.address],
+        ])
+      );
 
     await entrypoint.connect(owner).depositTo(owner.address, {
       value: ethers.BigNumber.from("1000000000000000000"),
@@ -131,7 +153,7 @@ describe("Account", function () {
         deployCardFactoryFixture
       );
 
-      const mintedAmount = 1000000000;
+      const mintedAmount = 1000000000n;
 
       await token.connect(owner).mint(account1.address, mintedAmount, "owner");
 
@@ -148,7 +170,7 @@ describe("Account", function () {
         );
 
       // balance should match what was sent
-      expect(await token.balanceOf(account2.address)).to.equal(100);
+      expect(await token.balanceOf(account2.address)).to.equal(100n);
     });
 
     it("Someone else should not be able to transfer ERC20 directly (not owner)", async function () {

@@ -14,11 +14,14 @@ import "./Account.sol";
  * The factory's createAccount returns the target account address even if it is already installed.
  * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
  */
-contract AccountFactory {
+contract AccountFactory is NonceManager {
     Account public immutable accountImplementation;
 
-    constructor(IEntryPoint _entryPoint) {
-        accountImplementation = new Account(_entryPoint);
+    address private immutable authorizer;
+
+    constructor(IEntryPoint _entryPoint, address _authorizer) {
+        accountImplementation = new Account(_entryPoint, this);
+        authorizer = _authorizer;
     }
 
     /**
@@ -40,7 +43,7 @@ contract AccountFactory {
             payable(
                 new ERC1967Proxy{salt: bytes32(salt)}(
                     address(accountImplementation),
-                    abi.encodeCall(Account.initialize, (owner))
+                    abi.encodeCall(Account.initialize, (owner, authorizer))
                 )
             )
         );
@@ -61,7 +64,10 @@ contract AccountFactory {
                         type(ERC1967Proxy).creationCode,
                         abi.encode(
                             address(accountImplementation),
-                            abi.encodeCall(Account.initialize, (owner))
+                            abi.encodeCall(
+                                Account.initialize,
+                                (owner, authorizer)
+                            )
                         )
                     )
                 )

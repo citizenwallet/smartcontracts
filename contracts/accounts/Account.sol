@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
-import "@account-abstraction/contracts/core/NonceManager.sol";
+import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
 import "./callback/TokenCallbackHandler.sol";
 
@@ -19,7 +19,6 @@ import "./callback/TokenCallbackHandler.sol";
  *  has execute, eth handling methods
  *  has a single signer that can send requests through the entryPoint.
  *  It adds a single authorizer, which can be used to run execute().
- *  onlyOwner has been updated to be stricter and not allow entryPoint or authorizer to call it.
  *  The authorizer can be only changed by the owner.
  *
  * https://github.com/eth-infinitism/account-abstraction/blob/develop/contracts/samples/SimpleAccount.sol
@@ -28,7 +27,6 @@ contract Account is
     IERC1271,
     BaseAccount,
     TokenCallbackHandler,
-    NonceManager,
     Initializable,
     OwnableUpgradeable,
     UUPSUpgradeable
@@ -42,6 +40,21 @@ contract Account is
         address indexed owner
     );
 
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyAccountOwner() {
+        _checkAccountOwner();
+        _;
+    }
+
+    function _checkAccountOwner() internal view virtual {
+        require(
+            owner() == _msgSender() || address(this) == _msgSender(),
+            "Ownable: caller is not the owner or the contract"
+        );
+    }
+
     /// @inheritdoc BaseAccount
     function entryPoint() public view virtual override returns (IEntryPoint) {
         return _entryPoint;
@@ -50,8 +63,9 @@ contract Account is
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    constructor(IEntryPoint anEntryPoint) {
+    constructor(IEntryPoint anEntryPoint, INonceManager aNonceManager) {
         _entryPoint = anEntryPoint;
+        nonceManager = aNonceManager;
         _disableInitializers();
     }
 
@@ -64,7 +78,7 @@ contract Account is
         bytes calldata func
     ) external {
         _requireFromEntryPointOrOwnerOrAuthorizer();
-        _requireWhitelisted(dest);
+        _requireWhitelistedIfAuthorizer(dest);
         _call(dest, value, func);
     }
 
@@ -85,12 +99,12 @@ contract Account is
         );
         if (value.length == 0) {
             for (uint256 i = 0; i < dest.length; i++) {
-                _requireWhitelisted(dest[i]);
+                _requireWhitelistedIfAuthorizer(dest[i]);
                 _call(dest[i], 0, func[i]);
             }
         } else {
             for (uint256 i = 0; i < dest.length; i++) {
-                _requireWhitelisted(dest[i]);
+                _requireWhitelistedIfAuthorizer(dest[i]);
                 _call(dest[i], value[i], func[i]);
             }
         }
@@ -101,15 +115,21 @@ contract Account is
      * a new implementation of Account must be deployed with the new EntryPoint address, then upgrading
      * the implementation by calling `upgradeTo()`
      */
-    function initialize(address anOwner) public virtual initializer {
+    function initialize(
+        address anOwner,
+        address anAuthorizer
+    ) public virtual initializer {
         __Ownable_init();
 
-        _initialize(anOwner);
+        _initialize(anOwner, anAuthorizer);
     }
 
-    function _initialize(address anOwner) internal virtual {
+    function _initialize(
+        address anOwner,
+        address anAuthorizer
+    ) internal virtual {
         transferOwnership(anOwner);
-        authorizer = anOwner; // at the initial stages, the authorizer is the owner
+        authorizer = anAuthorizer; // at the initial stages, the authorizer is the owner
         emit AccountInitialized(_entryPoint, anOwner);
     }
 
@@ -183,16 +203,22 @@ contract Account is
     address[] private _whitelist;
 
     function updateWhitelist(
-        address[] calldata newAuthorized
-    ) public onlyOwner {
+        address[] calldata newWhitelist
+    ) public onlyAccountOwner {
         // update the global list
-        _whitelist = newAuthorized;
+        _whitelist = newWhitelist;
     }
 
-    // _requireWhitelisted checks if the given address is whitelisted for this account
+    // _requireWhitelistedIfAuthorizer checks if the given address is whitelisted for this account
     // if the sender is not the authorizer, the check is skipped
-    function _requireWhitelisted(address dest) internal view {
+    function _requireWhitelistedIfAuthorizer(address dest) internal view {
         if (msg.sender != authorizer) {
+            // only applies to an authorizer
+            return;
+        }
+
+        if (dest == address(this)) {
+            // only an authorizer can call this account
             return;
         }
 
@@ -216,6 +242,10 @@ contract Account is
     }
 
     // ************************
+
+    // nonce management
+
+    INonceManager public immutable nonceManager;
 
     // ************************
 
