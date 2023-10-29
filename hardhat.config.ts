@@ -35,7 +35,7 @@ const hhconfig: HardhatUserConfig = {
     celo: {
       url: process.env.CELO_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: 30000000, // this is 30 Gwei
+      gasPrice: 5000000000, // this is 30 Gwei
     },
   },
   etherscan: {
@@ -59,7 +59,7 @@ const hhconfig: HardhatUserConfig = {
         network: "celo",
         chainId: 42220,
         urls: {
-          apiURL: "https://api.celoscan.io",
+          apiURL: "https://api.celoscan.io/api",
           browserURL: "https://celoscan.io",
         },
       },
