@@ -127,45 +127,6 @@ contract Authorizer is
         }
     }
 
-    // A memory copy of UserOp static fields only.
-    // Excluding: callData, initCode and signature. Replacing paymasterAndData with paymaster.
-    struct MemoryUserOp {
-        address sender;
-        uint256 nonce;
-        uint256 callGasLimit;
-        uint256 verificationGasLimit;
-        uint256 preVerificationGas;
-        address paymaster;
-        uint256 maxFeePerGas;
-        uint256 maxPriorityFeePerGas;
-    }
-
-    /**
-     * copy general fields from userOp into the memory opInfo structure.
-     */
-    function _copyUserOpToMemory(
-        UserOperation calldata userOp,
-        MemoryUserOp memory mUserOp
-    ) internal pure {
-        mUserOp.sender = userOp.sender;
-        mUserOp.nonce = userOp.nonce;
-        mUserOp.callGasLimit = userOp.callGasLimit;
-        mUserOp.verificationGasLimit = userOp.verificationGasLimit;
-        mUserOp.preVerificationGas = userOp.preVerificationGas;
-        mUserOp.maxFeePerGas = userOp.maxFeePerGas;
-        mUserOp.maxPriorityFeePerGas = userOp.maxPriorityFeePerGas;
-        bytes calldata paymasterAndData = userOp.paymasterAndData;
-        if (paymasterAndData.length > 0) {
-            require(
-                paymasterAndData.length >= 20,
-                "AA93 invalid paymasterAndData"
-            );
-            mUserOp.paymaster = address(bytes20(paymasterAndData[:20]));
-        } else {
-            mUserOp.paymaster = address(0);
-        }
-    }
-
     function _authorizeUpgrade(
         address newImplementation
     ) internal view override onlyOwner {
