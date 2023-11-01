@@ -9,9 +9,9 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
-import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
 import "./callback/TokenCallbackHandler.sol";
+import "./interfaces/IAuthorizer.sol";
 
 /**
  * minimal account with authorizer.
@@ -63,9 +63,8 @@ contract Account is
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    constructor(IEntryPoint anEntryPoint, INonceManager aNonceManager) {
+    constructor(IEntryPoint anEntryPoint) {
         _entryPoint = anEntryPoint;
-        nonceManager = aNonceManager;
         _disableInitializers();
     }
 
@@ -78,7 +77,6 @@ contract Account is
         bytes calldata func
     ) external {
         _requireFromEntryPointOrOwnerOrAuthorizer();
-        _requireWhitelistedIfAuthorizer(dest);
         _call(dest, value, func);
     }
 
@@ -99,12 +97,10 @@ contract Account is
         );
         if (value.length == 0) {
             for (uint256 i = 0; i < dest.length; i++) {
-                _requireWhitelistedIfAuthorizer(dest[i]);
                 _call(dest[i], 0, func[i]);
             }
         } else {
             for (uint256 i = 0; i < dest.length; i++) {
-                _requireWhitelistedIfAuthorizer(dest[i]);
                 _call(dest[i], value[i], func[i]);
             }
         }
@@ -117,7 +113,7 @@ contract Account is
      */
     function initialize(
         address anOwner,
-        address anAuthorizer
+        IAuthorizer anAuthorizer
     ) public virtual initializer {
         __Ownable_init();
 
@@ -126,7 +122,7 @@ contract Account is
 
     function _initialize(
         address anOwner,
-        address anAuthorizer
+        IAuthorizer anAuthorizer
     ) internal virtual {
         transferOwnership(anOwner);
         _authorizer = anAuthorizer; // at the initial stages, the authorizer is the owner
@@ -193,63 +189,15 @@ contract Account is
 
     // authorizer
 
-    address private _authorizer;
+    IAuthorizer private _authorizer;
 
     function authorizer() public view returns (address) {
-        return _authorizer;
+        return address(_authorizer);
     }
 
     function updateAuthorizer(address newAuthorizer) public onlyOwner {
-        _authorizer = newAuthorizer;
+        _authorizer = IAuthorizer(newAuthorizer);
     }
-
-    // global list of addresses that are allowed to be called by this account
-    address[] private _whitelist;
-
-    function updateWhitelist(
-        address[] calldata newWhitelist
-    ) public onlyAccountOwner {
-        // update the global list
-        _whitelist = newWhitelist;
-    }
-
-    // _requireWhitelistedIfAuthorizer checks if the given address is whitelisted for this account
-    // if the sender is not the authorizer, the check is skipped
-    function _requireWhitelistedIfAuthorizer(address dest) internal view {
-        if (msg.sender != authorizer()) {
-            // only applies to an authorizer
-            return;
-        }
-
-        if (dest == address(this)) {
-            // only an authorizer can call this account
-            return;
-        }
-
-        // only the authorizer should be checked against the whitelist
-        require(
-            _containsAddress(_whitelist, dest),
-            "account: address not whitelisted"
-        );
-    }
-
-    function _containsAddress(
-        address[] memory list,
-        address value
-    ) internal pure returns (bool) {
-        for (uint256 i = 0; i < list.length; i++) {
-            if (list[i] == value) {
-                return true; // Value found in the list
-            }
-        }
-        return false; // Value not found in the list
-    }
-
-    // ************************
-
-    // nonce management
-
-    INonceManager public immutable nonceManager;
 
     // ************************
 

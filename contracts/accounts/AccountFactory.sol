@@ -7,6 +7,7 @@ import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import "@account-abstraction/contracts/core/NonceManager.sol";
 
 import "./Account.sol";
+import "./interfaces/IAuthorizer.sol";
 
 /**
  * A sample factory contract for Account
@@ -17,10 +18,10 @@ import "./Account.sol";
 contract AccountFactory is NonceManager {
     Account public immutable accountImplementation;
 
-    address private immutable authorizer;
+    IAuthorizer private immutable authorizer;
 
-    constructor(IEntryPoint _entryPoint, address _authorizer) {
-        accountImplementation = new Account(_entryPoint, this);
+    constructor(IEntryPoint _entryPoint, IAuthorizer _authorizer) {
+        accountImplementation = new Account(_entryPoint);
         authorizer = _authorizer;
     }
 
