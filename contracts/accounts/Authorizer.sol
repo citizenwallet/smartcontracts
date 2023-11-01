@@ -56,14 +56,16 @@ contract Authorizer is
             // verify paymaster signature
             _validatePaymaster(op);
 
+            address sender = op.getSender();
+
             // verify nonce
-            _validateNonce(op);
+            _validateNonce(op, sender);
 
             // verify account
-            _validateAccount(op);
+            _validateAccount(op, sender);
 
             // execute the op
-            // TODO: execute the op
+            _call(sender, 0, op.callData);
 
             unchecked {
                 ++i;
@@ -87,15 +89,21 @@ contract Authorizer is
         );
     }
 
-    function _validateNonce(UserOperation calldata op) internal virtual {
-        uint256 nonce = getNonce(op.sender);
+    function _validateNonce(
+        UserOperation calldata op,
+        address sender
+    ) internal virtual {
+        uint256 nonce = getNonce(sender);
 
         require(op.nonce == nonce, "invalid nonce");
     }
 
-    function _validateAccount(UserOperation calldata op) internal virtual {
+    function _validateAccount(
+        UserOperation calldata op,
+        address sender
+    ) internal virtual {
         // verify the user op signature
-        IERC1271 account = IERC1271(op.sender);
+        IERC1271 account = IERC1271(sender);
 
         account.isValidSignature(op.hash(), op.signature);
 
@@ -104,10 +112,10 @@ contract Authorizer is
             return;
         }
 
-        _createAccount(op);
+        _initAccount(op);
     }
 
-    function _createAccount(UserOperation calldata op) internal virtual {
+    function _initAccount(UserOperation calldata op) internal virtual {
         bytes calldata initCode = op.initCode;
 
         require(initCode.length >= 20, "invalid initCode");
