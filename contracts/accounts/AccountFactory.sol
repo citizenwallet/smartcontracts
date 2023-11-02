@@ -4,27 +4,23 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/utils/Create2.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
-import "@account-abstraction/contracts/core/NonceManager.sol";
 
 import "./Account.sol";
 import "./interfaces/IAuthorizer.sol";
 
 /**
- * A sample factory contract for Account
- * A UserOperations "initCode" holds the address of the factory, and a method call (to createAccount, in this sample factory).
- * The factory's createAccount returns the target account address even if it is already installed.
- * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
+ * @title AccountFactory
+ * @dev Contract for creating new accounts and calculating their counterfactual addresses.
+ *
+ * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/SimpleAccountFactory.sol
  */
-contract AccountFactory is NonceManager {
+contract AccountFactory {
     Account public immutable accountImplementation;
-
-    IAuthorizer private immutable authorizer;
 
     event AccountCreated(address indexed account);
 
     constructor(IEntryPoint _entryPoint, IAuthorizer _authorizer) {
-        accountImplementation = new Account(_entryPoint);
-        authorizer = _authorizer;
+        accountImplementation = new Account(_entryPoint, _authorizer);
     }
 
     /**
@@ -49,7 +45,7 @@ contract AccountFactory is NonceManager {
             payable(
                 new ERC1967Proxy{salt: bytes32(salt)}(
                     address(accountImplementation),
-                    abi.encodeCall(Account.initialize, (owner, authorizer))
+                    abi.encodeCall(Account.initialize, (owner))
                 )
             )
         );
@@ -70,10 +66,7 @@ contract AccountFactory is NonceManager {
                         type(ERC1967Proxy).creationCode,
                         abi.encode(
                             address(accountImplementation),
-                            abi.encodeCall(
-                                Account.initialize,
-                                (owner, authorizer)
-                            )
+                            abi.encodeCall(Account.initialize, (owner))
                         )
                     )
                 )

@@ -14,14 +14,12 @@ import "./callback/TokenCallbackHandler.sol";
 import "./interfaces/IAuthorizer.sol";
 
 /**
- * minimal account with authorizer.
- *  this is a minimal account which keeps all the standard ERC4337 support.
- *  has execute, eth handling methods
- *  has a single signer that can send requests through the entryPoint.
- *  It adds a single authorizer, which can be used to run execute().
- *  The authorizer can be only changed by the owner.
+ * @title Account
+ * @dev This contract represents an account that can execute transactions and store funds in an entry point contract.
+ * It implements the ERC1271 standard for signature validation and is upgradeable using the UUPSUpgradeable pattern.
+ * The account owner can execute transactions directly or through the entry point contract, and can allow an authorizer contract to execute transactions on its behalf.
  *
- * https://github.com/eth-infinitism/account-abstraction/blob/develop/contracts/samples/SimpleAccount.sol
+ * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/SimpleAccount.sol
  */
 contract Account is
     IERC1271,
@@ -63,8 +61,9 @@ contract Account is
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    constructor(IEntryPoint anEntryPoint) {
+    constructor(IEntryPoint anEntryPoint, IAuthorizer anAuthorizer) {
         _entryPoint = anEntryPoint;
+        _authorizer = anAuthorizer;
         _disableInitializers();
     }
 
@@ -111,21 +110,14 @@ contract Account is
      * a new implementation of Account must be deployed with the new EntryPoint address, then upgrading
      * the implementation by calling `upgradeTo()`
      */
-    function initialize(
-        address anOwner,
-        IAuthorizer anAuthorizer
-    ) public virtual initializer {
+    function initialize(address anOwner) public virtual initializer {
         __Ownable_init();
 
-        _initialize(anOwner, anAuthorizer);
+        _initialize(anOwner);
     }
 
-    function _initialize(
-        address anOwner,
-        IAuthorizer anAuthorizer
-    ) internal virtual {
+    function _initialize(address anOwner) internal virtual {
         transferOwnership(anOwner);
-        _authorizer = anAuthorizer; // at the initial stages, the authorizer is the owner
         emit AccountInitialized(_entryPoint, anOwner);
     }
 
@@ -189,15 +181,15 @@ contract Account is
 
     // authorizer
 
-    IAuthorizer private _authorizer;
+    IAuthorizer private immutable _authorizer;
 
     function authorizer() public view returns (address) {
         return address(_authorizer);
     }
 
-    function updateAuthorizer(address newAuthorizer) public onlyOwner {
-        _authorizer = IAuthorizer(newAuthorizer);
-    }
+    // function updateAuthorizer(address newAuthorizer) public onlyOwner {
+    //     _authorizer = IAuthorizer(newAuthorizer);
+    // }
 
     // ************************
 

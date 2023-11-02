@@ -13,10 +13,16 @@ import "./Paymaster.sol";
 import "./interfaces/IAccountFactory.sol";
 
 /**
- * A sample factory contract for Account
- * A UserOperations "initCode" holds the address of the factory, and a method call (to createAccount, in this sample factory).
- * The factory's createAccount returns the target account address even if it is already installed.
- * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
+ * @title Authorizer
+ * @dev This contract is used to authorize user operations and execute them.
+ * It inherits from Paymaster, Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, and UUPSUpgradeable.
+ * It also uses ECDSA for signature verification and UserOperationLib for user operation handling.
+ *
+ * It is a simplified entry point contract which includes the verifying paymaster.
+ *
+ * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/core/EntryPoint.sol
+ * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/VerifyingPaymaster.sol
+ * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/interfaces/UserOperation.sol
  */
 contract Authorizer is
     Paymaster,
@@ -48,6 +54,10 @@ contract Authorizer is
         transferOwnership(anOwner);
     }
 
+    /**
+     * @dev Updates the paymaster sponsor address.
+     * @param newSponsor The new paymaster sponsor address.
+     */
     function updatePaymasterSponsor(
         address newSponsor
     ) public virtual onlyOwner {
@@ -55,6 +65,13 @@ contract Authorizer is
         emit PaymasterSponsorUpdated(newSponsor);
     }
 
+    /**
+     * @dev Executes a batch of user operations.
+     * @param ops Array of UserOperation structs containing the operations to execute.
+     * @param /*beneficiary << kept to make sure we keep the same function signature.
+     * @notice This function is non-reentrant and requires at least one user operation.
+     * @notice Each operation is validated for nonce, account, and paymaster signature before execution.
+     */
     function handleOps(
         UserOperation[] calldata ops,
         address payable /*beneficiary*/
@@ -86,6 +103,10 @@ contract Authorizer is
         }
     }
 
+    /**
+     * @dev Validates the paymaster address and data of a user operation.
+     * @param op The user operation to validate.
+     */
     function _validatePaymaster(UserOperation calldata op) internal virtual {
         bytes calldata paymasterAndData = op.paymasterAndData;
 
@@ -101,6 +122,13 @@ contract Authorizer is
         require(_validatePaymasterUserOp(op), "invalid paymaster signature");
     }
 
+    /**
+     * @dev Validates the nonce of a user operation against the nonce stored in the account.
+     * @param op The user operation to validate.
+     * @param sender The address of the account to validate against.
+     * Requirements:
+     * - The nonce in the user operation must match the nonce in the account.
+     */
     function _validateNonce(
         UserOperation calldata op,
         address sender
@@ -113,6 +141,11 @@ contract Authorizer is
 
     bytes4 internal constant MAGICVALUE = 0x1626ba7e;
 
+    /**
+     * @dev Validates a user operation and its signature.
+     * @param op The user operation to validate.
+     * @param sender The address of the sender of the user operation.
+     */
     function _validateAccount(
         UserOperation calldata op,
         address sender
@@ -134,6 +167,11 @@ contract Authorizer is
         );
     }
 
+    /**
+     * @dev Initializes a new account using the provided UserOperation and ophash.
+     * @param op The UserOperation which contains the initCode.
+     * @param ophash The ophash to use for signature verification.
+     */
     function _initAccount(
         UserOperation calldata op,
         bytes32 ophash
@@ -179,6 +217,11 @@ contract Authorizer is
             keccak256(abi.encode(userOp.hash(), address(this), block.chainid));
     }
 
+    /**
+     * @dev Checks if a contract exists at a given address.
+     * @param contractAddress The address to check.
+     * @return A boolean indicating whether a contract exists at the given address.
+     */
     function _contractExists(
         address contractAddress
     ) internal virtual returns (bool) {
@@ -189,6 +232,13 @@ contract Authorizer is
         return size > 0;
     }
 
+    /**
+     * @dev Internal function to call a contract with value and data.
+     * If the call fails, it reverts with the reason returned by the callee.
+     * @param target The address of the contract to call.
+     * @param value The amount of ether to send with the call.
+     * @param data The data to send with the call.
+     */
     function _call(address target, uint256 value, bytes memory data) internal {
         (bool success, bytes memory result) = target.call{value: value}(data);
         if (!success) {
