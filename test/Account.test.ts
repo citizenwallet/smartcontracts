@@ -58,7 +58,7 @@ const createUserOp = async ({
   };
 
   // nonce
-  const nonce: BigNumber = await authorizerContract.getNonce(sender);
+  const nonce: BigNumber = await authorizerContract.getNonce(sender, 0);
 
   userop.nonce = nonce;
 
