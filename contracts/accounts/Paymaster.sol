@@ -113,7 +113,7 @@ contract Paymaster {
             uint48 validUntil,
             uint48 validAfter,
             bytes calldata signature
-        ) = parsePaymasterAndData(userOp.paymasterAndData);
+        ) = _parsePaymasterAndData(userOp.paymasterAndData);
         // ECDSA library supports both 64 and 65-byte long signatures.
         // we only "require" it here so that the revert reason on invalid signature will be of "VerifyingPaymaster", and not "ECDSA"
         require(
@@ -142,10 +142,10 @@ contract Paymaster {
         return true;
     }
 
-    function parsePaymasterAndData(
+    function _parsePaymasterAndData(
         bytes calldata paymasterAndData
     )
-        public
+        internal
         pure
         returns (uint48 validUntil, uint48 validAfter, bytes calldata signature)
     {
