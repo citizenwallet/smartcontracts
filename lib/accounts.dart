@@ -5,3 +5,4 @@ library;
 
 export 'contracts/accounts/Account.g.dart';
 export 'contracts/accounts/AccountFactory.g.dart';
+export 'contracts/accounts/Authorizer.g.dart';

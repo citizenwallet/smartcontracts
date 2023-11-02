@@ -4,7 +4,7 @@
 import 'package:web3dart/web3dart.dart' as _i1;
 
 final _contractAbi = _i1.ContractAbi.fromJson(
-  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"_entryPoint","type":"address"},{"internalType":"address","name":"_authorizer","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[],"name":"accountImplementation","outputs":[{"internalType":"contract Account","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"createAccount","outputs":[{"internalType":"contract Account","name":"ret","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"getAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"uint192","name":"key","type":"uint192"}],"name":"getNonce","outputs":[{"internalType":"uint256","name":"nonce","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint192","name":"key","type":"uint192"}],"name":"incrementNonce","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"uint192","name":"","type":"uint192"}],"name":"nonceSequenceNumber","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]',
+  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"_entryPoint","type":"address"},{"internalType":"contract IAuthorizer","name":"_authorizer","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"account","type":"address"}],"name":"AccountCreated","type":"event"},{"inputs":[],"name":"accountImplementation","outputs":[{"internalType":"contract Account","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"createAccount","outputs":[{"internalType":"contract Account","name":"ret","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"getAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"}]',
   'AccountFactory',
 );
 
@@ -83,66 +83,38 @@ class AccountFactory extends _i1.GeneratedContract {
     return (response[0] as _i1.EthereumAddress);
   }
 
-  /// The optional [atBlock] parameter can be used to view historical data. When
-  /// set, the function will be evaluated in the specified block. By default, the
-  /// latest on-chain block will be used.
-  Future<BigInt> getNonce(
-    _i1.EthereumAddress sender,
-    BigInt key, {
-    _i1.BlockNum? atBlock,
-  }) async {
-    final function = self.abi.functions[4];
-    assert(checkSignature(function, '35567e1a'));
-    final params = [
-      sender,
-      key,
-    ];
-    final response = await read(
-      function,
-      params,
-      atBlock,
+  /// Returns a live stream of all AccountCreated events emitted by this contract.
+  Stream<AccountCreated> accountCreatedEvents({
+    _i1.BlockNum? fromBlock,
+    _i1.BlockNum? toBlock,
+  }) {
+    final event = self.event('AccountCreated');
+    final filter = _i1.FilterOptions.events(
+      contract: self,
+      event: event,
+      fromBlock: fromBlock,
+      toBlock: toBlock,
     );
-    return (response[0] as BigInt);
+    return client.events(filter).map((_i1.FilterEvent result) {
+      final decoded = event.decodeResults(
+        result.topics!,
+        result.data!,
+      );
+      return AccountCreated(
+        decoded,
+        result,
+      );
+    });
   }
+}
 
-  /// The optional [transaction] parameter can be used to override parameters
-  /// like the gas price, nonce and max gas. The `data` and `to` fields will be
-  /// set by the contract.
-  Future<String> incrementNonce(
-    BigInt key, {
-    required _i1.Credentials credentials,
-    _i1.Transaction? transaction,
-  }) async {
-    final function = self.abi.functions[5];
-    assert(checkSignature(function, '0bd28e3b'));
-    final params = [key];
-    return write(
-      credentials,
-      transaction,
-      function,
-      params,
-    );
-  }
+class AccountCreated {
+  AccountCreated(
+    List<dynamic> response,
+    this.event,
+  ) : account = (response[0] as _i1.EthereumAddress);
 
-  /// The optional [atBlock] parameter can be used to view historical data. When
-  /// set, the function will be evaluated in the specified block. By default, the
-  /// latest on-chain block will be used.
-  Future<BigInt> nonceSequenceNumber(
-    _i1.EthereumAddress $param7,
-    BigInt $param8, {
-    _i1.BlockNum? atBlock,
-  }) async {
-    final function = self.abi.functions[6];
-    assert(checkSignature(function, '1b2e01b8'));
-    final params = [
-      $param7,
-      $param8,
-    ];
-    final response = await read(
-      function,
-      params,
-      atBlock,
-    );
-    return (response[0] as BigInt);
-  }
+  final _i1.EthereumAddress account;
+
+  final _i1.FilterEvent event;
 }
