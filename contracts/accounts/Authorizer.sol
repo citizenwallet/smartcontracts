@@ -133,7 +133,7 @@ contract Authorizer is
         UserOperation calldata op,
         address sender
     ) internal virtual {
-        uint256 nonce = getNonce(sender);
+        uint256 nonce = getNonce(sender, 0);
 
         // the nonce in the user op must match the nonce in the account
         require(op.nonce == nonce, "invalid nonce");
