@@ -446,12 +446,12 @@ describe("Account", function () {
       ).to.be.revertedWith("invalid paymaster signature");
 
       await expect(
-        authorizerContract.updatePaymasterVerifier(authorizer2.address)
+        authorizerContract.updatePaymasterSponsor(authorizer2.address)
       ).to.be.revertedWith("Ownable: caller is not the owner");
 
       await authorizerContract
         .connect(authorizer)
-        .updatePaymasterVerifier(authorizer2.address);
+        .updatePaymasterSponsor(authorizer2.address);
 
       await authorizerContract.handleOps([userop], authorizer2.address);
 

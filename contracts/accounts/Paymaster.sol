@@ -22,7 +22,7 @@ contract Paymaster {
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
 
-    address public verifyingSigner;
+    address public sponsor;
 
     uint256 private constant VALID_TIMESTAMP_OFFSET = 20;
 
@@ -30,12 +30,12 @@ contract Paymaster {
 
     constructor() {}
 
-    function __Paymaster_init(address _verifyingSigner) internal {
-        __Paymaster_init_unchained(_verifyingSigner);
+    function __Paymaster_init(address _sponsor) internal {
+        __Paymaster_init_unchained(_sponsor);
     }
 
-    function __Paymaster_init_unchained(address _verifyingSigner) internal {
-        verifyingSigner = _verifyingSigner;
+    function __Paymaster_init_unchained(address _sponsor) internal {
+        sponsor = _sponsor;
     }
 
     mapping(address => uint256) public senderNonce;
@@ -133,7 +133,7 @@ contract Paymaster {
         senderNonce[userOp.getSender()]++;
 
         // don't revert on signature failure
-        if (verifyingSigner != hash.recover(signature)) {
+        if (sponsor != hash.recover(signature)) {
             return false;
         }
 

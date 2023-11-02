@@ -28,14 +28,14 @@ contract Authorizer is
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
 
-    event PaymasterVerifierUpdated(address indexed newVerifier);
+    event PaymasterSponsorUpdated(address indexed newVerifier);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
-    // we make the owner of also the verifier by default
+    // we make the owner of also the sponsor by default
     function initialize(address anOwner) public virtual initializer {
         __Ownable_init();
         __Paymaster_init(anOwner);
@@ -48,11 +48,11 @@ contract Authorizer is
         transferOwnership(anOwner);
     }
 
-    function updatePaymasterVerifier(
-        address newVerifier
+    function updatePaymasterSponsor(
+        address newSponsor
     ) public virtual onlyOwner {
-        verifyingSigner = newVerifier;
-        emit PaymasterVerifierUpdated(newVerifier);
+        sponsor = newSponsor;
+        emit PaymasterSponsorUpdated(newSponsor);
     }
 
     function handleOps(
