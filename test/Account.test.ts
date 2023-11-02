@@ -191,7 +191,7 @@ describe("Account", function () {
   config();
 
   async function deployCardFactoryFixture() {
-    const [owner, friend1, friend2, friend3, authorizer] =
+    const [owner, friend1, friend2, friend3, authorizer, authorizer2] =
       await ethers.getSigners();
 
     const TokenContract = await ethers.getContractFactory("RegensUniteToken", {
@@ -286,6 +286,7 @@ describe("Account", function () {
       account1,
       account2,
       authorizer,
+      authorizer2,
     };
   }
 
@@ -386,6 +387,73 @@ describe("Account", function () {
       userop.signature = await signUserOp(userop, authorizerContract, friend3);
 
       await authorizerContract.handleOps([userop], authorizer.address);
+
+      // balance should match what was sent
+      expect(await token.balanceOf(accountAddress2)).to.equal(transferAmount);
+
+      // cannot replay transaction
+      await expect(
+        authorizerContract.handleOps([userop], authorizer.address)
+      ).to.be.revertedWith("invalid nonce");
+    });
+
+    it("Updating the verifying address of the paymaster should allow this new address to be used instead", async function () {
+      const {
+        owner,
+        token,
+        authorizerContract,
+        friend2,
+        friend3,
+        authorizer,
+        authorizer2,
+        accountFactory,
+      } = await loadFixture(deployCardFactoryFixture);
+
+      const address = await accountFactory.getAddress(
+        friend3.address,
+        ethers.BigNumber.from(0)
+      );
+
+      const accountAddress2 = await accountFactory.getAddress(
+        friend2.address,
+        ethers.BigNumber.from(0)
+      );
+
+      const mintedAmount = 1000000000;
+
+      await token.connect(owner).mint(address, mintedAmount, "owner");
+
+      // balance should match what was minted
+      expect(await token.balanceOf(address)).to.equal(mintedAmount);
+
+      const transferAmount = 100n;
+
+      const userop = await createUserOp({
+        sender: address,
+        receiver: accountAddress2,
+        amount: transferAmount,
+        tokenAddress: token.address,
+        signerAddress: friend3.address,
+        accountFactoryAddress: accountFactory.address,
+        authorizerContract,
+        authorizer: authorizer2,
+      });
+
+      userop.signature = await signUserOp(userop, authorizerContract, friend3);
+
+      await expect(
+        authorizerContract.handleOps([userop], authorizer2.address)
+      ).to.be.revertedWith("invalid paymaster signature");
+
+      await expect(
+        authorizerContract.updatePaymasterVerifier(authorizer2.address)
+      ).to.be.revertedWith("Ownable: caller is not the owner");
+
+      await authorizerContract
+        .connect(authorizer)
+        .updatePaymasterVerifier(authorizer2.address);
+
+      await authorizerContract.handleOps([userop], authorizer2.address);
 
       // balance should match what was sent
       expect(await token.balanceOf(accountAddress2)).to.equal(transferAmount);

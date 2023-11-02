@@ -20,6 +20,8 @@ contract AccountFactory is NonceManager {
 
     IAuthorizer private immutable authorizer;
 
+    event AccountCreated(address indexed account);
+
     constructor(IEntryPoint _entryPoint, IAuthorizer _authorizer) {
         accountImplementation = new Account(_entryPoint);
         authorizer = _authorizer;
@@ -36,6 +38,9 @@ contract AccountFactory is NonceManager {
         uint256 salt
     ) public returns (Account ret) {
         address addr = getAddress(owner, salt);
+
+        emit AccountCreated(addr);
+
         uint codeSize = addr.code.length;
         if (codeSize > 0) {
             return Account(payable(addr));
