@@ -40,7 +40,10 @@ contract Paymaster {
 
     mapping(address => uint256) public senderNonce;
 
-    function getNonce(address sender) public view returns (uint256 nonce) {
+    function getNonce(
+        address sender,
+        uint192 key
+    ) public view returns (uint256 nonce) {
         return senderNonce[sender] | (uint256(0) << 64);
     }
 
