@@ -8,7 +8,7 @@
 
 **Traditional ERC4337:** A bundler + access to a full node is necessary in order to process **User Operations**. This increases the cost of processing transactions and adds an extra layer that can potentially fail.
 
-Our approach allows user operations to be submitted directly to the **Authorizer** contract and be processed on chain.
+Our approach allows user operations to be submitted directly to the **TokenEntryPoint** contract and be processed on chain.
 
 The only pre-requisite is for a sponsor to sign the user operation before submission.
 
@@ -26,9 +26,9 @@ It only requires publishing Smart Contracts and dealing with signed User Operati
 
 Our approach simplifies execution and verification into a single contract and reduces gas fee consumption.
 
-## Authorizer
+## TokenEntryPoint
 
-The `Authorizer` contract is a Solidity contract used to authorize and execute user operations. It inherits from several OpenZeppelin contracts and uses ECDSA for signature verification and UserOperationLib for user operation handling.
+The `TokenEntryPoint` contract is a Solidity contract used to authorize and execute user operations. It inherits from several OpenZeppelin contracts and uses ECDSA for signature verification and UserOperationLib for user operation handling.
 
 ### Key Features
 
@@ -85,7 +85,7 @@ This contract depends on several OpenZeppelin contracts:
 Create2: Used for calculating counterfactual addresses.
 ERC1967Proxy: Used for creating new accounts.
 Account: The implementation for the accounts created by the factory.
-It also depends on the IEntryPoint and IAuthorizer interfaces from the @account-abstraction/contracts package.
+It also depends on the IEntryPoint and ITokenEntryPoint interfaces from the @account-abstraction/contracts package.
 
 ### References
 
@@ -126,7 +126,7 @@ This contract depends on several OpenZeppelin contracts:
 - `OwnableUpgradeable`: Used for owner functionality.
 - `UUPSUpgradeable`: Used for upgradeability functionality.
 
-It also uses ECDSA for signature recovery and `IEntryPoint` and `IAuthorizer` interfaces for entry point and authorizer functionality.
+It also uses ECDSA for signature recovery and `IEntryPoint` and `ITokenEntryPoint` interfaces for entry point and authorizer functionality.
 
 ### References
 

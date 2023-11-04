@@ -11,7 +11,7 @@ import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 import "./callback/TokenCallbackHandler.sol";
-import "./interfaces/IAuthorizer.sol";
+import "./interfaces/ITokenEntryPoint.sol";
 
 /**
  * @title Account
@@ -61,9 +61,9 @@ contract Account is
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    constructor(IEntryPoint anEntryPoint, IAuthorizer anAuthorizer) {
+    constructor(IEntryPoint anEntryPoint, ITokenEntryPoint anAuthorizer) {
         _entryPoint = anEntryPoint;
-        _authorizer = anAuthorizer;
+        _tokenEntryPoint = anAuthorizer;
         _disableInitializers();
     }
 
@@ -127,7 +127,7 @@ contract Account is
             msg.sender == address(entryPoint()) ||
                 msg.sender == owner() ||
                 msg.sender == authorizer(),
-            "account: not Owner or EntryPoint or Authorizer"
+            "account: not Owner or EntryPoint or TokenEntryPoint"
         );
     }
 
@@ -181,15 +181,11 @@ contract Account is
 
     // authorizer
 
-    IAuthorizer private immutable _authorizer;
+    ITokenEntryPoint private immutable _tokenEntryPoint;
 
     function authorizer() public view returns (address) {
-        return address(_authorizer);
+        return address(_tokenEntryPoint);
     }
-
-    // function updateAuthorizer(address newAuthorizer) public onlyOwner {
-    //     _authorizer = IAuthorizer(newAuthorizer);
-    // }
 
     // ************************
 

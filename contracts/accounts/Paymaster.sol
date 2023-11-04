@@ -4,10 +4,16 @@ pragma solidity ^0.8.12;
 /* solhint-disable reason-string */
 /* solhint-disable no-inline-assembly */
 
-import "@account-abstraction/contracts/core/BasePaymaster.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import "hardhat/console.sol";
+import "@account-abstraction/contracts/core/Helpers.sol";
+import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
+import "@account-abstraction/contracts/interfaces/INonceManager.sol";
+
+// import "./interfaces/IPaymaster.sol";
 
 /**
  * A sample paymaster that uses external service to decide whether to pay for the UserOp.
@@ -18,24 +24,33 @@ import "hardhat/console.sol";
  * - the paymaster checks a signature to agree to PAY for GAS.
  * - the account checks a signature to prove identity and account ownership.
  */
-contract Paymaster {
+contract Paymaster is
+    IPaymaster,
+    INonceManager,
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
-
-    address public sponsor;
 
     uint256 private constant VALID_TIMESTAMP_OFFSET = 20;
 
     uint256 private constant SIGNATURE_OFFSET = 84;
 
-    constructor() {}
-
-    function __Paymaster_init(address _sponsor) internal {
-        __Paymaster_init_unchained(_sponsor);
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
     }
 
-    function __Paymaster_init_unchained(address _sponsor) internal {
-        sponsor = _sponsor;
+    function initialize(address sponsor) public virtual initializer {
+        __Ownable_init();
+
+        _initialize(sponsor);
+    }
+
+    function _initialize(address sponsor) internal virtual {
+        transferOwnership(sponsor);
     }
 
     mapping(address => uint256) public senderNonce;
@@ -46,6 +61,8 @@ contract Paymaster {
     ) public view returns (uint256 nonce) {
         return senderNonce[sender] | (uint256(0) << 64);
     }
+
+    function incrementNonce(uint192 key) external onlyOwner {}
 
     function pack(
         UserOperation calldata userOp
@@ -109,9 +126,11 @@ contract Paymaster {
      * paymasterAndData[20:84] : abi.encode(validUntil, validAfter)
      * paymasterAndData[84:] : signature
      */
-    function _validatePaymasterUserOp(
-        UserOperation calldata userOp
-    ) internal returns (bool) {
+    function validatePaymasterUserOp(
+        UserOperation calldata userOp,
+        bytes32 userOpHash,
+        uint256 maxCost
+    ) public returns (bytes memory context, uint256 validationData) {
         (
             uint48 validUntil,
             uint48 validAfter,
@@ -135,14 +154,10 @@ contract Paymaster {
 
         senderNonce[userOp.getSender()]++;
 
-        // don't revert on signature failure
-        if (sponsor != hash.recover(signature)) {
-            return false;
-        }
-
-        // no need for other on-chain validation: entire UserOp should have been checked
-        // by the external service prior to signing it.
-        return true;
+        require(
+            owner() == hash.recover(signature),
+            "invalid paymaster signature"
+        );
     }
 
     function _parsePaymasterAndData(
@@ -157,5 +172,17 @@ contract Paymaster {
             (uint48, uint48)
         );
         signature = paymasterAndData[SIGNATURE_OFFSET:];
+    }
+
+    function postOp(
+        PostOpMode mode,
+        bytes calldata context,
+        uint256 actualGasCost
+    ) external view {}
+
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal view override onlyOwner {
+        (newImplementation);
     }
 }

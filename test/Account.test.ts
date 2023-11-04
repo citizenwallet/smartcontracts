@@ -29,8 +29,13 @@ interface UserOpCreation {
   tokenAddress: string;
   signerAddress: string;
   accountFactoryAddress: string;
-  authorizerContract: any; // using Contract type causes errors
-  authorizer: SignerWithAddress;
+  paymasterContract: any; // using Contract type causes errors
+}
+
+interface UserOpPaymasterData {
+  userop: IUserOp;
+  paymasterContract: any; // using Contract type causes errors
+  sponsor: SignerWithAddress;
 }
 
 const createUserOp = async ({
@@ -40,8 +45,7 @@ const createUserOp = async ({
   tokenAddress,
   signerAddress,
   accountFactoryAddress,
-  authorizerContract,
-  authorizer,
+  paymasterContract,
 }: UserOpCreation) => {
   const userop: IUserOp = {
     sender,
@@ -58,7 +62,7 @@ const createUserOp = async ({
   };
 
   // nonce
-  const nonce: BigNumber = await authorizerContract.getNonce(sender, 0);
+  const nonce: BigNumber = await paymasterContract.getNonce(sender, 0);
 
   userop.nonce = nonce;
 
@@ -82,15 +86,23 @@ const createUserOp = async ({
     erc20Token.encodeFunctionData("transfer", [receiver, amount]),
   ]);
 
+  return userop;
+};
+
+const getPaymasterAndData = async ({
+  userop,
+  paymasterContract,
+  sponsor,
+}: UserOpPaymasterData): Promise<string> => {
   // paymasterAndData
 
   const current = await time.latest();
 
   const hash = ethers.utils.arrayify(
-    await authorizerContract.getHash(userop, current + 86400, current)
+    await paymasterContract.getHash(userop, current + 86400, current)
   );
 
-  const signedHash = await authorizer.signMessage(hash);
+  const signedHash = await sponsor.signMessage(hash);
 
   // Define the types of the values
   const types = ["uint48", "uint48"];
@@ -101,16 +113,14 @@ const createUserOp = async ({
   // ABI encode the values
   const encoded = ethers.utils.defaultAbiCoder.encode(types, values);
 
-  userop.paymasterAndData = ethers.utils.hexConcat([
-    authorizerContract.address,
+  return ethers.utils.hexConcat([
+    paymasterContract.address,
     encoded,
     signedHash,
   ]);
-
-  return userop;
 };
 
-const getUserOpHash = (userop: IUserOp, authorizerContract: any) => {
+const getUserOpHash = (userop: IUserOp, tokenEntryPointContract: any) => {
   const packedData = ethers.utils.defaultAbiCoder.encode(
     [
       "address",
@@ -142,7 +152,7 @@ const getUserOpHash = (userop: IUserOp, authorizerContract: any) => {
     ["bytes32", "address", "uint256"],
     [
       ethers.utils.keccak256(packedData),
-      authorizerContract.address,
+      tokenEntryPointContract.address,
       network.config.chainId,
     ]
   );
@@ -151,10 +161,10 @@ const getUserOpHash = (userop: IUserOp, authorizerContract: any) => {
 
 const signUserOp = async (
   userop: IUserOp,
-  authorizerContract: any,
+  tokenEntryPointContract: any,
   signer: SignerWithAddress
 ) => {
-  const userOpHash = getUserOpHash(userop, authorizerContract);
+  const userOpHash = getUserOpHash(userop, tokenEntryPointContract);
 
   return await signer.signMessage(ethers.utils.arrayify(userOpHash));
 };
@@ -190,8 +200,8 @@ const erc20Token = new ethers.utils.Interface(partialERC20TokenABI);
 describe("Account", function () {
   config();
 
-  async function deployCardFactoryFixture() {
-    const [owner, friend1, friend2, friend3, authorizer, authorizer2] =
+  async function deployAccountFactoryFixture() {
+    const [owner, friend1, friend2, friend3, sponsor, sponsor2] =
       await ethers.getSigners();
 
     const TokenContract = await ethers.getContractFactory("RegensUniteToken", {
@@ -218,13 +228,29 @@ describe("Account", function () {
     );
     const entrypoint = await EntryPointContract.deploy();
 
-    const AuthorizerContract = await ethers.getContractFactory("Authorizer", {
+    const PaymasterContract = await ethers.getContractFactory("Paymaster", {
       signer: owner,
     });
 
-    const authorizerContract = await upgrades.deployProxy(
-      AuthorizerContract,
-      [authorizer.address],
+    const paymasterContract = await upgrades.deployProxy(
+      PaymasterContract,
+      [sponsor.address],
+      {
+        kind: "uups",
+        initializer: "initialize",
+      }
+    );
+
+    const TokenEntryPointContract = await ethers.getContractFactory(
+      "TokenEntryPoint",
+      {
+        signer: owner,
+      }
+    );
+
+    const tokenEntryPointContract = await upgrades.deployProxy(
+      TokenEntryPointContract,
+      [sponsor.address],
       {
         kind: "uups",
         initializer: "initialize",
@@ -240,7 +266,7 @@ describe("Account", function () {
 
     const accountFactory = await AccountFactoryContract.deploy(
       entrypoint.address,
-      authorizerContract.address
+      tokenEntryPointContract.address
     );
 
     await accountFactory.createAccount(
@@ -277,7 +303,8 @@ describe("Account", function () {
     return {
       entrypoint,
       token,
-      authorizerContract,
+      tokenEntryPointContract,
+      paymasterContract,
       accountFactory,
       owner,
       friend1,
@@ -285,15 +312,15 @@ describe("Account", function () {
       friend3,
       account1,
       account2,
-      authorizer,
-      authorizer2,
+      sponsor,
+      sponsor2,
     };
   }
 
   describe("Execute", function () {
     it("Should be able to transfer ERC20 directly (owner)", async function () {
       const { owner, token, friend1, account1, account2 } = await loadFixture(
-        deployCardFactoryFixture
+        deployAccountFactoryFixture
       );
 
       const mintedAmount = 1000000000n;
@@ -318,7 +345,7 @@ describe("Account", function () {
 
     it("Someone else should not be able to transfer ERC20 directly (not owner)", async function () {
       const { owner, token, account1, friend2, account2 } = await loadFixture(
-        deployCardFactoryFixture
+        deployAccountFactoryFixture
       );
 
       const mintedAmount = 1000000000;
@@ -337,22 +364,25 @@ describe("Account", function () {
             ethers.constants.Zero,
             erc20Token.encodeFunctionData("transfer", [account2.address, 100n])
           )
-      ).to.be.revertedWith("account: not Owner or EntryPoint or Authorizer");
+      ).to.be.revertedWith(
+        "account: not Owner or EntryPoint or TokenEntryPoint"
+      );
 
       // balance should match what was sent
       expect(await token.balanceOf(account2.address)).to.equal(0);
     });
 
-    it("Authorizer should be able to transfer ERC20 if user op signed by user (authorizer)", async function () {
+    it("TokenEntryPoint should be able to transfer ERC20 if user op signed by user (sponsor)", async function () {
       const {
         owner,
         token,
-        authorizerContract,
+        tokenEntryPointContract,
+        paymasterContract,
         friend2,
         friend3,
-        authorizer,
+        sponsor,
         accountFactory,
-      } = await loadFixture(deployCardFactoryFixture);
+      } = await loadFixture(deployAccountFactoryFixture);
 
       const address = await accountFactory.getAddress(
         friend3.address,
@@ -380,20 +410,31 @@ describe("Account", function () {
         tokenAddress: token.address,
         signerAddress: friend3.address,
         accountFactoryAddress: accountFactory.address,
-        authorizerContract,
-        authorizer,
+        paymasterContract,
       });
 
-      userop.signature = await signUserOp(userop, authorizerContract, friend3);
+      const paymasterAndData = await getPaymasterAndData({
+        userop,
+        paymasterContract,
+        sponsor,
+      });
 
-      await authorizerContract.handleOps([userop], authorizer.address);
+      userop.paymasterAndData = paymasterAndData;
+
+      userop.signature = await signUserOp(
+        userop,
+        tokenEntryPointContract,
+        friend3
+      );
+
+      await tokenEntryPointContract.handleOps([userop], sponsor.address);
 
       // balance should match what was sent
       expect(await token.balanceOf(accountAddress2)).to.equal(transferAmount);
 
       // cannot replay transaction
       await expect(
-        authorizerContract.handleOps([userop], authorizer.address)
+        tokenEntryPointContract.handleOps([userop], sponsor.address)
       ).to.be.revertedWith("invalid nonce");
     });
 
@@ -401,13 +442,14 @@ describe("Account", function () {
       const {
         owner,
         token,
-        authorizerContract,
+        tokenEntryPointContract,
         friend2,
         friend3,
-        authorizer,
-        authorizer2,
+        sponsor,
+        sponsor2,
+        paymasterContract,
         accountFactory,
-      } = await loadFixture(deployCardFactoryFixture);
+      } = await loadFixture(deployAccountFactoryFixture);
 
       const address = await accountFactory.getAddress(
         friend3.address,
@@ -435,32 +477,43 @@ describe("Account", function () {
         tokenAddress: token.address,
         signerAddress: friend3.address,
         accountFactoryAddress: accountFactory.address,
-        authorizerContract,
-        authorizer: authorizer2,
+        paymasterContract,
       });
 
-      userop.signature = await signUserOp(userop, authorizerContract, friend3);
+      const paymasterAndData = await getPaymasterAndData({
+        userop,
+        paymasterContract,
+        sponsor: sponsor2,
+      });
+
+      userop.paymasterAndData = paymasterAndData;
+
+      userop.signature = await signUserOp(
+        userop,
+        tokenEntryPointContract,
+        friend3
+      );
 
       await expect(
-        authorizerContract.handleOps([userop], authorizer2.address)
+        tokenEntryPointContract.handleOps([userop], sponsor2.address)
       ).to.be.revertedWith("invalid paymaster signature");
 
       await expect(
-        authorizerContract.updatePaymasterSponsor(authorizer2.address)
+        paymasterContract.transferOwnership(sponsor2.address)
       ).to.be.revertedWith("Ownable: caller is not the owner");
 
-      await authorizerContract
-        .connect(authorizer)
-        .updatePaymasterSponsor(authorizer2.address);
+      await paymasterContract
+        .connect(sponsor)
+        .transferOwnership(sponsor2.address);
 
-      await authorizerContract.handleOps([userop], authorizer2.address);
+      await tokenEntryPointContract.handleOps([userop], sponsor2.address);
 
       // balance should match what was sent
       expect(await token.balanceOf(accountAddress2)).to.equal(transferAmount);
 
       // cannot replay transaction
       await expect(
-        authorizerContract.handleOps([userop], authorizer.address)
+        tokenEntryPointContract.handleOps([userop], sponsor.address)
       ).to.be.revertedWith("invalid nonce");
     });
   });
@@ -468,7 +521,7 @@ describe("Account", function () {
   describe("Factory", function () {
     it("Should be owned by the caller", async function () {
       const { accountFactory, friend1 } = await loadFixture(
-        deployCardFactoryFixture
+        deployAccountFactoryFixture
       );
 
       const account = await ethers.getContractAt(
@@ -484,7 +537,7 @@ describe("Account", function () {
 
     it("Should be possible to change the owner", async function () {
       const { accountFactory, friend1, friend2 } = await loadFixture(
-        deployCardFactoryFixture
+        deployAccountFactoryFixture
       );
 
       const address = friend1.address;
@@ -504,7 +557,7 @@ describe("Account", function () {
   describe("Address", function () {
     it("Should return the same address twice", async function () {
       const { accountFactory, owner, friend1, friend2 } = await loadFixture(
-        deployCardFactoryFixture
+        deployAccountFactoryFixture
       );
 
       expect(
@@ -534,7 +587,7 @@ describe("Account", function () {
 
     it("Should return a different address for a different salt", async function () {
       const { accountFactory, owner } = await loadFixture(
-        deployCardFactoryFixture
+        deployAccountFactoryFixture
       );
 
       expect(
@@ -546,7 +599,7 @@ describe("Account", function () {
 
     it("Should return a different address for a different user", async function () {
       const { accountFactory, friend1, friend2 } = await loadFixture(
-        deployCardFactoryFixture
+        deployAccountFactoryFixture
       );
 
       expect(

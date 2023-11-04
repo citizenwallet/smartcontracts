@@ -8,12 +8,13 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
 import "@account-abstraction/contracts/interfaces/UserOperation.sol";
+import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
+import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
-import "./Paymaster.sol";
 import "./interfaces/IAccountFactory.sol";
 
 /**
- * @title Authorizer
+ * @title TokenEntryPoint
  * @dev This contract is used to authorize user operations and execute them.
  * It inherits from Paymaster, Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, and UUPSUpgradeable.
  * It also uses ECDSA for signature verification and UserOperationLib for user operation handling.
@@ -24,8 +25,7 @@ import "./interfaces/IAccountFactory.sol";
  * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/VerifyingPaymaster.sol
  * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/interfaces/UserOperation.sol
  */
-contract Authorizer is
-    Paymaster,
+contract TokenEntryPoint is
     Initializable,
     ReentrancyGuardUpgradeable,
     OwnableUpgradeable,
@@ -33,8 +33,6 @@ contract Authorizer is
 {
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
-
-    event PaymasterSponsorUpdated(address indexed newVerifier);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -44,7 +42,6 @@ contract Authorizer is
     // we make the owner of also the sponsor by default
     function initialize(address anOwner) public virtual initializer {
         __Ownable_init();
-        __Paymaster_init(anOwner);
         __ReentrancyGuard_init();
 
         _initialize(anOwner);
@@ -52,17 +49,6 @@ contract Authorizer is
 
     function _initialize(address anOwner) internal virtual {
         transferOwnership(anOwner);
-    }
-
-    /**
-     * @dev Updates the paymaster sponsor address.
-     * @param newSponsor The new paymaster sponsor address.
-     */
-    function updatePaymasterSponsor(
-        address newSponsor
-    ) public virtual onlyOwner {
-        sponsor = newSponsor;
-        emit PaymasterSponsorUpdated(newSponsor);
     }
 
     /**
@@ -74,7 +60,7 @@ contract Authorizer is
      */
     function handleOps(
         UserOperation[] calldata ops,
-        address payable beneficiary
+        address payable beneficiary // kept to make sure we keep the same function signature
     ) public nonReentrant {
         require(ops.length > 0, "needs at least one user operation");
 
@@ -85,14 +71,16 @@ contract Authorizer is
 
             address sender = op.getSender();
 
+            address paymaster = _getPaymaster(op);
+
             // verify nonce
-            _validateNonce(op, sender);
+            _validateNonce(op, sender, paymaster);
 
             // verify account
             _validateAccount(op, sender);
 
             // verify paymaster signature
-            _validatePaymaster(op);
+            _validatePaymasterUserOp(op, paymaster);
 
             // execute the op
             _call(sender, 0, op.callData);
@@ -103,23 +91,27 @@ contract Authorizer is
         }
     }
 
-    /**
-     * @dev Validates the paymaster address and data of a user operation.
-     * @param op The user operation to validate.
-     */
-    function _validatePaymaster(UserOperation calldata op) internal virtual {
+    function _getPaymaster(
+        UserOperation calldata op
+    ) internal virtual returns (address) {
         bytes calldata paymasterAndData = op.paymasterAndData;
 
         // paymasterAndData must be at least 20 bytes long, and the first 20 bytes must be the paymaster address
         require(paymasterAndData.length >= 20, "invalid paymasterAndData");
 
-        address paymaster = address(bytes20(paymasterAndData[:20]));
+        return address(bytes20(paymasterAndData[:20]));
+    }
 
-        // the paymaster should be this contract
-        require(paymaster == address(this), "invalid paymaster");
-
+    /**
+     * @dev Validates the paymaster address and data of a user operation.
+     * @param op The user operation to validate.
+     */
+    function _validatePaymasterUserOp(
+        UserOperation calldata op,
+        address paymaster
+    ) internal virtual {
         // verify paymasterAndData signature
-        require(_validatePaymasterUserOp(op), "invalid paymaster signature");
+        IPaymaster(paymaster).validatePaymasterUserOp(op, bytes32(0), 0);
     }
 
     /**
@@ -131,9 +123,10 @@ contract Authorizer is
      */
     function _validateNonce(
         UserOperation calldata op,
-        address sender
+        address sender,
+        address paymaster
     ) internal virtual {
-        uint256 nonce = getNonce(sender, 0);
+        uint256 nonce = INonceManager(paymaster).getNonce(sender, 0);
 
         // the nonce in the user op must match the nonce in the account
         require(op.nonce == nonce, "invalid nonce");
@@ -186,11 +179,11 @@ contract Authorizer is
         // the factory in the init code must be deployed
         require(_contractExists(factory), "invalid factory");
 
-        IAccountFactory accountFactory = IAccountFactory(factory);
-
         address signer = ophash.recover(op.signature);
 
         // the factory must return the address of the sender it will create
+        IAccountFactory accountFactory = IAccountFactory(factory);
+
         require(
             accountFactory.getAddress(signer, 0) == op.getSender(),
             "factory must return sender"

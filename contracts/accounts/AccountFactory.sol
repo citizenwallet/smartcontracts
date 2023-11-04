@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 import "./Account.sol";
-import "./interfaces/IAuthorizer.sol";
+import "./interfaces/ITokenEntryPoint.sol";
 
 /**
  * @title AccountFactory
@@ -19,7 +19,7 @@ contract AccountFactory {
 
     event AccountCreated(address indexed account);
 
-    constructor(IEntryPoint _entryPoint, IAuthorizer _authorizer) {
+    constructor(IEntryPoint _entryPoint, ITokenEntryPoint _authorizer) {
         accountImplementation = new Account(_entryPoint, _authorizer);
     }
 

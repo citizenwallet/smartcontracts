@@ -19,11 +19,11 @@ async function main() {
     throw Error("PAYMASTER_ADDR is not set");
   }
 
-  console.log("deploying Authorizer...");
+  console.log("deploying Paymaster...");
 
-  const authFactory = await ethers.getContractFactory("Authorizer");
-  const authorizer = await upgrades.deployProxy(
-    authFactory,
+  const paymasterFactory = await ethers.getContractFactory("Paymaster");
+  const paymaster = await upgrades.deployProxy(
+    paymasterFactory,
     [process.env.PAYMASTER_ADDR],
     {
       kind: "uups",
@@ -33,13 +33,32 @@ async function main() {
 
   console.log("request sent...");
 
-  await authorizer.deployed();
-  console.log(`Authorizer deployed to: ${authorizer.address}`);
+  await paymaster.deployed();
+  console.log(`Paymaster deployed to: ${paymaster.address}`);
+
+  console.log("deploying TokenEntryPoint...");
+
+  const tokenEntryPointFactory = await ethers.getContractFactory(
+    "TokenEntryPoint"
+  );
+  const tokenEntryPoint = await upgrades.deployProxy(
+    tokenEntryPointFactory,
+    [process.env.PAYMASTER_ADDR],
+    {
+      kind: "uups",
+      initializer: "initialize",
+    }
+  );
+
+  console.log("request sent...");
+
+  await tokenEntryPoint.deployed();
+  console.log(`TokenEntryPoint deployed to: ${tokenEntryPoint.address}`);
 
   console.log("deploying AccountFactory...");
   const accFactory = await ethers.deployContract("AccountFactory", [
     process.env.ENTRYPOINT_ADDR,
-    authorizer.address,
+    tokenEntryPoint.address,
   ]);
 
   console.log("request sent...");
