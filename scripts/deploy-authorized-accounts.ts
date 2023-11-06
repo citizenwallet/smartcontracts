@@ -43,7 +43,7 @@ async function main() {
   );
   const tokenEntryPoint = await upgrades.deployProxy(
     tokenEntryPointFactory,
-    [process.env.PAYMASTER_ADDR],
+    [process.env.PAYMASTER_ADDR, paymaster.address],
     {
       kind: "uups",
       initializer: "initialize",
