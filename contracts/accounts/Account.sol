@@ -61,9 +61,9 @@ contract Account is
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    constructor(IEntryPoint anEntryPoint, ITokenEntryPoint anAuthorizer) {
+    constructor(IEntryPoint anEntryPoint, ITokenEntryPoint aTokenEntryPoint) {
         _entryPoint = anEntryPoint;
-        _tokenEntryPoint = anAuthorizer;
+        _tokenEntryPoint = aTokenEntryPoint;
         _disableInitializers();
     }
 
@@ -135,11 +135,18 @@ contract Account is
     function _validateSignature(
         UserOperation calldata userOp,
         bytes32 userOpHash
-    ) internal virtual override returns (uint256 validationData) {
+    ) internal view override returns (uint256 validationData) {
         bytes32 hash = userOpHash.toEthSignedMessageHash();
         if (owner() != hash.recover(userOp.signature))
             return SIG_VALIDATION_FAILED;
         return 0;
+    }
+
+    function isValidUserOp(
+        UserOperation calldata userOp,
+        bytes32 userOpHash
+    ) external view returns (bool) {
+        return _validateSignature(userOp, userOpHash) != SIG_VALIDATION_FAILED;
     }
 
     function _call(address target, uint256 value, bytes memory data) internal {

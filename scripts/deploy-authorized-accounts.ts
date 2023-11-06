@@ -1,4 +1,4 @@
-import { ethers, upgrades } from "hardhat";
+import { ethers, upgrades, run } from "hardhat";
 import { config } from "dotenv";
 
 async function main() {
@@ -22,12 +22,14 @@ async function main() {
   console.log("deploying Paymaster...");
 
   const paymasterFactory = await ethers.getContractFactory("Paymaster");
+
   const paymaster = await upgrades.deployProxy(
     paymasterFactory,
     [process.env.PAYMASTER_ADDR],
     {
       kind: "uups",
       initializer: "initialize",
+      verifySourceCode: true,
     }
   );
 
@@ -47,6 +49,7 @@ async function main() {
     {
       kind: "uups",
       initializer: "initialize",
+      verifySourceCode: true,
     }
   );
 
@@ -56,6 +59,7 @@ async function main() {
   console.log(`TokenEntryPoint deployed to: ${tokenEntryPoint.address}`);
 
   console.log("deploying AccountFactory...");
+
   const accFactory = await ethers.deployContract("AccountFactory", [
     process.env.ENTRYPOINT_ADDR,
     tokenEntryPoint.address,
@@ -66,6 +70,22 @@ async function main() {
   await accFactory.deployed();
 
   console.log(`Account Factory deployed to: ${accFactory.address}`);
+
+  console.log("verifying...");
+
+  // wait 10 seconds
+  await new Promise((r) => setTimeout(r, 10000));
+
+  // Verify the contract
+  await run("verify:verify", {
+    address: accFactory.address,
+    constructorArguments: [
+      process.env.ENTRYPOINT_ADDR,
+      tokenEntryPoint.address,
+    ],
+  });
+
+  console.log("verified...");
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -19,8 +19,8 @@ contract AccountFactory {
 
     event AccountCreated(address indexed account);
 
-    constructor(IEntryPoint _entryPoint, ITokenEntryPoint _authorizer) {
-        accountImplementation = new Account(_entryPoint, _authorizer);
+    constructor(IEntryPoint _entryPoint, ITokenEntryPoint _tokenEntryPoint) {
+        accountImplementation = new Account(_entryPoint, _tokenEntryPoint);
     }
 
     /**

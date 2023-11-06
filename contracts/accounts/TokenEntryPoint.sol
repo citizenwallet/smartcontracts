@@ -12,6 +12,7 @@ import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import "@account-abstraction/contracts/interfaces/IAccount.sol";
 import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
+import "./interfaces/IUserOpValidator.sol";
 import "./interfaces/IAccountFactory.sol";
 import "./interfaces/IOwnable.sol";
 
@@ -127,8 +128,6 @@ contract TokenEntryPoint is
         require(op.nonce == nonce, "invalid nonce");
     }
 
-    bytes4 internal constant MAGICVALUE = 0x1626ba7e;
-
     /**
      * @dev Validates a user operation and its signature.
      * @param op The user operation to validate.
@@ -138,32 +137,26 @@ contract TokenEntryPoint is
         UserOperation calldata op,
         address sender
     ) internal virtual {
-        bytes32 ophash = getUserOpHash(op).toEthSignedMessageHash();
-
         // call the initCode
         if (op.nonce == 0) {
-            _initAccount(op, ophash);
+            _initAccount(op);
         }
 
         // verify the user op signature
-        IERC1271 account = IERC1271(sender);
+        IUserOpValidator account = IUserOpValidator(sender);
 
-        // the account must return the magic value according to IERC1271
+        // the account must not return SIG_VALIDATION_FAILED
         require(
-            account.isValidSignature(ophash, op.signature) == MAGICVALUE,
+            account.isValidUserOp(op, getUserOpHash(op)),
             "invalid account signature"
         );
     }
 
     /**
-     * @dev Initializes a new account using the provided UserOperation and ophash.
+     * @dev Initializes a new account using the provided UserOperation.
      * @param op The UserOperation which contains the initCode.
-     * @param ophash The ophash to use for signature verification.
      */
-    function _initAccount(
-        UserOperation calldata op,
-        bytes32 ophash
-    ) internal virtual {
+    function _initAccount(UserOperation calldata op) internal virtual {
         bytes calldata initCode = op.initCode;
 
         // initCode must be at least 20 bytes long, and the first 20 bytes must be the factory address
