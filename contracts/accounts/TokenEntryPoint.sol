@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
 import "@account-abstraction/contracts/interfaces/UserOperation.sol";
 import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
+import "@account-abstraction/contracts/interfaces/IAccount.sol";
 import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
 import "./interfaces/IAccountFactory.sol";
@@ -103,18 +104,6 @@ contract TokenEntryPoint is
     }
 
     /**
-     * @dev Validates the paymaster address and data of a user operation.
-     * @param op The user operation to validate.
-     */
-    function _validatePaymasterUserOp(
-        UserOperation calldata op,
-        address paymaster
-    ) internal virtual {
-        // verify paymasterAndData signature
-        IPaymaster(paymaster).validatePaymasterUserOp(op, bytes32(0), 0);
-    }
-
-    /**
      * @dev Validates the nonce of a user operation against the nonce stored in the account.
      * @param op The user operation to validate.
      * @param sender The address of the account to validate against.
@@ -143,7 +132,7 @@ contract TokenEntryPoint is
         UserOperation calldata op,
         address sender
     ) internal virtual {
-        bytes32 ophash = _userOpHash(op).toEthSignedMessageHash();
+        bytes32 ophash = getUserOpHash(op).toEthSignedMessageHash();
 
         // call the initCode
         if (op.nonce == 0) {
@@ -202,8 +191,23 @@ contract TokenEntryPoint is
         );
     }
 
-    // generate a full hash of the user op in order to verify the signature
-    function _userOpHash(
+    /**
+     * @dev Validates the paymaster address and data of a user operation.
+     * @param op The user operation to validate.
+     */
+    function _validatePaymasterUserOp(
+        UserOperation calldata op,
+        address paymaster
+    ) internal virtual {
+        // verify paymasterAndData signature
+        IPaymaster(paymaster).validatePaymasterUserOp(op, bytes32(0), 0);
+    }
+
+    /**
+     * generate a request Id - unique identifier for this request.
+     * the request ID is a hash over the content of the userOp (except the signature), the entrypoint and the chainid.
+     */
+    function getUserOpHash(
         UserOperation calldata userOp
     ) public view returns (bytes32) {
         return

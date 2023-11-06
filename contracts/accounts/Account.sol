@@ -68,7 +68,7 @@ contract Account is
     }
 
     /**
-     * execute a transaction (called directly from owner, or by entryPoint)
+     * execute a transaction (called directly from owner, by entryPoint, or by tokenEntryPoint)
      */
     function execute(
         address dest,
