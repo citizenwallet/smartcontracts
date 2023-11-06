@@ -17,10 +17,10 @@ import "./interfaces/IAccountFactory.sol";
 /**
  * @title TokenEntryPoint
  * @dev This contract is used to authorize user operations and execute them.
- * It inherits from Paymaster, Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, and UUPSUpgradeable.
+ * It inherits from Initializable, ReentrancyGuardUpgradeable, OwnableUpgradeable, and UUPSUpgradeable.
  * It also uses ECDSA for signature verification and UserOperationLib for user operation handling.
  *
- * It is a simplified entry point contract which includes the verifying paymaster.
+ * It is a simplified entry point contract.
  *
  * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/core/EntryPoint.sol
  * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/VerifyingPaymaster.sol

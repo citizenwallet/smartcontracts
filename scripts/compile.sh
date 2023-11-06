@@ -34,7 +34,8 @@ CW_CONTRACT_EXT_PATH='contracts/external'
 # TODO: fix contract compilation to not have duplicate package names
 CW_ACCOUNT_CONTRACTS=('account,Account' \ 
         'accfactory,AccountFactory' \
-        'tokenEntryPoint,TokenEntryPoint')
+        'tokenEntryPoint,TokenEntryPoint' \
+        'paymaster,Paymaster')
 
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \

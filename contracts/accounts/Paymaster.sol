@@ -23,6 +23,8 @@ import "@account-abstraction/contracts/interfaces/INonceManager.sol";
  * Note that this signature is NOT a replacement for the account-specific signature:
  * - the paymaster checks a signature to agree to PAY for GAS.
  * - the account checks a signature to prove identity and account ownership.
+ *
+ *  https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/VerifyingPaymaster.sol
  */
 contract Paymaster is
     IPaymaster,
