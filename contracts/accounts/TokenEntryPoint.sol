@@ -35,21 +35,40 @@ contract TokenEntryPoint is
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
 
+    address private _paymaster;
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
 
     // we make the owner of also the sponsor by default
-    function initialize(address anOwner) public virtual initializer {
+    function initialize(
+        address anOwner,
+        address aPaymaster
+    ) public virtual initializer {
         __Ownable_init();
         __ReentrancyGuard_init();
 
-        _initialize(anOwner);
+        _initialize(anOwner, aPaymaster);
     }
 
-    function _initialize(address anOwner) internal virtual {
+    function _initialize(address anOwner, address aPaymaster) internal virtual {
         transferOwnership(anOwner);
+        _paymaster = aPaymaster;
+    }
+
+    function getNonce(
+        address sender,
+        uint192 key
+    ) public view returns (uint256 nonce) {
+        return INonceManager(_paymaster).getNonce(sender, key);
+    }
+
+    function updatePaymaster(address newPaymaster) public onlyOwner {
+        require(_contractExists(newPaymaster), "invalid paymaster");
+
+        _paymaster = newPaymaster;
     }
 
     /**
@@ -75,7 +94,7 @@ contract TokenEntryPoint is
             address paymaster = _getPaymaster(op);
 
             // verify nonce
-            _validateNonce(op, sender, paymaster);
+            _validateNonce(op, sender);
 
             // verify account
             _validateAccount(op, sender);
@@ -100,7 +119,11 @@ contract TokenEntryPoint is
         // paymasterAndData must be at least 20 bytes long, and the first 20 bytes must be the paymaster address
         require(paymasterAndData.length >= 20, "invalid paymasterAndData");
 
-        return address(bytes20(paymasterAndData[:20]));
+        address paymaster = address(bytes20(paymasterAndData[0:20]));
+
+        require(paymaster == _paymaster, "invalid paymaster");
+
+        return paymaster;
     }
 
     /**
@@ -112,10 +135,9 @@ contract TokenEntryPoint is
      */
     function _validateNonce(
         UserOperation calldata op,
-        address sender,
-        address paymaster
+        address sender
     ) internal virtual {
-        uint256 nonce = INonceManager(paymaster).getNonce(sender, 0);
+        uint256 nonce = getNonce(sender, 0);
 
         // the nonce in the user op must match the nonce in the account
         require(op.nonce == nonce, "invalid nonce");
