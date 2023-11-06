@@ -91,8 +91,6 @@ contract TokenEntryPoint is
 
             address sender = op.getSender();
 
-            address paymaster = _getPaymaster(op);
-
             // verify nonce
             _validateNonce(op, sender);
 
@@ -100,7 +98,7 @@ contract TokenEntryPoint is
             _validateAccount(op, sender);
 
             // verify paymaster signature
-            _validatePaymasterUserOp(op, paymaster);
+            _validatePaymasterUserOp(op);
 
             // execute the op
             _call(sender, 0, op.callData);
@@ -109,21 +107,6 @@ contract TokenEntryPoint is
                 ++i;
             }
         }
-    }
-
-    function _getPaymaster(
-        UserOperation calldata op
-    ) internal virtual returns (address) {
-        bytes calldata paymasterAndData = op.paymasterAndData;
-
-        // paymasterAndData must be at least 20 bytes long, and the first 20 bytes must be the paymaster address
-        require(paymasterAndData.length >= 20, "invalid paymasterAndData");
-
-        address paymaster = address(bytes20(paymasterAndData[0:20]));
-
-        require(paymaster == _paymaster, "invalid paymaster");
-
-        return paymaster;
     }
 
     /**
@@ -218,11 +201,27 @@ contract TokenEntryPoint is
      * @param op The user operation to validate.
      */
     function _validatePaymasterUserOp(
-        UserOperation calldata op,
-        address paymaster
+        UserOperation calldata op
     ) internal virtual {
+        address paymaster = _getPaymaster(op);
+
         // verify paymasterAndData signature
         IPaymaster(paymaster).validatePaymasterUserOp(op, bytes32(0), 0);
+    }
+
+    function _getPaymaster(
+        UserOperation calldata op
+    ) internal virtual returns (address) {
+        bytes calldata paymasterAndData = op.paymasterAndData;
+
+        // paymasterAndData must be at least 20 bytes long, and the first 20 bytes must be the paymaster address
+        require(paymasterAndData.length >= 20, "invalid paymasterAndData");
+
+        address paymaster = address(bytes20(paymasterAndData[0:20]));
+
+        require(paymaster == _paymaster, "invalid paymaster");
+
+        return paymaster;
     }
 
     /**
