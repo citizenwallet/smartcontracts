@@ -13,6 +13,7 @@ import "@account-abstraction/contracts/interfaces/IAccount.sol";
 import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
 import "./interfaces/IAccountFactory.sol";
+import "./interfaces/IOwnable.sol";
 
 /**
  * @title TokenEntryPoint
@@ -173,26 +174,23 @@ contract TokenEntryPoint is
         // the factory in the init code must be deployed
         require(_contractExists(factory), "invalid factory");
 
-        address signer = ophash.recover(op.signature);
-
-        // the factory must return the address of the sender it will create
-        IAccountFactory accountFactory = IAccountFactory(factory);
-
-        require(
-            accountFactory.getAddress(signer, 0) == op.getSender(),
-            "factory must return sender"
-        );
-
         // the rest of the initCode is the data to be passed to the factory
         bytes calldata data = initCode[20:];
 
         // call the factory
         _call(factory, 0, data);
 
+        address sender = op.getSender();
+
         // the account must be created
+        require(_contractExists(sender), "invalid account initialization");
+
+        IAccountFactory factoryContract = IAccountFactory(factory);
+
         require(
-            _contractExists(op.getSender()),
-            "invalid account initialization"
+            factoryContract.getAddress(IOwnable(sender).owner(), 0) ==
+                op.getSender(),
+            "call to factory must be sender"
         );
     }
 

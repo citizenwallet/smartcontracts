@@ -173,12 +173,6 @@ const accountExecuteABI = [
   "function execute(address to, uint256 value, bytes data)",
 ];
 const accountCreateABI = ["function createAccount(address, uint256)"];
-const accountUpdateAuthorizerABI = [
-  "function updateAuthorizer(address newAuthorizer)",
-];
-const accountUpdateWhitelistABI = [
-  "function updateWhitelist(address[] newWhitelist)",
-];
 
 // An ABI can be fragments and does not have to include the entire interface.
 // As long as it includes the parts we want to use.
@@ -188,12 +182,6 @@ const partialERC20TokenABI = [
 
 const accountExecute = new ethers.utils.Interface(accountExecuteABI);
 const accountCreate = new ethers.utils.Interface(accountCreateABI);
-const accountUpdateAuthorizer = new ethers.utils.Interface(
-  accountUpdateAuthorizerABI
-);
-const accountUpdateWhitelist = new ethers.utils.Interface(
-  accountUpdateWhitelistABI
-);
 const erc20Token = new ethers.utils.Interface(partialERC20TokenABI);
 
 // cards with paymaster and whitelist
