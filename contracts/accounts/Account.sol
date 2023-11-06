@@ -75,7 +75,7 @@ contract Account is
         uint256 value,
         bytes calldata func
     ) external {
-        _requireFromEntryPointOrOwnerOrAuthorizer();
+        _requireFromEntryPointOrOwnerOrTokenEntryPoint();
         _call(dest, value, func);
     }
 
@@ -88,7 +88,7 @@ contract Account is
         uint256[] calldata value,
         bytes[] calldata func
     ) external {
-        _requireFromEntryPointOrOwnerOrAuthorizer();
+        _requireFromEntryPointOrOwnerOrTokenEntryPoint();
         require(
             dest.length == func.length &&
                 (value.length == 0 || value.length == func.length),
@@ -121,12 +121,12 @@ contract Account is
         emit AccountInitialized(_entryPoint, anOwner);
     }
 
-    // Require the function call went through EntryPoint or owner or authorizer
-    function _requireFromEntryPointOrOwnerOrAuthorizer() internal view {
+    // Require the function call went through EntryPoint or owner or TokenEntryPoint
+    function _requireFromEntryPointOrOwnerOrTokenEntryPoint() internal view {
         require(
             msg.sender == address(entryPoint()) ||
                 msg.sender == owner() ||
-                msg.sender == authorizer(),
+                msg.sender == tokenEntryPoint(),
             "account: not Owner or EntryPoint or TokenEntryPoint"
         );
     }
@@ -183,7 +183,7 @@ contract Account is
 
     ITokenEntryPoint private immutable _tokenEntryPoint;
 
-    function authorizer() public view returns (address) {
+    function tokenEntryPoint() public view returns (address) {
         return address(_tokenEntryPoint);
     }
 
