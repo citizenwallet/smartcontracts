@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
 import "@account-abstraction/contracts/core/BaseAccount.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
+import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
 import "./callback/TokenCallbackHandler.sol";
 import "./interfaces/ITokenEntryPoint.sol";
@@ -142,11 +143,16 @@ contract Account is
         return 0;
     }
 
-    function isValidUserOp(
+    function validateUserOp(
         UserOperation calldata userOp,
         bytes32 userOpHash
-    ) external view returns (bool) {
-        return _validateSignature(userOp, userOpHash) != SIG_VALIDATION_FAILED;
+    ) external returns (bool) {
+        bool isValid = _validateSignature(userOp, userOpHash) == 0;
+        if (isValid) {
+            INonceManager(entryPoint()).incrementNonce(0);
+        }
+
+        return isValid;
     }
 
     function _call(address target, uint256 value, bytes memory data) internal {

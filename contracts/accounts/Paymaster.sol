@@ -13,8 +13,6 @@ import "@account-abstraction/contracts/core/Helpers.sol";
 import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
-// import "./interfaces/IPaymaster.sol";
-
 /**
  * A sample paymaster that uses external service to decide whether to pay for the UserOp.
  * The paymaster trusts an external signer to sign the transaction.
@@ -147,8 +145,12 @@ contract Paymaster is
 
         uint48 currentTime = uint48(block.timestamp);
         require(
-            currentTime > validAfter && currentTime <= validUntil,
-            "signature has expired"
+            currentTime >= validAfter,
+            "VerifyingPaymaster: signature is not valid yet"
+        );
+        require(
+            currentTime < validUntil,
+            "VerifyingPaymaster: signature has expired"
         );
 
         bytes32 hash = getHash(userOp, validUntil, validAfter)
@@ -158,8 +160,11 @@ contract Paymaster is
 
         require(
             owner() == hash.recover(signature),
-            "invalid paymaster signature"
+            "VerifyingPaymaster: invalid paymaster signature"
         );
+
+        context = "";
+        validationData = 0;
     }
 
     function _parsePaymasterAndData(

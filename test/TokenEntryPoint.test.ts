@@ -29,7 +29,7 @@ interface UserOpCreation {
   tokenAddress: string;
   signerAddress: string;
   accountFactoryAddress: string;
-  paymasterContract: any; // using Contract type causes errors
+  entrypoint: any; // using Contract type causes errors
 }
 
 interface UserOpPaymasterData {
@@ -45,7 +45,7 @@ const createUserOp = async ({
   tokenAddress,
   signerAddress,
   accountFactoryAddress,
-  paymasterContract,
+  entrypoint,
 }: UserOpCreation) => {
   const userop: IUserOp = {
     sender,
@@ -62,7 +62,8 @@ const createUserOp = async ({
   };
 
   // nonce
-  const nonce: BigNumber = await paymasterContract.getNonce(sender, 0);
+  const nonce: BigNumber = await entrypoint.getNonce(sender, 0);
+  // const nonce: BigNumber = BigNumber.from("0");
 
   userop.nonce = nonce;
 
@@ -98,8 +99,11 @@ const getPaymasterAndData = async ({
 
   const current = await time.latest();
 
+  const validUntil = current + 86400;
+  const validAfter = current;
+
   const hash = ethers.utils.arrayify(
-    await paymasterContract.getHash(userop, current + 86400, current)
+    await paymasterContract.getHash(userop, validUntil, validAfter)
   );
 
   const signedHash = await sponsor.signMessage(hash);
@@ -108,7 +112,7 @@ const getPaymasterAndData = async ({
   const types = ["uint48", "uint48"];
 
   // Define the values
-  const values = [current + 86400, current];
+  const values = [validUntil, validAfter];
 
   // ABI encode the values
   const encoded = ethers.utils.defaultAbiCoder.encode(types, values);
@@ -209,12 +213,14 @@ describe("Account", function () {
         .toString()
     );
 
-    const EntryPointContract = new ContractFactory(
+    const EntryPointContract = await ethers.getContractFactory(
       entrypointABI,
       entrypointBin,
       owner
     );
     const entrypoint = await EntryPointContract.deploy();
+
+    await entrypoint.deployed();
 
     const PaymasterContract = await ethers.getContractFactory("Paymaster", {
       signer: owner,
@@ -229,6 +235,8 @@ describe("Account", function () {
       }
     );
 
+    await paymasterContract.deployed();
+
     const TokenEntryPointContract = await ethers.getContractFactory(
       "TokenEntryPoint",
       {
@@ -238,12 +246,14 @@ describe("Account", function () {
 
     const tokenEntryPointContract = await upgrades.deployProxy(
       TokenEntryPointContract,
-      [sponsor.address, paymasterContract.address],
+      [sponsor.address, paymasterContract.address, entrypoint.address],
       {
         kind: "uups",
         initializer: "initialize",
       }
     );
+
+    await tokenEntryPointContract.deployed();
 
     const AccountFactoryContract = await ethers.getContractFactory(
       "AccountFactory",
@@ -256,6 +266,8 @@ describe("Account", function () {
       entrypoint.address,
       tokenEntryPointContract.address
     );
+
+    await accountFactory.deployed();
 
     await accountFactory.createAccount(
       friend1.address,
@@ -362,6 +374,7 @@ describe("Account", function () {
 
     it("TokenEntryPoint should be able to transfer ERC20 if user op signed by user (sponsor)", async function () {
       const {
+        entrypoint,
         owner,
         token,
         tokenEntryPointContract,
@@ -398,7 +411,7 @@ describe("Account", function () {
         tokenAddress: token.address,
         signerAddress: friend3.address,
         accountFactoryAddress: accountFactory.address,
-        paymasterContract,
+        entrypoint,
       });
 
       const paymasterAndData = await getPaymasterAndData({
@@ -415,6 +428,14 @@ describe("Account", function () {
         friend3
       );
 
+      await expect(
+        tokenEntryPointContract.handleOps([userop], sponsor.address)
+      ).to.be.revertedWith("contract not whitelisted");
+
+      await tokenEntryPointContract
+        .connect(sponsor)
+        .updateWhitelist([token.address]);
+
       await tokenEntryPointContract.handleOps([userop], sponsor.address);
 
       // balance should match what was sent
@@ -428,6 +449,7 @@ describe("Account", function () {
 
     it("Updating the verifying address of the paymaster should allow this new address to be used instead", async function () {
       const {
+        entrypoint,
         owner,
         token,
         tokenEntryPointContract,
@@ -465,7 +487,7 @@ describe("Account", function () {
         tokenAddress: token.address,
         signerAddress: friend3.address,
         accountFactoryAddress: accountFactory.address,
-        paymasterContract,
+        entrypoint,
       });
 
       const paymasterAndData = await getPaymasterAndData({
@@ -482,9 +504,13 @@ describe("Account", function () {
         friend3
       );
 
+      await tokenEntryPointContract
+        .connect(sponsor)
+        .updateWhitelist([token.address]);
+
       await expect(
         tokenEntryPointContract.handleOps([userop], sponsor2.address)
-      ).to.be.revertedWith("invalid paymaster signature");
+      ).to.be.revertedWith("VerifyingPaymaster: invalid paymaster signature");
 
       await expect(
         paymasterContract.transferOwnership(sponsor2.address)

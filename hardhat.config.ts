@@ -26,6 +26,15 @@ const hhconfig: HardhatUserConfig = {
       url: process.env.POLYGON_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 90000000000, // this is 30 Gwei
+      timeout: 999999,
+      // timeoutBlocks: 200,
+      gas: 12400000,
+      // gasPrice: 900000000000,
+      throwOnTransactionFailures: true,
+      throwOnCallFailures: true,
+      allowUnlimitedContractSize: true,
+      // blockGasLimit: 0x1fffffffffffff,
+      // timeout: 1800000,
     },
     base: {
       url: process.env.BASE_RPC_URL,

@@ -28,7 +28,7 @@ Our approach simplifies execution and verification into a single contract and re
 
 ## TokenEntryPoint
 
-The `TokenEntryPoint` contract is a Solidity contract used to authorize and execute user operations. It inherits from several OpenZeppelin contracts and uses ECDSA for signature verification and UserOperationLib for user operation handling.
+The `TokenEntryPoint` contract is a simplified EntryPoint used to authorize and handle user operations. It inherits from several OpenZeppelin contracts and uses ECDSA for signature verification and UserOperationLib for user operation handling.
 
 ### Key Features
 
@@ -36,19 +36,18 @@ The `TokenEntryPoint` contract is a Solidity contract used to authorize and exec
 
 - **Signature Verification**: The contract uses ECDSA for signature verification. It verifies the nonce, account, and paymaster signature of each user operation before execution.
 
-- **Paymaster Sponsor**: The contract includes a paymaster sponsor, which can be updated with the `updatePaymasterSponsor` function.
+- **Paymaster**: The contract includes a reference to the paymaster contract, which can be updated with the `updatePaymaster` function.
 
 ### Usage
 
 To execute a batch of user operations, call the `handleOps` function with an array of `UserOperation` structs and a beneficiary address. The function will execute each operation in the array.
 
-To update the paymaster sponsor, call the `updatePaymasterSponsor` function with the new sponsor's address. The function will update the sponsor and emit a `PaymasterSponsorUpdated` event.
+To update the paymaster, call the `updatePaymaster` function with the new paymaster's address.
 
 ### Dependencies
 
 This contract depends on several OpenZeppelin contracts:
 
-- `Paymaster`: Used for paymaster functionality.
 - `Initializable`: Used for initialization functionality.
 - `ReentrancyGuardUpgradeable`: Used to prevent reentrancy attacks.
 - `OwnableUpgradeable`: Used for owner functionality.

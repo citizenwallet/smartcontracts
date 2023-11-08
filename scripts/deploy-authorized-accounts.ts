@@ -13,10 +13,10 @@ async function main() {
   }
 
   if (
-    process.env.PAYMASTER_ADDR === undefined ||
-    process.env.PAYMASTER_ADDR === ""
+    process.env.PAYMASTER_SPONSOR_ADDR === undefined ||
+    process.env.PAYMASTER_SPONSOR_ADDR === ""
   ) {
-    throw Error("PAYMASTER_ADDR is not set");
+    throw Error("PAYMASTER_SPONSOR_ADDR is not set");
   }
 
   console.log("deploying Paymaster...");
@@ -25,18 +25,31 @@ async function main() {
 
   const paymaster = await upgrades.deployProxy(
     paymasterFactory,
-    [process.env.PAYMASTER_ADDR],
+    [process.env.PAYMASTER_SPONSOR_ADDR],
     {
       kind: "uups",
       initializer: "initialize",
-      verifySourceCode: true,
+      timeout: 999999,
     }
   );
 
   console.log("request sent...");
 
   await paymaster.deployed();
+
   console.log(`Paymaster deployed to: ${paymaster.address}`);
+
+  console.log("verifying...");
+
+  // wait for etherscan to index the contract
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+
+  await run("verify:verify", {
+    address: paymaster.address,
+    constructorArguments: [],
+  });
+
+  console.log("verified!");
 
   console.log("deploying TokenEntryPoint...");
 
@@ -45,18 +58,35 @@ async function main() {
   );
   const tokenEntryPoint = await upgrades.deployProxy(
     tokenEntryPointFactory,
-    [process.env.PAYMASTER_ADDR, paymaster.address],
+    [
+      process.env.PAYMASTER_SPONSOR_ADDR,
+      paymaster.address,
+      process.env.ENTRYPOINT_ADDR,
+    ],
     {
       kind: "uups",
       initializer: "initialize",
-      verifySourceCode: true,
+      timeout: 999999,
     }
   );
 
   console.log("request sent...");
 
   await tokenEntryPoint.deployed();
+
   console.log(`TokenEntryPoint deployed to: ${tokenEntryPoint.address}`);
+
+  console.log("verifying...");
+
+  // wait for etherscan to index the contract
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+
+  await run("verify:verify", {
+    address: tokenEntryPoint.address,
+    constructorArguments: [],
+  });
+
+  console.log("verified!");
 
   console.log("deploying AccountFactory...");
 
@@ -73,10 +103,9 @@ async function main() {
 
   console.log("verifying...");
 
-  // wait 10 seconds
-  await new Promise((r) => setTimeout(r, 10000));
+  // wait for etherscan to index the contract
+  await new Promise((resolve) => setTimeout(resolve, 10000));
 
-  // Verify the contract
   await run("verify:verify", {
     address: accFactory.address,
     constructorArguments: [
@@ -85,7 +114,16 @@ async function main() {
     ],
   });
 
-  console.log("verified...");
+  console.log("verified!");
+
+  console.log("*************************************");
+  console.log("DEPLOYMENT COMPLETE");
+  console.log(" ");
+  console.log(" ");
+  console.log("Paymaster: ", paymaster.address);
+  console.log("Token Entry Point: ", tokenEntryPoint.address);
+  console.log("Account Factory: ", accFactory.address);
+  console.log("*************************************");
 }
 
 // We recommend this pattern to be able to use async/await everywhere
