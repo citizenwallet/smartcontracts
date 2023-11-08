@@ -26,6 +26,15 @@ const hhconfig: HardhatUserConfig = {
       url: process.env.POLYGON_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 90000000000, // this is 30 Gwei
+      timeout: 999999,
+      // timeoutBlocks: 200,
+      gas: 12400000,
+      // gasPrice: 900000000000,
+      throwOnTransactionFailures: true,
+      throwOnCallFailures: true,
+      allowUnlimitedContractSize: true,
+      // blockGasLimit: 0x1fffffffffffff,
+      // timeout: 1800000,
     },
     base: {
       url: process.env.BASE_RPC_URL,
@@ -35,7 +44,7 @@ const hhconfig: HardhatUserConfig = {
     celo: {
       url: process.env.CELO_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: 30000000, // this is 30 Gwei
+      gasPrice: 5000000000, // this is 30 Gwei
     },
   },
   etherscan: {
@@ -59,7 +68,7 @@ const hhconfig: HardhatUserConfig = {
         network: "celo",
         chainId: 42220,
         urls: {
-          apiURL: "https://api.celoscan.io",
+          apiURL: "https://api.celoscan.io/api",
           browserURL: "https://celoscan.io",
         },
       },

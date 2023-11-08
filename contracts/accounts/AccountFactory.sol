@@ -6,18 +6,21 @@ import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 
 import "./Account.sol";
+import "./interfaces/ITokenEntryPoint.sol";
 
 /**
- * A sample factory contract for Account
- * A UserOperations "initCode" holds the address of the factory, and a method call (to createAccount, in this sample factory).
- * The factory's createAccount returns the target account address even if it is already installed.
- * This way, the entryPoint.getSenderAddress() can be called either before or after the account is created.
+ * @title AccountFactory
+ * @dev Contract for creating new accounts and calculating their counterfactual addresses.
+ *
+ * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/SimpleAccountFactory.sol
  */
 contract AccountFactory {
     Account public immutable accountImplementation;
 
-    constructor(IEntryPoint _entryPoint) {
-        accountImplementation = new Account(_entryPoint);
+    event AccountCreated(address indexed account);
+
+    constructor(IEntryPoint _entryPoint, ITokenEntryPoint _tokenEntryPoint) {
+        accountImplementation = new Account(_entryPoint, _tokenEntryPoint);
     }
 
     /**
@@ -31,6 +34,9 @@ contract AccountFactory {
         uint256 salt
     ) public returns (Account ret) {
         address addr = getAddress(owner, salt);
+
+        emit AccountCreated(addr);
+
         uint codeSize = addr.code.length;
         if (codeSize > 0) {
             return Account(payable(addr));

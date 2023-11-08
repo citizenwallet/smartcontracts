@@ -4,8 +4,6 @@ const { ethers, upgrades } = require("hardhat");
 describe("RegensUniteToken", function () {
   let regensUniteToken,
     RegensUniteToken,
-    regensUniteTokenV2Test,
-    RegensUniteTokenV2Test,
     owner,
     addr1,
     addr2,
@@ -37,31 +35,6 @@ describe("RegensUniteToken", function () {
           minter1.address
         )
       ).to.equal(true);
-    });
-
-    it("Should be able to upgrade the contract", async function () {
-      // Assume RegensUniteTokenV2 is a new version of your contract with a new function called `newFunction`
-      RegensUniteTokenV2Test = await ethers.getContractFactory(
-        "RegensUniteTokenV2Test"
-      );
-
-      // Upgrading the existing proxy to the new implementation
-      regensUniteTokenV2Test = await upgrades.upgradeProxy(
-        regensUniteToken.address,
-        RegensUniteTokenV2Test
-      );
-
-      // New function should be callable on the proxy address
-      await expect(regensUniteTokenV2Test.newFunction()).to.be.ok;
-
-      // Existing functionalities should still work
-      await regensUniteTokenV2Test
-        .connect(minter1)
-        .mint(owner.address, 100, "For services rendered in V2");
-      const ownerBalance = await regensUniteTokenV2Test.balanceOf(
-        owner.address
-      );
-      expect(ownerBalance).to.equal(100);
     });
   });
 

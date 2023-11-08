@@ -33,8 +33,8 @@ CW_CONTRACT_EXT_PATH='contracts/external'
 # file = solidity file name
 # TODO: fix contract compilation to not have duplicate package names
 CW_ACCOUNT_CONTRACTS=('account,Account' \ 
-        'accfactory,AccountFactory' \ 
-        'gateway,Gateway' \
+        'accfactory,AccountFactory' \
+        'tokenEntryPoint,TokenEntryPoint' \
         'paymaster,Paymaster')
 
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
@@ -139,7 +139,7 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
                 # https://ethereum.stackexchange.com/a/84719
                 docker run -v $(pwd):/root --platform linux/amd64  ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
-                echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart';" >> "lib/accounts.dart"
+                echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;" >> "lib/accounts.dart"
                 echo "[.abi] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
                 echo "[.bin] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
 
