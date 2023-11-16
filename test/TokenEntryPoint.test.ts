@@ -641,6 +641,9 @@ describe("Account", function () {
       );
 
       expect(account1NewBytecode).to.equal(accountFactory2Bytecode);
+
+      // still useable
+      expect(await account1.owner()).to.equal(friend1.address);
     });
 
     it("Should allow account upgrades through a user op", async function () {
@@ -725,6 +728,9 @@ describe("Account", function () {
       );
 
       expect(account1NewBytecode).to.equal(accountFactory2Bytecode);
+
+      // still useable
+      expect(await account1.owner()).to.equal(friend1.address);
     });
   });
 
