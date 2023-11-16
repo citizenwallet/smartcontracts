@@ -49,7 +49,8 @@ CW_STD_CONTRACTS=('erc20,ERC20' \
 CW_EXTERNAL_CONTRACTS=('simpleaccountfactory,SimpleAccountFactory' \
         'derc20,DERC20' \
         'simpleaccount,SimpleAccount' \
-        'entrypoint,EntryPoint')
+        'entrypoint,EntryPoint' \
+        'erc1967Proxy,ERC1967Proxy')
 
 # Clean build folder
 echo "Cleaning build folder..."

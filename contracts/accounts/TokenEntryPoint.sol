@@ -40,34 +40,29 @@ contract TokenEntryPoint is
 
     SenderCreator private senderCreator;
 
-    INonceManager private _entrypoint;
+    INonceManager private immutable _entrypoint;
     address private _paymaster;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
+    constructor(INonceManager anEntryPoint) {
+        _entrypoint = anEntryPoint;
         _disableInitializers();
     }
 
     // we make the owner of also the sponsor by default
     function initialize(
         address anOwner,
-        address aPaymaster,
-        INonceManager anEntryPoint
+        address aPaymaster
     ) public virtual initializer {
         __Ownable_init();
         __ReentrancyGuard_init();
 
-        _initialize(anOwner, aPaymaster, anEntryPoint);
+        _initialize(anOwner, aPaymaster);
     }
 
-    function _initialize(
-        address anOwner,
-        address aPaymaster,
-        INonceManager anEntryPoint
-    ) internal virtual {
+    function _initialize(address anOwner, address aPaymaster) internal virtual {
         transferOwnership(anOwner);
         _paymaster = aPaymaster;
-        _entrypoint = anEntryPoint;
         senderCreator = new SenderCreator();
 
         executeSelector = bytes4(
