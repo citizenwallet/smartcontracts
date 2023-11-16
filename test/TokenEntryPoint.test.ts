@@ -24,12 +24,10 @@ interface IUserOp {
 
 interface UserOpCreation {
   sender: string;
-  receiver: string;
-  amount: BigNumberish;
-  tokenAddress: string;
   signerAddress: string;
   accountFactoryAddress: string;
   entrypoint: any; // using Contract type causes errors
+  callData: BytesLike;
 }
 
 interface UserOpPaymasterData {
@@ -38,14 +36,30 @@ interface UserOpPaymasterData {
   sponsor: SignerWithAddress;
 }
 
+const transferCallData = (
+  tokenAddress: string,
+  receiver: string,
+  amount: BigNumberish
+) =>
+  accountExecute.encodeFunctionData("execute", [
+    tokenAddress,
+    ethers.constants.Zero,
+    erc20Token.encodeFunctionData("transfer", [receiver, amount]),
+  ]);
+
+const upgradeCallData = (accountAddress: string, implementation: string) =>
+  accountExecute.encodeFunctionData("execute", [
+    accountAddress,
+    ethers.constants.Zero,
+    accountUpgrade.encodeFunctionData("upgradeTo", [implementation]),
+  ]);
+
 const createUserOp = async ({
   sender,
-  receiver,
-  amount,
-  tokenAddress,
   signerAddress,
   accountFactoryAddress,
   entrypoint,
+  callData,
 }: UserOpCreation) => {
   const userop: IUserOp = {
     sender,
@@ -63,7 +77,6 @@ const createUserOp = async ({
 
   // nonce
   const nonce: BigNumber = await entrypoint.getNonce(sender, 0);
-  // const nonce: BigNumber = BigNumber.from("0");
 
   userop.nonce = nonce;
 
@@ -81,11 +94,7 @@ const createUserOp = async ({
   }
 
   // callData
-  userop.callData = accountExecute.encodeFunctionData("execute", [
-    tokenAddress,
-    ethers.constants.Zero,
-    erc20Token.encodeFunctionData("transfer", [receiver, amount]),
-  ]);
+  userop.callData = callData;
 
   return userop;
 };
@@ -177,6 +186,7 @@ const accountExecuteABI = [
   "function execute(address to, uint256 value, bytes data)",
 ];
 const accountCreateABI = ["function createAccount(address, uint256)"];
+const accountUpgradeABI = ["function upgradeTo(address newImplementation)"];
 
 // An ABI can be fragments and does not have to include the entire interface.
 // As long as it includes the parts we want to use.
@@ -186,6 +196,7 @@ const partialERC20TokenABI = [
 
 const accountExecute = new ethers.utils.Interface(accountExecuteABI);
 const accountCreate = new ethers.utils.Interface(accountCreateABI);
+const accountUpgrade = new ethers.utils.Interface(accountUpgradeABI);
 const erc20Token = new ethers.utils.Interface(partialERC20TokenABI);
 
 // cards with paymaster and whitelist
@@ -270,6 +281,13 @@ describe("Account", function () {
 
     await accountFactory.deployed();
 
+    const accountFactory2 = await AccountFactoryContract.deploy(
+      entrypoint.address,
+      tokenEntryPointContract.address
+    );
+
+    await accountFactory2.deployed();
+
     await accountFactory.createAccount(
       friend1.address,
       ethers.BigNumber.from(0)
@@ -307,6 +325,7 @@ describe("Account", function () {
       tokenEntryPointContract,
       paymasterContract,
       accountFactory,
+      accountFactory2,
       owner,
       friend1,
       friend2,
@@ -407,12 +426,14 @@ describe("Account", function () {
 
       const userop = await createUserOp({
         sender: address,
-        receiver: accountAddress2,
-        amount: transferAmount,
-        tokenAddress: token.address,
         signerAddress: friend3.address,
         accountFactoryAddress: accountFactory.address,
         entrypoint,
+        callData: transferCallData(
+          token.address,
+          accountAddress2,
+          transferAmount
+        ),
       });
 
       const paymasterAndData = await getPaymasterAndData({
@@ -483,12 +504,14 @@ describe("Account", function () {
 
       const userop = await createUserOp({
         sender: address,
-        receiver: accountAddress2,
-        amount: transferAmount,
-        tokenAddress: token.address,
         signerAddress: friend3.address,
         accountFactoryAddress: accountFactory.address,
         entrypoint,
+        callData: transferCallData(
+          token.address,
+          accountAddress2,
+          transferAmount
+        ),
       });
 
       const paymasterAndData = await getPaymasterAndData({
@@ -566,6 +589,142 @@ describe("Account", function () {
       await account.connect(friend1).transferOwnership(address2);
 
       expect(await account.connect(friend2).owner()).to.equal(address2);
+    });
+
+    it("Should allow account upgrades directly", async function () {
+      const { accountFactory, accountFactory2, friend1, account1 } =
+        await loadFixture(deployAccountFactoryFixture);
+
+      await accountFactory2.createAccount(friend1.address, 0);
+
+      const slot = ethers.BigNumber.from(
+        "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+      );
+
+      // bytecode in the account factory and implementation of account 1 should match
+      const account1Impl = `0x${(
+        await ethers.provider.getStorageAt(account1.address, slot)
+      ).slice(26)}`;
+
+      const account1Bytecode = await ethers.provider.getCode(account1Impl);
+
+      const accountFactoryBytecode = await ethers.provider.getCode(
+        await accountFactory.accountImplementation()
+      );
+
+      expect(account1Bytecode).to.equal(accountFactoryBytecode);
+
+      const accountFactory2Bytecode = await ethers.provider.getCode(
+        await accountFactory2.accountImplementation()
+      );
+
+      expect(account1Bytecode).to.not.equal(accountFactory2Bytecode);
+
+      const newAddress = await accountFactory2.getAddress(friend1.address, 0);
+
+      expect(account1.address).to.not.equal(newAddress);
+
+      const newAccount = await ethers.getContractAt("Account", newAddress);
+
+      const implementation = `0x${(
+        await ethers.provider.getStorageAt(newAccount.address, slot)
+      ).slice(26)}`;
+
+      await account1.connect(friend1).upgradeTo(implementation);
+
+      const account1NewImpl = `0x${(
+        await ethers.provider.getStorageAt(account1.address, slot)
+      ).slice(26)}`;
+
+      const account1NewBytecode = await ethers.provider.getCode(
+        account1NewImpl
+      );
+
+      expect(account1NewBytecode).to.equal(accountFactory2Bytecode);
+    });
+
+    it("Should allow account upgrades through a user op", async function () {
+      const {
+        entrypoint,
+        accountFactory,
+        accountFactory2,
+        friend1,
+        account1,
+        paymasterContract,
+        sponsor,
+        tokenEntryPointContract,
+      } = await loadFixture(deployAccountFactoryFixture);
+
+      await accountFactory2.createAccount(friend1.address, 0);
+
+      const slot = ethers.BigNumber.from(
+        "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+      );
+
+      // bytecode in the account factory and implementation of account 1 should match
+      const account1Impl = `0x${(
+        await ethers.provider.getStorageAt(account1.address, slot)
+      ).slice(26)}`;
+
+      const account1Bytecode = await ethers.provider.getCode(account1Impl);
+
+      const accountFactoryBytecode = await ethers.provider.getCode(
+        await accountFactory.accountImplementation()
+      );
+
+      expect(account1Bytecode).to.equal(accountFactoryBytecode);
+
+      const accountFactory2Bytecode = await ethers.provider.getCode(
+        await accountFactory2.accountImplementation()
+      );
+
+      expect(account1Bytecode).to.not.equal(accountFactory2Bytecode);
+
+      const newAddress = await accountFactory2.getAddress(friend1.address, 0);
+
+      expect(account1.address).to.not.equal(newAddress);
+
+      const newAccount = await ethers.getContractAt("Account", newAddress);
+
+      const implementation = `0x${(
+        await ethers.provider.getStorageAt(newAccount.address, slot)
+      ).slice(26)}`;
+
+      // upgrade account 1 to the new implementation by using a user op
+      // await account1.connect(friend1).upgradeTo(implementation); << this but with a user op
+      const userop = await createUserOp({
+        sender: account1.address,
+        signerAddress: friend1.address,
+        accountFactoryAddress: accountFactory2.address,
+        entrypoint,
+        callData: upgradeCallData(account1.address, implementation),
+      });
+
+      const paymasterAndData = await getPaymasterAndData({
+        userop,
+        paymasterContract,
+        sponsor: sponsor,
+      });
+
+      userop.paymasterAndData = paymasterAndData;
+
+      userop.signature = await signUserOp(
+        userop,
+        tokenEntryPointContract,
+        friend1
+      );
+
+      await tokenEntryPointContract.handleOps([userop], sponsor.address);
+
+      const account1NewImpl = `0x${(
+        await ethers.provider.getStorageAt(account1.address, slot)
+      ).slice(26)}`;
+
+      const account1NewBytecode = await ethers.provider.getCode(
+        account1NewImpl
+      );
+
+      expect(account1NewBytecode).to.equal(accountFactory2Bytecode);
     });
   });
 
