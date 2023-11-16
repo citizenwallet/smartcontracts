@@ -246,10 +246,11 @@ describe("Account", function () {
 
     const tokenEntryPointContract = await upgrades.deployProxy(
       TokenEntryPointContract,
-      [sponsor.address, paymasterContract.address, entrypoint.address],
+      [sponsor.address, paymasterContract.address],
       {
         kind: "uups",
         initializer: "initialize",
+        constructorArgs: [entrypoint.address],
       }
     );
 

@@ -40,6 +40,7 @@ contract TokenEntryPoint is
 
     SenderCreator private senderCreator;
 
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
     INonceManager private immutable _entrypoint;
     address private _paymaster;
 
