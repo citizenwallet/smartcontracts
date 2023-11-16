@@ -186,7 +186,7 @@ contract Account is
     function withdrawDepositTo(
         address payable withdrawAddress,
         uint256 amount
-    ) public onlyOwner {
+    ) public onlyAccountOwner {
         entryPoint().withdrawTo(withdrawAddress, amount);
     }
 
@@ -296,7 +296,7 @@ contract Account is
 
     function _authorizeUpgrade(
         address newImplementation
-    ) internal view override onlyOwner {
+    ) internal view override onlyAccountOwner {
         (newImplementation);
     }
 }
