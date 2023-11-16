@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -13,7 +14,6 @@ import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
 import "./interfaces/IUserOpValidator.sol";
-import "./interfaces/IAccountFactory.sol";
 import "./interfaces/IOwnable.sol";
 
 /**
@@ -194,14 +194,6 @@ contract TokenEntryPoint is
 
         // the account must be created
         require(_contractExists(sender), "invalid account initialization");
-
-        IAccountFactory factoryContract = IAccountFactory(factory);
-
-        require(
-            factoryContract.getAddress(IOwnable(sender).owner(), 0) ==
-                op.getSender(),
-            "call to factory must be sender"
-        );
     }
 
     /**
@@ -267,13 +259,8 @@ contract TokenEntryPoint is
         if (selector == executeSelector) {
             address dest = _extractAddressFromCallData(op.callData);
 
-            if (dest == sender) {
-                // it should be possible to operate on your own contract without whitelisting it
-                return;
-            }
-
             require(
-                _isAddressInList(dest, _whitelist),
+                dest == sender || _isAddressInList(dest, _whitelist),
                 "contract not whitelisted"
             );
         }
@@ -284,12 +271,11 @@ contract TokenEntryPoint is
             for (uint i = 0; i < dests.length; i++) {
                 // it should be possible to operate on your own contract without whitelisting it
                 address dest = dests[i];
-                if (dest != sender) {
-                    require(
-                        _isAddressInList(dest, _whitelist),
-                        "contract not whitelisted"
-                    );
-                }
+
+                require(
+                    dest == sender || _isAddressInList(dest, _whitelist),
+                    "contract not whitelisted"
+                );
             }
         }
     }
