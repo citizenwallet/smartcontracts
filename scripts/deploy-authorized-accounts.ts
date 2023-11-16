@@ -1,4 +1,5 @@
 import { ethers, upgrades, run } from "hardhat";
+import "@nomicfoundation/hardhat-toolbox";
 import { config } from "dotenv";
 
 async function main() {
@@ -39,22 +40,6 @@ async function main() {
 
   console.log(`Paymaster deployed to: ${paymaster.address}`);
 
-  console.log("verifying...");
-
-  // wait for etherscan to index the contract
-  await new Promise((resolve) => setTimeout(resolve, 10000));
-
-  try {
-    await run("verify:verify", {
-      address: paymaster.address,
-      constructorArguments: [],
-    });
-
-    console.log("verified!");
-  } catch (error) {
-    console.log(error);
-  }
-
   console.log("deploying TokenEntryPoint...");
 
   const tokenEntryPointFactory = await ethers.getContractFactory(
@@ -77,22 +62,6 @@ async function main() {
 
   console.log(`TokenEntryPoint deployed to: ${tokenEntryPoint.address}`);
 
-  console.log("verifying...");
-
-  // wait for etherscan to index the contract
-  await new Promise((resolve) => setTimeout(resolve, 10000));
-
-  try {
-    await run("verify:verify", {
-      address: tokenEntryPoint.address,
-      constructorArguments: [],
-    });
-
-    console.log("verified!");
-  } catch (error) {
-    console.log(error);
-  }
-
   console.log("deploying AccountFactory...");
 
   const accFactory = await ethers.deployContract("AccountFactory", [
@@ -110,6 +79,28 @@ async function main() {
 
   // wait for etherscan to index the contract
   await new Promise((resolve) => setTimeout(resolve, 10000));
+
+  try {
+    await run("verify:verify", {
+      address: paymaster.address,
+      constructorArguments: [],
+    });
+
+    console.log("verified!");
+  } catch (error) {
+    console.log(error);
+  }
+
+  try {
+    await run("verify:verify", {
+      address: tokenEntryPoint.address,
+      constructorArguments: [process.env.ENTRYPOINT_ADDR],
+    });
+
+    console.log("verified!");
+  } catch (error) {
+    console.log(error);
+  }
 
   try {
     await run("verify:verify", {
