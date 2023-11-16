@@ -44,12 +44,16 @@ async function main() {
   // wait for etherscan to index the contract
   await new Promise((resolve) => setTimeout(resolve, 10000));
 
-  await run("verify:verify", {
-    address: paymaster.address,
-    constructorArguments: [],
-  });
+  try {
+    await run("verify:verify", {
+      address: paymaster.address,
+      constructorArguments: [],
+    });
 
-  console.log("verified!");
+    console.log("verified!");
+  } catch (error) {
+    console.log(error);
+  }
 
   console.log("deploying TokenEntryPoint...");
 
@@ -58,14 +62,11 @@ async function main() {
   );
   const tokenEntryPoint = await upgrades.deployProxy(
     tokenEntryPointFactory,
-    [
-      process.env.PAYMASTER_SPONSOR_ADDR,
-      paymaster.address,
-      process.env.ENTRYPOINT_ADDR,
-    ],
+    [process.env.PAYMASTER_SPONSOR_ADDR, paymaster.address],
     {
       kind: "uups",
       initializer: "initialize",
+      constructorArgs: [process.env.ENTRYPOINT_ADDR],
       timeout: 999999,
     }
   );
@@ -81,12 +82,16 @@ async function main() {
   // wait for etherscan to index the contract
   await new Promise((resolve) => setTimeout(resolve, 10000));
 
-  await run("verify:verify", {
-    address: tokenEntryPoint.address,
-    constructorArguments: [],
-  });
+  try {
+    await run("verify:verify", {
+      address: tokenEntryPoint.address,
+      constructorArguments: [],
+    });
 
-  console.log("verified!");
+    console.log("verified!");
+  } catch (error) {
+    console.log(error);
+  }
 
   console.log("deploying AccountFactory...");
 
@@ -106,15 +111,19 @@ async function main() {
   // wait for etherscan to index the contract
   await new Promise((resolve) => setTimeout(resolve, 10000));
 
-  await run("verify:verify", {
-    address: accFactory.address,
-    constructorArguments: [
-      process.env.ENTRYPOINT_ADDR,
-      tokenEntryPoint.address,
-    ],
-  });
+  try {
+    await run("verify:verify", {
+      address: accFactory.address,
+      constructorArguments: [
+        process.env.ENTRYPOINT_ADDR,
+        tokenEntryPoint.address,
+      ],
+    });
 
-  console.log("verified!");
+    console.log("verified!");
+  } catch (error) {
+    console.log(error);
+  }
 
   console.log("*************************************");
   console.log("DEPLOYMENT COMPLETE");
