@@ -85,6 +85,10 @@ contract TokenEntryPoint is
 
     function incrementNonce(uint192 key) external override onlyOwner {}
 
+    function paymaster() public view returns (address) {
+        return _paymaster;
+    }
+
     function updatePaymaster(address newPaymaster) public onlyOwner {
         require(_contractExists(newPaymaster), "invalid paymaster");
 
@@ -159,7 +163,7 @@ contract TokenEntryPoint is
         address sender
     ) internal virtual {
         // call the initCode
-        if (op.nonce == 0) {
+        if (op.nonce == 0 && !_contractExists(sender)) {
             _initAccount(op);
         }
 
