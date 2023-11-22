@@ -250,6 +250,12 @@ async function main() {
     sponsor.privateKey.replace("0x", "")
   );
   console.log(" ");
+  if (contractAddresses.length > 0) {
+    console.log(`whitelisted contracts:`);
+    contractAddresses.forEach((addr) => console.log(addr));
+    console.log(profile.address);
+    console.log("\n");
+  }
   console.log(" ");
   console.log("Token Entry Point: ", tokenEntryPoint.address);
   console.log("Account Factory: ", accFactory.address);
