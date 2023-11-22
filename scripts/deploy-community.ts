@@ -14,13 +14,6 @@ async function main() {
     throw Error("ENTRYPOINT_ADDR is not set");
   }
 
-  if (
-    process.env.PAYMASTER_SPONSOR_ADDR === undefined ||
-    process.env.PAYMASTER_SPONSOR_ADDR === ""
-  ) {
-    throw Error("PAYMASTER_SPONSOR_ADDR is not set");
-  }
-
   const response = new Promise<string[]>((resolve) => {
     const rl = readline.createInterface({
       input: process.stdin,
@@ -36,14 +29,17 @@ async function main() {
     );
   });
 
-  console.log("\n");
-
   const contractAddresses = await response;
+
+  console.log("\n");
 
   if (contractAddresses.length > 0) {
     console.log(`whitelisting contracts:`);
     contractAddresses.forEach((addr) => console.log(addr));
+    console.log("\n");
   }
+
+  const sponsor = ethers.Wallet.createRandom();
 
   console.log("⚙️ deploying Paymaster...");
 
@@ -51,7 +47,7 @@ async function main() {
 
   const paymaster = await upgrades.deployProxy(
     paymasterFactory,
-    [process.env.PAYMASTER_SPONSOR_ADDR],
+    [sponsor.address],
     {
       kind: "uups",
       initializer: "initialize",
@@ -74,7 +70,7 @@ async function main() {
   );
   const tokenEntryPoint = await upgrades.deployProxy(
     tokenEntryPointFactory,
-    [process.env.PAYMASTER_SPONSOR_ADDR, paymaster.address, contractAddresses],
+    [sponsor.address, paymaster.address, contractAddresses],
     {
       kind: "uups",
       initializer: "initialize",
@@ -184,6 +180,13 @@ async function main() {
   console.log("\n");
   console.log("\n");
   console.log("Paymaster: ", paymaster.address);
+  console.log("paymaster sponsor address: ", sponsor.address);
+  console.log(
+    "paymaster sponsor private key: ",
+    sponsor.privateKey.replace("0x", "")
+  );
+  console.log("\n");
+  console.log("\n");
   console.log("Token Entry Point: ", tokenEntryPoint.address);
   console.log("Account Factory: ", accFactory.address);
   console.log("Profile: ", profile.address);

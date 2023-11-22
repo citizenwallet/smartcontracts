@@ -13,13 +13,6 @@ async function main() {
   }
 
   if (
-    process.env.PAYMASTER_SPONSOR_ADDR === undefined ||
-    process.env.PAYMASTER_SPONSOR_ADDR === ""
-  ) {
-    throw Error("PAYMASTER_SPONSOR_ADDR is not set");
-  }
-
-  if (
     process.env.TOKEN_ENTRYPOINT_ADDR === undefined ||
     process.env.TOKEN_ENTRYPOINT_ADDR === ""
   ) {
