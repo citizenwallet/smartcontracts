@@ -53,10 +53,12 @@ contract TokenEntryPoint is
     // we make the owner of also the sponsor by default
     function initialize(
         address anOwner,
-        address aPaymaster
+        address aPaymaster,
+        address[] calldata addresses
     ) public virtual initializer {
         __Ownable_init();
         __ReentrancyGuard_init();
+        __Whitelist_init(addresses);
 
         _initialize(anOwner, aPaymaster);
     }
@@ -128,7 +130,7 @@ contract TokenEntryPoint is
             _validatePaymasterUserOp(op);
 
             // execute the op
-            require(_call(sender, 0, op.callData), "op execution failed");
+            _call(sender, 0, op.callData);
 
             unchecked {
                 ++i;
@@ -207,11 +209,12 @@ contract TokenEntryPoint is
     function _validatePaymasterUserOp(
         UserOperation calldata op
     ) internal virtual {
-        address paymaster = _getPaymaster(op);
+        address paymasterAddress = _getPaymaster(op);
 
         // verify paymasterAndData signature
-        (bytes memory context, uint256 validationData) = IPaymaster(paymaster)
-            .validatePaymasterUserOp(op, op.hash(), 0);
+        (bytes memory context, uint256 validationData) = IPaymaster(
+            paymasterAddress
+        ).validatePaymasterUserOp(op, op.hash(), 0);
 
         if (validationData != 0) {
             revert(string(context));
@@ -226,13 +229,13 @@ contract TokenEntryPoint is
         // paymasterAndData must be at least 20 bytes long, and the first 20 bytes must be the paymaster address
         require(paymasterAndData.length >= 20, "invalid paymasterAndData");
 
-        address paymaster = address(bytes20(paymasterAndData[0:20]));
+        address paymasterAddress = address(bytes20(paymasterAndData[0:20]));
 
-        require(_contractExists(paymaster), "paymaster not deployed");
+        require(_contractExists(paymasterAddress), "paymaster not deployed");
 
-        require(paymaster == _paymaster, "invalid paymaster");
+        require(paymasterAddress == _paymaster, "invalid paymaster");
 
-        return paymaster;
+        return paymasterAddress;
     }
 
     bytes4 private executeSelector;
@@ -264,7 +267,7 @@ contract TokenEntryPoint is
             address dest = _extractAddressFromCallData(op.callData);
 
             require(
-                dest == sender || _isAddressInList(dest, _whitelist),
+                dest == sender || isWhitelisted(dest),
                 "contract not whitelisted"
             );
         }
@@ -277,7 +280,7 @@ contract TokenEntryPoint is
                 address dest = dests[i];
 
                 require(
-                    dest == sender || _isAddressInList(dest, _whitelist),
+                    dest == sender || isWhitelisted(dest),
                     "contract not whitelisted"
                 );
             }
@@ -318,26 +321,41 @@ contract TokenEntryPoint is
         return addrs;
     }
 
-    address[] private _whitelist;
+    // more gas efficient for updating the whitelist than only using a mapping
+    uint256 private _whitelistVersion;
+    mapping(address => uint256) private _whitelist;
+
+    function __Whitelist_init(
+        address[] calldata addresses
+    ) internal initializer {
+        _whitelistVersion = 0;
+        _updateWhiteList(addresses);
+    }
+
+    /**
+     * @dev Checks if an address is in the whitelist.
+     * @param addr The address to check.
+     * @return A boolean indicating whether the address is in the whitelist.
+     */
+    function isWhitelisted(address addr) internal view returns (bool) {
+        return _whitelist[addr] == _whitelistVersion;
+    }
+
+    function _updateWhiteList(address[] calldata addresses) internal virtual {
+        updateWhitelist(addresses);
+    }
 
     /**
      * @dev Updates the whitelist.
-     * @param addr The addresses to update the whitelist.
+     * @param addresses The addresses to update the whitelist.
      */
-    function updateWhitelist(address[] calldata addr) external onlyOwner {
-        _whitelist = addr;
-    }
+    function updateWhitelist(address[] calldata addresses) public onlyOwner {
+        // bump the version number so that we don't have to clear the mapping
+        _whitelistVersion++;
 
-    function _isAddressInList(
-        address addr,
-        address[] memory list
-    ) public pure returns (bool) {
-        for (uint i = 0; i < list.length; i++) {
-            if (list[i] == addr) {
-                return true;
-            }
+        for (uint i = 0; i < addresses.length; i++) {
+            _whitelist[addresses[i]] = _whitelistVersion;
         }
-        return false;
     }
 
     /**
@@ -373,14 +391,13 @@ contract TokenEntryPoint is
      * @param value The amount of ether to send with the call.
      * @param data The data to send with the call.
      */
-    function _call(
-        address target,
-        uint256 value,
-        bytes memory data
-    ) internal returns (bool) {
+    function _call(address target, uint256 value, bytes memory data) internal {
         (bool success, bytes memory result) = target.call{value: value}(data);
-
-        return success;
+        if (!success) {
+            assembly {
+                revert(add(result, 32), mload(result))
+            }
+        }
     }
 
     function _authorizeUpgrade(
