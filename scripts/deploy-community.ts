@@ -41,6 +41,23 @@ async function main() {
 
   const sponsor = ethers.Wallet.createRandom();
 
+  console.log("⚙️ deploying Profile...");
+
+  const profileFactory = await ethers.getContractFactory("Profile");
+
+  const profile = await upgrades.deployProxy(profileFactory, [], {
+    kind: "uups",
+    initializer: "initialize",
+    timeout: 999999,
+  });
+
+  console.log("🚀 request sent...");
+  await profile.deployed();
+
+  console.log(`✅ Profile deployed to ${profile.address}`);
+
+  console.log("\n");
+
   console.log("⚙️ deploying Paymaster...");
 
   const paymasterFactory = await ethers.getContractFactory("Paymaster");
@@ -70,7 +87,11 @@ async function main() {
   );
   const tokenEntryPoint = await upgrades.deployProxy(
     tokenEntryPointFactory,
-    [sponsor.address, paymaster.address, contractAddresses],
+    [
+      sponsor.address,
+      paymaster.address,
+      [...contractAddresses, profile.address],
+    ],
     {
       kind: "uups",
       initializer: "initialize",
@@ -102,23 +123,6 @@ async function main() {
 
   console.log("\n");
 
-  console.log("⚙️ deploying Profile...");
-
-  const profileFactory = await ethers.getContractFactory("Profile");
-
-  const profile = await upgrades.deployProxy(profileFactory, [], {
-    kind: "uups",
-    initializer: "initialize",
-    timeout: 999999,
-  });
-
-  console.log("🚀 request sent...");
-  await profile.deployed();
-
-  console.log(`✅ Profile deployed to ${profile.address}`);
-
-  console.log("\n");
-
   console.log("🧐 verifying...");
 
   // wait for etherscan to index the contract
@@ -131,8 +135,23 @@ async function main() {
     });
 
     console.log("verified!");
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    if (
+      error.message.includes(
+        "does not seem to be verified. Please verify and publish the contract source before proceeding with this proxy verification."
+      )
+    ) {
+      console.log("\n");
+      console.log(
+        "⚠️ We were unable to verify the contract fully. This can happen when deploying the same contract with a proxy multiple times.\n"
+      );
+      console.log(
+        "You might need to go the contract's code page on Etherscan and click 'More Options' -> 'Is this a proxy?'"
+      );
+      console.log("\n");
+    } else {
+      console.log(error);
+    }
   }
 
   try {
@@ -142,8 +161,23 @@ async function main() {
     });
 
     console.log("verified!");
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    if (
+      error.message.includes(
+        "does not seem to be verified. Please verify and publish the contract source before proceeding with this proxy verification."
+      )
+    ) {
+      console.log("\n");
+      console.log(
+        "⚠️ We were unable to verify the contract fully. This can happen when deploying the same contract with a proxy multiple times.\n"
+      );
+      console.log(
+        "You might need to go the contract's code page on Etherscan and click 'More Options' -> 'Is this a proxy?'"
+      );
+      console.log("\n");
+    } else {
+      console.log(error);
+    }
   }
 
   try {
@@ -156,8 +190,23 @@ async function main() {
     });
 
     console.log("verified!");
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    if (
+      error.message.includes(
+        "does not seem to be verified. Please verify and publish the contract source before proceeding with this proxy verification."
+      )
+    ) {
+      console.log("\n");
+      console.log(
+        "⚠️ We were unable to verify the contract fully. This can happen when deploying the same contract with a proxy multiple times.\n"
+      );
+      console.log(
+        "You might need to go the contract's code page on Etherscan and click 'More Options' -> 'Is this a proxy?'"
+      );
+      console.log("\n");
+    } else {
+      console.log(error);
+    }
   }
 
   try {
@@ -167,8 +216,23 @@ async function main() {
     });
 
     console.log("verified!");
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    if (
+      error.message.includes(
+        "does not seem to be verified. Please verify and publish the contract source before proceeding with this proxy verification."
+      )
+    ) {
+      console.log("\n");
+      console.log(
+        "⚠️ We were unable to verify the contract fully. This can happen when deploying the same contract with a proxy multiple times.\n"
+      );
+      console.log(
+        "You might need to go the contract's code page on Etherscan and click 'More Options' -> 'Is this a proxy?'"
+      );
+      console.log("\n");
+    } else {
+      console.log(error);
+    }
   }
 
   console.log("\n");
@@ -177,16 +241,16 @@ async function main() {
 
   console.log("*************************************");
   console.log("DEPLOYMENT COMPLETE 🎉");
-  console.log("\n");
-  console.log("\n");
+  console.log(" ");
+  console.log(" ");
   console.log("Paymaster: ", paymaster.address);
   console.log("paymaster sponsor address: ", sponsor.address);
   console.log(
     "paymaster sponsor private key: ",
     sponsor.privateKey.replace("0x", "")
   );
-  console.log("\n");
-  console.log("\n");
+  console.log(" ");
+  console.log(" ");
   console.log("Token Entry Point: ", tokenEntryPoint.address);
   console.log("Account Factory: ", accFactory.address);
   console.log("Profile: ", profile.address);
