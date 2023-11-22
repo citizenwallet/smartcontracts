@@ -537,12 +537,10 @@ describe("Account", function () {
       ).to.be.revertedWith("VerifyingPaymaster: invalid paymaster signature");
 
       await expect(
-        paymasterContract.transferOwnership(sponsor2.address)
+        paymasterContract.connect(sponsor).updateSponsor(sponsor2.address)
       ).to.be.revertedWith("Ownable: caller is not the owner");
 
-      await paymasterContract
-        .connect(sponsor)
-        .transferOwnership(sponsor2.address);
+      await paymasterContract.connect(owner).updateSponsor(sponsor2.address);
 
       await tokenEntryPointContract.handleOps([userop], sponsor2.address);
 

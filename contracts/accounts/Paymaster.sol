@@ -43,15 +43,29 @@ contract Paymaster is
         _disableInitializers();
     }
 
-    function initialize(address sponsor) public virtual initializer {
+    function initialize(address aSponsor) public virtual initializer {
         __Ownable_init();
 
-        _initialize(sponsor);
+        _initialize(aSponsor);
     }
 
-    function _initialize(address sponsor) internal virtual {
-        transferOwnership(sponsor);
+    function _initialize(address aSponsor) internal virtual {
+        _sponsor = aSponsor;
     }
+
+    ////////////////////////////////////////////////
+    // separate the owner from the one who will actually sign the transactions.
+    address private _sponsor;
+
+    function sponsor() public view returns (address) {
+        return _sponsor;
+    }
+
+    function updateSponsor(address aSponsor) public onlyOwner {
+        _sponsor = aSponsor;
+    }
+
+    ////////////////////////////////////////////////
 
     mapping(address => uint256) public senderNonce;
 
@@ -159,7 +173,7 @@ contract Paymaster is
         senderNonce[userOp.getSender()]++;
 
         require(
-            owner() == hash.recover(signature),
+            sponsor() == hash.recover(signature),
             "VerifyingPaymaster: invalid paymaster signature"
         );
 

@@ -14,7 +14,6 @@ import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
 import "./interfaces/IUserOpValidator.sol";
-import "./interfaces/IOwnable.sol";
 
 /**
  * @title TokenEntryPoint
