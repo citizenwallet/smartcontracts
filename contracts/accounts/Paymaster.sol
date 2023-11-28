@@ -154,28 +154,19 @@ contract Paymaster is
         // we only "require" it here so that the revert reason on invalid signature will be of "VerifyingPaymaster", and not "ECDSA"
         require(
             signature.length == 64 || signature.length == 65,
-            "VerifyingPaymaster: invalid signature length in paymasterAndData"
+            "AA34 signature error"
         );
 
         uint48 currentTime = uint48(block.timestamp);
-        require(
-            currentTime >= validAfter,
-            "VerifyingPaymaster: signature is not valid yet"
-        );
-        require(
-            currentTime < validUntil,
-            "VerifyingPaymaster: signature has expired"
-        );
+        require(currentTime >= validAfter, "AA32 expired or not due");
+        require(currentTime < validUntil, "AA32 expired or not due");
 
         bytes32 hash = getHash(userOp, validUntil, validAfter)
             .toEthSignedMessageHash();
 
         senderNonce[userOp.getSender()]++;
 
-        require(
-            sponsor() == hash.recover(signature),
-            "VerifyingPaymaster: invalid paymaster signature"
-        );
+        require(sponsor() == hash.recover(signature), "AA34 signature error");
 
         context = "";
         validationData = 0;

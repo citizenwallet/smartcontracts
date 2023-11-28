@@ -452,7 +452,7 @@ describe("Account", function () {
 
       await expect(
         tokenEntryPointContract.handleOps([userop], sponsor.address)
-      ).to.be.revertedWith("contract not whitelisted");
+      ).to.be.revertedWith("AA28 contract not whitelisted");
 
       await tokenEntryPointContract
         .connect(sponsor)
@@ -466,7 +466,7 @@ describe("Account", function () {
       // cannot replay transaction
       await expect(
         tokenEntryPointContract.handleOps([userop], sponsor.address)
-      ).to.be.revertedWith("invalid nonce");
+      ).to.be.revertedWith("AA25 invalid account nonce");
     });
 
     it("Updating the verifying address of the paymaster should allow this new address to be used instead", async function () {
@@ -534,7 +534,7 @@ describe("Account", function () {
 
       await expect(
         tokenEntryPointContract.handleOps([userop], sponsor2.address)
-      ).to.be.revertedWith("VerifyingPaymaster: invalid paymaster signature");
+      ).to.be.revertedWith("AA34 signature error");
 
       await expect(
         paymasterContract.connect(sponsor).updateSponsor(sponsor2.address)
@@ -550,7 +550,7 @@ describe("Account", function () {
       // cannot replay transaction
       await expect(
         tokenEntryPointContract.handleOps([userop], sponsor.address)
-      ).to.be.revertedWith("invalid nonce");
+      ).to.be.revertedWith("AA25 invalid account nonce");
     });
   });
 

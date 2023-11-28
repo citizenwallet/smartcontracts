@@ -107,7 +107,7 @@ contract TokenEntryPoint is
         UserOperation[] calldata ops,
         address payable beneficiary // kept to make sure we keep the same function signature
     ) public nonReentrant {
-        require(ops.length > 0, "needs at least one user operation");
+        require(ops.length > 0, "AA42 needs at least one user operation");
 
         uint len = ops.length;
         for (uint i = 0; i < len; ) {
@@ -151,7 +151,7 @@ contract TokenEntryPoint is
         uint256 nonce = getNonce(sender, 0);
 
         // the nonce in the user op must match the nonce in the account
-        require(nonce == op.nonce, "invalid nonce");
+        require(nonce == op.nonce, "AA25 invalid account nonce");
     }
 
     /**
@@ -165,7 +165,7 @@ contract TokenEntryPoint is
     ) internal virtual {
         // call the initCode
         if (op.nonce == 0 && !_contractExists(sender)) {
-            _initAccount(op);
+            _initAccount(op, sender);
         }
 
         // verify the user op signature
@@ -173,7 +173,7 @@ contract TokenEntryPoint is
 
         require(
             account.validateUserOp(op, getUserOpHash(op)),
-            "invalid account signature"
+            "AA24 signature error"
         );
     }
 
@@ -181,24 +181,31 @@ contract TokenEntryPoint is
      * @dev Initializes a new account using the provided UserOperation.
      * @param op The UserOperation which contains the initCode.
      */
-    function _initAccount(UserOperation calldata op) internal virtual {
+    function _initAccount(
+        UserOperation calldata op,
+        address sender
+    ) internal virtual {
         bytes calldata initCode = op.initCode;
 
         // initCode must be at least 20 bytes long, and the first 20 bytes must be the factory address
-        require(initCode.length >= 20, "invalid initCode");
+        require(initCode.length >= 20, "AA17 invalid initCode");
 
         address factory = address(bytes20(initCode[0:20]));
 
         // the factory in the init code must be deployed
-        require(_contractExists(factory), "invalid factory");
+        require(
+            _contractExists(factory),
+            "AA16 invalid factory or does not exist"
+        );
 
         // call the factory
-        address sender = senderCreator.createSender(initCode);
+        address created = senderCreator.createSender(initCode);
 
-        require(sender != address(0), "account initialization failed");
+        require(sender != address(0), "AA13 initCode failed or OOG");
+        require(sender == created, "AA14 initCode must return sender");
 
         // the account must be created
-        require(_contractExists(sender), "invalid account initialization");
+        require(_contractExists(created), "AA15 initCode must create sender");
     }
 
     /**
@@ -226,13 +233,16 @@ contract TokenEntryPoint is
         bytes calldata paymasterAndData = op.paymasterAndData;
 
         // paymasterAndData must be at least 20 bytes long, and the first 20 bytes must be the paymaster address
-        require(paymasterAndData.length >= 20, "invalid paymasterAndData");
+        require(paymasterAndData.length >= 20, "AA36 invalid paymaster data");
 
         address paymasterAddress = address(bytes20(paymasterAndData[0:20]));
 
-        require(_contractExists(paymasterAddress), "paymaster not deployed");
+        require(
+            _contractExists(paymasterAddress),
+            "AA30 paymaster not deployed"
+        );
 
-        require(paymasterAddress == _paymaster, "invalid paymaster");
+        require(paymasterAddress == _paymaster, "AA35 invalid paymaster");
 
         return paymasterAddress;
     }
@@ -249,17 +259,17 @@ contract TokenEntryPoint is
         address sender
     ) internal virtual {
         // callData must be at least 4 bytes long, and the first 4 bytes must be the function selector
-        require(op.callData.length >= 4, "invalid callData");
+        require(op.callData.length >= 4, "AA26 invalid calldata");
 
         bytes4 selector = bytes4(op.callData[0:4]);
 
         // the function selector must be valid
-        require(selector != bytes4(0), "invalid function selector");
+        require(selector != bytes4(0), "AA27 invalid function selector");
 
         // we only allow execute or executeBatch calls
         require(
             selector == executeSelector || selector == executeBatchSelector,
-            "invalid function selector"
+            "AA27 invalid function selector"
         );
 
         if (selector == executeSelector) {
@@ -267,7 +277,7 @@ contract TokenEntryPoint is
 
             require(
                 dest == sender || isWhitelisted(dest),
-                "contract not whitelisted"
+                "AA28 contract not whitelisted"
             );
         }
 
@@ -280,7 +290,7 @@ contract TokenEntryPoint is
 
                 require(
                     dest == sender || isWhitelisted(dest),
-                    "contract not whitelisted"
+                    "AA28 contract not whitelisted"
                 );
             }
         }
