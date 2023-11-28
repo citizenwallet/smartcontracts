@@ -793,4 +793,16 @@ describe("Account", function () {
       );
     });
   });
+
+  describe("Token EntryPoint", function () {
+    it("Should return the matching token entrypoint with which the factory was deployed", async function () {
+      const { tokenEntryPointContract, account1 } = await loadFixture(
+        deployAccountFactoryFixture
+      );
+
+      expect(await account1.tokenEntryPoint()).equal(
+        tokenEntryPointContract.address
+      );
+    });
+  });
 });
