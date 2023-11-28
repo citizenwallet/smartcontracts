@@ -16,7 +16,7 @@ vim .env.local
 
 1. Deploy a community token
 
-Make a copy of a template (e.g. `contracts/RegensUniteToken.sol`, a simple ERC20, no pre-mint, upgradeable), edit the name and the symbol (line 32) and edit the script `scripts/deploy-upgradeable.js` to change the name of your contract (line 5). You may also change the initial addresses that have the `MINTER` role (by default, `MINTER1_ADDRESS` and `MINTER2_ADDRESS` defined in your `.env.local` file).
+Make a copy of a template (e.g. `contracts/RegensUniteToken.sol`, a simple ERC20, no pre-mint, upgradeable), edit the name and the symbol (line 12 and line 32) and edit the script `scripts/deploy-upgradeable.js` to change the name of your contract (line 5). You may also change the initial addresses that have the `MINTER` role (by default, `MINTER1_ADDRESS` and `MINTER2_ADDRESS` defined in your `.env.local` file).
 
 Then run:
 
