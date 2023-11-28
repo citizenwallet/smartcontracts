@@ -4,7 +4,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import { config } from "dotenv";
 
 async function main() {
-  console.log("reading config...");
+  console.log("🏃🏻‍♂️ Running...\n");
   config();
 
   if (
@@ -14,14 +14,37 @@ async function main() {
     throw Error("ENTRYPOINT_ADDR is not set");
   }
 
-  const response = new Promise<string[]>((resolve) => {
+  const profileResponse = new Promise<string | undefined>((resolve) => {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
     });
 
     rl.question(
-      "Please enter the contracts to be whitelisted (comma separated) (ex: 0x123...,0x345...): ",
+      "Custom profile contract address (leave empty if you want to create one): ",
+      (answer) => {
+        if (answer === "" || answer === undefined || !answer.startsWith("0x")) {
+          resolve(undefined);
+        }
+
+        resolve(answer);
+        rl.close();
+      }
+    );
+  });
+
+  const customProfile = await profileResponse;
+
+  console.log("\n");
+
+  const addressResponse = new Promise<string[]>((resolve) => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    rl.question(
+      "Token addresses to be whitelisted (comma separated) (ex: 0x123...,0x345...): ",
       (answer) => {
         resolve(answer.split(",").map((addr) => addr.trim()));
         rl.close();
@@ -29,34 +52,45 @@ async function main() {
     );
   });
 
-  const contractAddresses = await response;
+  const contractAddresses = await addressResponse;
 
   console.log("\n");
+
+  const sponsor = ethers.Wallet.createRandom();
+
+  let profileAddress: string = customProfile ?? "";
+  if (customProfile === undefined) {
+    console.log("⚙️ deploying Profile...");
+
+    const profileFactory = await ethers.getContractFactory("Profile");
+
+    const profile = await upgrades.deployProxy(profileFactory, [], {
+      kind: "uups",
+      initializer: "initialize",
+      timeout: 999999,
+    });
+
+    console.log("🚀 request sent...");
+    await profile.deployed();
+
+    console.log(`✅ Profile deployed to ${profile.address}`);
+
+    profileAddress = profile.address;
+
+    console.log("\n");
+  }
+
+  if (profileAddress === "") {
+    throw Error("Something went wrong, profile address is empty");
+  }
+
+  contractAddresses.push(profileAddress);
 
   if (contractAddresses.length > 0) {
     console.log(`whitelisting contracts:`);
     contractAddresses.forEach((addr) => console.log(addr));
     console.log("\n");
   }
-
-  const sponsor = ethers.Wallet.createRandom();
-
-  console.log("⚙️ deploying Profile...");
-
-  const profileFactory = await ethers.getContractFactory("Profile");
-
-  const profile = await upgrades.deployProxy(profileFactory, [], {
-    kind: "uups",
-    initializer: "initialize",
-    timeout: 999999,
-  });
-
-  console.log("🚀 request sent...");
-  await profile.deployed();
-
-  console.log(`✅ Profile deployed to ${profile.address}`);
-
-  console.log("\n");
 
   console.log("⚙️ deploying Paymaster...");
 
@@ -90,7 +124,7 @@ async function main() {
     [
       sponsor.address,
       paymaster.address,
-      [...contractAddresses, profile.address],
+      [...contractAddresses, profileAddress],
     ],
     {
       kind: "uups",
@@ -211,7 +245,7 @@ async function main() {
 
   try {
     await run("verify:verify", {
-      address: profile.address,
+      address: profileAddress,
       constructorArguments: [],
     });
 
@@ -253,13 +287,13 @@ async function main() {
   if (contractAddresses.length > 0) {
     console.log(`whitelisted contracts:`);
     contractAddresses.forEach((addr) => console.log(addr));
-    console.log(profile.address);
+    console.log(profileAddress);
     console.log("\n");
   }
   console.log(" ");
   console.log("Token Entry Point: ", tokenEntryPoint.address);
   console.log("Account Factory: ", accFactory.address);
-  console.log("Profile: ", profile.address);
+  console.log("Profile: ", profileAddress);
   console.log("*************************************");
 
   console.log("\n");
