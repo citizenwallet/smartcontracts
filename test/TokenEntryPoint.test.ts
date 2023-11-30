@@ -207,13 +207,21 @@ describe("Account", function () {
     const [owner, friend1, friend2, friend3, sponsor, sponsor2] =
       await ethers.getSigners();
 
-    const TokenContract = await ethers.getContractFactory("RegensUniteToken", {
-      signer: owner,
-    });
-    const token = await upgrades.deployProxy(TokenContract, [[owner.address]], {
-      kind: "uups",
-      initializer: "initialize",
-    });
+    const TokenContract = await ethers.getContractFactory(
+      "ERC20TokenWithUpgrades",
+      {
+        signer: owner,
+      }
+    );
+    const token = await upgrades.deployProxy(
+      TokenContract,
+      [[owner.address], "My Token", "MT"],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        constructorArgs: [6],
+      }
+    );
 
     const entrypointBin = fs
       .readFileSync(path.join(__dirname, "data", "entrypoint.bin"))

@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract RegensUniteToken is
+contract ERC20TokenWithUpgrades is
     Initializable,
     ERC20Upgradeable,
     ERC20BurnableUpgradeable,
@@ -24,12 +24,17 @@ contract RegensUniteToken is
     event Minted(address indexed to, uint256 amount, string description);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
+    constructor(uint8 initDecimals) {
+        _decimals = initDecimals;
         _disableInitializers();
     }
 
-    function initialize(address[] memory minters) public initializer {
-        __ERC20_init("Regens Unite Token", "RGNU");
+    function initialize(
+        address[] memory minters,
+        string memory name,
+        string memory symbol
+    ) public initializer {
+        __ERC20_init(name, symbol);
         __ERC20Burnable_init();
         __Ownable_init();
         __AccessControl_init();
@@ -42,8 +47,11 @@ contract RegensUniteToken is
         }
     }
 
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    uint8 private immutable _decimals;
+
     function decimals() public view virtual override returns (uint8) {
-        return 6;
+        return _decimals;
     }
 
     function mint(
