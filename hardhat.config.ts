@@ -1,5 +1,5 @@
 import "@openzeppelin/hardhat-upgrades";
-import { HardhatUserConfig, task, types } from "hardhat/config";
+import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import { config } from "dotenv";
 
