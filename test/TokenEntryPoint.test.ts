@@ -208,7 +208,7 @@ describe("Account", function () {
       await ethers.getSigners();
 
     const TokenContract = await ethers.getContractFactory(
-      "ERC20TokenWithUpgrades",
+      "UpgradeableCommunityToken",
       {
         signer: owner,
       }

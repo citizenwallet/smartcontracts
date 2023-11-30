@@ -1,9 +1,9 @@
 const { expect } = require("chai");
 const { ethers, upgrades } = require("hardhat");
 
-describe("ERC20TokenWithUpgrades", function () {
+describe("UpgradeableCommunityToken", function () {
   let erc20Token,
-    ERC20TokenWithUpgrades,
+    UpgradeableCommunityToken,
     owner,
     addr1,
     addr2,
@@ -13,13 +13,13 @@ describe("ERC20TokenWithUpgrades", function () {
     anotherAccount;
 
   beforeEach(async function () {
-    ERC20TokenWithUpgrades = await ethers.getContractFactory(
-      "ERC20TokenWithUpgrades"
+    UpgradeableCommunityToken = await ethers.getContractFactory(
+      "UpgradeableCommunityToken"
     );
     [owner, addr1, addr2, minter1, minter2, receiver, anotherAccount] =
       await ethers.getSigners();
     erc20Token = await upgrades.deployProxy(
-      ERC20TokenWithUpgrades,
+      UpgradeableCommunityToken,
       [[minter1.address], "Regens Unite Token", "RGN"],
       { kind: "uups", initializer: "initialize", constructorArgs: [6] }
     );
