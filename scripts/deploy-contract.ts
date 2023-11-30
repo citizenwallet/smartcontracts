@@ -71,10 +71,14 @@ async function main() {
   const nativeCurrencySymbol =
     nativeCurrencySymbols[chainId] || `Unknown chainId: ${chainId}`;
 
-  const wallet = new ethers.Wallet(
-    process.env.DEPLOYER_PRIVATE_KEY,
-    ethers.provider
-  );
+  const pk = process.env.DEPLOYER_PRIVATE_KEY;
+  if (!pk) {
+    term.red("Please set your DEPLOYER_PRIVATE_KEY in your .env.local file");
+    term("\n");
+    process.exit();
+  }
+
+  const wallet = new ethers.Wallet(pk, ethers.provider);
   const balanceWei = await wallet.getBalance();
   term(
     `The balance of the deployer wallet on ${networkName} is: ${ethers.utils.formatEther(
@@ -83,7 +87,7 @@ async function main() {
   );
 
   // Check if the balance is greater than 50 gwei
-  if (BigInt(balanceWei) < BigInt(50 * 10 ** 9)) {
+  if (balanceWei.toBigInt() < BigInt(50 * 10 ** 9)) {
     term.red(
       `Insufficiant balance on ${wallet.address} to deploy a contract.\n`
     );
@@ -108,8 +112,18 @@ async function main() {
     .green.bold(networkName)
     .green("\n");
   term.green("Using the minters defined in your .env.local: \n");
-  term.green("  Minter 1: %s\n", process.env.MINTER1_ADDRESS);
-  term.green("  Minter 2: %s\n", process.env.MINTER2_ADDRESS);
+  const minter1 = process.env.MINTER1_ADDRESS;
+  const minter2 = process.env.MINTER2_ADDRESS;
+  if (!minter1 || !minter2) {
+    term.red(
+      "Please set your MINTER1_ADDRESS and MINTER2_ADDRESS in your .env.local file"
+    );
+    term("\n");
+    process.exit();
+  }
+
+  term.green("  Minter 1: %s\n", minter1);
+  term.green("  Minter 2: %s\n", minter2);
 
   term("\n");
 
@@ -140,8 +154,8 @@ async function main() {
   term("You are about to deploy the following contract:\n");
   term.green("  Contract Name: %s\n", contractName);
   term.green("  Network: %s\n", networkName);
-  term.green("  Minter 1: %s\n", process.env.MINTER1_ADDRESS);
-  term.green("  Minter 2: %s\n", process.env.MINTER2_ADDRESS);
+  term.green("  Minter 1: %s\n", minter1);
+  term.green("  Minter 2: %s\n", minter2);
   term.green("  Token Name: %s\n", tokenName);
   term.green("  Token Symbol: %s\n", tokenSymbol);
   term.green("  Token Decimals: %s\n", tokenDecimals);
@@ -158,8 +172,8 @@ async function main() {
     );
     deployContract(
       contractName,
-      process.env.MINTER1_ADDRESS,
-      process.env.MINTER2_ADDRESS,
+      minter1,
+      minter2,
       tokenName,
       tokenSymbol,
       tokenDecimals
