@@ -6,6 +6,8 @@
   "scripts": {
     "typechain": "typechain --target ethers-v5 --out-dir typechain-types --glob 'artifacts/contracts/*/*[!dbg].json'",
     "compile": "rm -rf cache && npx hardhat compile",
+    "deploy:contract": "ts-node scripts/deploy.ts contract",
+    "deploy:community": "ts-node scripts/deploy.ts community",
     "test": "npx hardhat test"
   },
   "author": "Xavier Damman",
@@ -19,7 +21,8 @@
     "@openzeppelin/test-helpers": "^0.5.16",
     "dotenv": "^16.1.3",
     "hardhat": "^2.19.1",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "terminal-kit": "^3.0.1"
   },
   "dependencies": {
     "userop": "^0.3.3"
