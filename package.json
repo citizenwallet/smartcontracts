@@ -6,8 +6,8 @@
   "scripts": {
     "typechain": "typechain --target ethers-v5 --out-dir typechain-types --glob 'artifacts/contracts/*/*[!dbg].json'",
     "compile": "rm -rf cache && npx hardhat compile",
-    "deploy:contract": "ts-node scripts/deploy.ts contract",
     "deploy:community": "ts-node scripts/deploy.ts community",
+    "deploy:community_entrypoint": "ts-node scripts/deploy.ts community-entrypoint",
     "test": "npx hardhat test"
   },
   "author": "Xavier Damman",
