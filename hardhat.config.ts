@@ -17,13 +17,13 @@ const hhconfig: HardhatUserConfig = {
     },
   },
   networks: {
-    ethereum: {
-      url: process.env.ETHEREUM_RPC_URL,
+    ethereum_mainnet: {
+      url: process.env.ETHEREUM_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 9000000000, // this is 90 Gwei
     },
-    polygon: {
-      url: process.env.POLYGON_RPC_URL,
+    polygon_mainnet: {
+      url: process.env.POLYGON_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 90000000000, // this is 90 Gwei
       timeout: 999999,
@@ -41,8 +41,8 @@ const hhconfig: HardhatUserConfig = {
       throwOnCallFailures: true,
       allowUnlimitedContractSize: true,
     },
-    base: {
-      url: process.env.BASE_RPC_URL,
+    base_mainnet: {
+      url: process.env.BASE_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 30000000, // this is 30 Gwei
     },
@@ -51,8 +51,8 @@ const hhconfig: HardhatUserConfig = {
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 30000000, // this is 30 Gwei
     },
-    celo: {
-      url: process.env.CELO_RPC_URL,
+    celo_mainnet: {
+      url: process.env.CELO_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 5000000000, // this is 30 Gwei
     },
@@ -64,15 +64,18 @@ const hhconfig: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      mainnet: process.env.ETEHREUM_MAINNET_ETHERSCAN_API_KEY || "",
-      polygonMumbai: process.env.POLYGON_MUMBAI_ETHERSCAN_API_KEY || "",
-      polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
-      base: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
-      celo: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
+      ethereum_mainnet: process.env.ETHEREUM_MAINNET_ETHERSCAN_API_KEY || "",
+      ethereum_testnet: process.env.ETHEREUM_TESTNET_ETHERSCAN_API_KEY || "",
+      polygon_testnet: process.env.POLYGON_TESTNET_ETHERSCAN_API_KEY || "",
+      polygon_mainnet: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
+      base_mainnet: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
+      base_testnet: process.env.BASE_TESTNET_ETHERSCAN_API_KEY || "",
+      celo_mainnet: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
+      celo_testnet: process.env.CELO_TESTNET_ETHERSCAN_API_KEY || "",
     },
     customChains: [
       {
-        network: "base",
+        network: "base_mainnet",
         chainId: 8453,
         urls: {
           apiURL: "https://api.basescan.org/api",
@@ -80,11 +83,27 @@ const hhconfig: HardhatUserConfig = {
         },
       },
       {
-        network: "celo",
+        network: "base_testnet",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org",
+        },
+      },
+      {
+        network: "celo_mainnet",
         chainId: 42220,
         urls: {
           apiURL: "https://api.celoscan.io/api",
           browserURL: "https://celoscan.io",
+        },
+      },
+      {
+        network: "celo_testnet",
+        chainId: 44787,
+        urls: {
+          apiURL: "https://api-alfajores.celoscan.io/api",
+          browserURL: "https://alfajores.celoscan.io",
         },
       },
     ],
