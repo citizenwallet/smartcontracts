@@ -130,21 +130,21 @@ async function main() {
   term("Enter a token name (My Test Token): ");
 
   const tokenName: string =
-    (await term.inputField({}).promise) ?? "My Test Token";
+    (await term.inputField({}).promise) || "My Test Token";
 
   term("\n");
 
   term("Enter a token symbol (MTT): ");
 
-  const tokenSymbol: string = (await term.inputField({}).promise) ?? "MTT";
+  const tokenSymbol: string = (await term.inputField({}).promise) || "MTT";
 
   term("\n");
 
   term("How many decimals should it have (6): ");
 
-  const tokenDecimalsInput: string = (await term.inputField({}).promise) ?? "6";
-
+  const tokenDecimalsInput: string = (await term.inputField({}).promise) || "6";
   const tokenDecimals = parseInt(tokenDecimalsInput);
+
   if (isNaN(tokenDecimals) || tokenDecimals < 0 || tokenDecimals > 18) {
     term.red("Decimals should be between 0 and 18\n");
     process.exit();
