@@ -64,10 +64,10 @@ const hhconfig: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      ethereum_mainnet: process.env.ETHEREUM_MAINNET_ETHERSCAN_API_KEY || "",
-      ethereum_testnet: process.env.ETHEREUM_TESTNET_ETHERSCAN_API_KEY || "",
-      polygon_testnet: process.env.POLYGON_TESTNET_ETHERSCAN_API_KEY || "",
-      polygon_mainnet: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
+      mainnet: process.env.ETHEREUM_MAINNET_ETHERSCAN_API_KEY || "",
+      sepolia: process.env.ETHEREUM_TESTNET_ETHERSCAN_API_KEY || "",
+      polygonMumbai: process.env.POLYGON_TESTNET_ETHERSCAN_API_KEY || "",
+      polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
       base_mainnet: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
       base_testnet: process.env.BASE_TESTNET_ETHERSCAN_API_KEY || "",
       celo_mainnet: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
