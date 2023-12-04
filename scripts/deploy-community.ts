@@ -1,307 +1,231 @@
-import readline from "readline";
-import { ethers, upgrades, run } from "hardhat";
-import "@nomicfoundation/hardhat-toolbox";
-import { config } from "dotenv";
+import { ethers, network, upgrades } from "hardhat";
+import dotenv from "dotenv";
+import { terminal as term } from "terminal-kit";
+import fs from "fs";
+import path from "path";
+import { execSync } from "child_process";
+dotenv.config();
 
-async function main() {
-  console.log("🏃🏻‍♂️ Running...\n");
-  config();
-
-  if (
-    process.env.ENTRYPOINT_ADDR === undefined ||
-    process.env.ENTRYPOINT_ADDR === ""
-  ) {
-    throw Error("ENTRYPOINT_ADDR is not set");
-  }
-
-  const profileResponse = new Promise<string | undefined>((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
-    rl.question(
-      "Custom profile contract address (leave empty if you want to create one): ",
-      (answer) => {
-        if (answer === "" || answer === undefined || !answer.startsWith("0x")) {
-          resolve(undefined);
-        }
-
-        resolve(answer);
-        rl.close();
-      }
-    );
-  });
-
-  const customProfile = await profileResponse;
-
-  console.log("\n");
-
-  const addressResponse = new Promise<string[]>((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
-    rl.question(
-      "Token addresses to be whitelisted (comma separated) (ex: 0x123...,0x345...): ",
-      (answer) => {
-        resolve(answer.split(",").map((addr) => addr.trim()));
-        rl.close();
-      }
-    );
-  });
-
-  const contractAddresses = await addressResponse;
-
-  console.log("\n");
-
-  const sponsor = ethers.Wallet.createRandom();
-
-  let profileAddress: string = customProfile ?? "";
-  if (customProfile === undefined) {
-    console.log("⚙️ deploying Profile...");
-
-    const profileFactory = await ethers.getContractFactory("Profile");
-
-    const profile = await upgrades.deployProxy(profileFactory, [], {
-      kind: "uups",
-      initializer: "initialize",
-      timeout: 999999,
-    });
-
-    console.log("🚀 request sent...");
-    await profile.deployed();
-
-    console.log(`✅ Profile deployed to ${profile.address}`);
-
-    profileAddress = profile.address;
-
-    console.log("\n");
-  }
-
-  if (profileAddress === "") {
-    throw Error("Something went wrong, profile address is empty");
-  }
-
-  contractAddresses.push(profileAddress);
-
-  if (contractAddresses.length > 0) {
-    console.log(`whitelisting contracts:`);
-    contractAddresses.forEach((addr) => console.log(addr));
-    console.log("\n");
-  }
-
-  console.log("⚙️ deploying Paymaster...");
-
-  const paymasterFactory = await ethers.getContractFactory("Paymaster");
-
-  const paymaster = await upgrades.deployProxy(
-    paymasterFactory,
-    [sponsor.address],
-    {
-      kind: "uups",
-      initializer: "initialize",
-      timeout: 999999,
-    }
-  );
-
-  console.log("🚀 request sent...");
-
-  await paymaster.deployed();
-
-  console.log(`✅ Paymaster deployed to: ${paymaster.address}`);
-
-  console.log("\n");
-
-  console.log("⚙️ deploying TokenEntryPoint...");
-
-  const tokenEntryPointFactory = await ethers.getContractFactory(
-    "TokenEntryPoint"
-  );
-  const tokenEntryPoint = await upgrades.deployProxy(
-    tokenEntryPointFactory,
-    [
-      sponsor.address,
-      paymaster.address,
-      [...contractAddresses, profileAddress],
-    ],
-    {
-      kind: "uups",
-      initializer: "initialize",
-      constructorArgs: [process.env.ENTRYPOINT_ADDR],
-      timeout: 999999,
-    }
-  );
-
-  console.log("🚀 request sent...");
-
-  await tokenEntryPoint.deployed();
-
-  console.log(`✅ TokenEntryPoint deployed to: ${tokenEntryPoint.address}`);
-
-  console.log("\n");
-
-  console.log("⚙️ deploying AccountFactory...");
-
-  const accFactory = await ethers.deployContract("AccountFactory", [
-    process.env.ENTRYPOINT_ADDR,
-    tokenEntryPoint.address,
-  ]);
-
-  console.log("🚀 request sent...");
-
-  await accFactory.deployed();
-
-  console.log(`✅ Account Factory deployed to: ${accFactory.address}`);
-
-  console.log("\n");
-
-  console.log("🧐 verifying...");
-
-  // wait for etherscan to index the contract
-  await new Promise((resolve) => setTimeout(resolve, 10000));
-
+const listFiles = (directory: string, pattern: string): string[] => {
   try {
-    await run("verify:verify", {
-      address: paymaster.address,
-      constructorArguments: [],
-    });
+    const files = fs.readdirSync(directory);
+    const extension = pattern.startsWith("*.") ? pattern.slice(1) : pattern;
 
-    console.log("verified!");
-  } catch (error: any) {
-    if (
-      error.message.includes(
-        "does not seem to be verified. Please verify and publish the contract source before proceeding with this proxy verification."
-      )
-    ) {
-      console.log("\n");
-      console.log(
-        "⚠️ We were unable to verify the contract fully. This can happen when deploying the same contract with a proxy multiple times.\n"
-      );
-      console.log(
-        "You might need to go the contract's code page on Etherscan and click 'More Options' -> 'Is this a proxy?'"
-      );
-      console.log("\n");
-    } else {
-      console.log(error);
-    }
+    return files.filter((file) => path.extname(file) === extension);
+  } catch (error) {
+    console.error("Error reading directory:", error);
+    return []; // Return an empty array in case of an error
   }
+};
 
-  try {
-    await run("verify:verify", {
-      address: tokenEntryPoint.address,
-      constructorArguments: [process.env.ENTRYPOINT_ADDR],
-    });
-
-    console.log("verified!");
-  } catch (error: any) {
-    if (
-      error.message.includes(
-        "does not seem to be verified. Please verify and publish the contract source before proceeding with this proxy verification."
-      )
-    ) {
-      console.log("\n");
-      console.log(
-        "⚠️ We were unable to verify the contract fully. This can happen when deploying the same contract with a proxy multiple times.\n"
-      );
-      console.log(
-        "You might need to go the contract's code page on Etherscan and click 'More Options' -> 'Is this a proxy?'"
-      );
-      console.log("\n");
-    } else {
-      console.log(error);
-    }
-  }
-
-  try {
-    await run("verify:verify", {
-      address: accFactory.address,
-      constructorArguments: [
-        process.env.ENTRYPOINT_ADDR,
-        tokenEntryPoint.address,
-      ],
-    });
-
-    console.log("verified!");
-  } catch (error: any) {
-    if (
-      error.message.includes(
-        "does not seem to be verified. Please verify and publish the contract source before proceeding with this proxy verification."
-      )
-    ) {
-      console.log("\n");
-      console.log(
-        "⚠️ We were unable to verify the contract fully. This can happen when deploying the same contract with a proxy multiple times.\n"
-      );
-      console.log(
-        "You might need to go the contract's code page on Etherscan and click 'More Options' -> 'Is this a proxy?'"
-      );
-      console.log("\n");
-    } else {
-      console.log(error);
-    }
-  }
-
-  try {
-    await run("verify:verify", {
-      address: profileAddress,
-      constructorArguments: [],
-    });
-
-    console.log("verified!");
-  } catch (error: any) {
-    if (
-      error.message.includes(
-        "does not seem to be verified. Please verify and publish the contract source before proceeding with this proxy verification."
-      )
-    ) {
-      console.log("\n");
-      console.log(
-        "⚠️ We were unable to verify the contract fully. This can happen when deploying the same contract with a proxy multiple times.\n"
-      );
-      console.log(
-        "You might need to go the contract's code page on Etherscan and click 'More Options' -> 'Is this a proxy?'"
-      );
-      console.log("\n");
-    } else {
-      console.log(error);
-    }
-  }
-
-  console.log("\n");
-  console.log("\n");
-  console.log("\n");
-
-  console.log("*************************************");
-  console.log("DEPLOYMENT COMPLETE 🎉");
-  console.log(" ");
-  console.log(" ");
-  console.log("Paymaster: ", paymaster.address);
-  console.log("paymaster sponsor address: ", sponsor.address);
-  console.log(
-    "paymaster sponsor private key: ",
-    sponsor.privateKey.replace("0x", "")
-  );
-  console.log(" ");
-  if (contractAddresses.length > 0) {
-    console.log(`whitelisted contracts:`);
-    contractAddresses.forEach((addr) => console.log(addr));
-    console.log(profileAddress);
-    console.log("\n");
-  }
-  console.log(" ");
-  console.log("Token Entry Point: ", tokenEntryPoint.address);
-  console.log("Account Factory: ", accFactory.address);
-  console.log("Profile: ", profileAddress);
-  console.log("*************************************");
-
-  console.log("\n");
+function terminate() {
+  term.grabInput(false);
+  setTimeout(function () {
+    process.exit();
+  }, 100);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
+term.on("key", function (name: string, _: any, __: any) {
+  if (name === "CTRL_C") {
+    terminate();
+  }
 });
+
+if (!process.env.DEPLOYER_PRIVATE_KEY) {
+  term.red("Please set your DEPLOYER_PRIVATE_KEY in your .env.local file");
+  term("\n");
+  process.exit();
+}
+
+// Define a mapping of chain IDs to their native currency symbols
+const nativeCurrencySymbols: { [chainId: number]: string } = {
+  1: "ETH", // Ethereum Mainnet
+  3: "ETH", // Ropsten
+  4: "ETH", // Rinkeby
+  5: "ETH", // Goerli
+  42: "ETH", // Kovan
+  56: "BNB", // Binance Smart Chain Mainnet
+  97: "BNB", // Binance Smart Chain Testnet
+  137: "MATIC", // Polygon Mainnet
+  8453: "ETH", // Base
+  84531: "ETH", // Base
+  80001: "MATIC", // Polygon Mumbai Testnet
+  42220: "CELO", // Celo Mainnet
+  44787: "CELO", // Alfajores Testnet (Celo)
+  10: "ETH", // Optimism Mainnet
+  69: "ETH", // Optimism Kovan Testnet
+  // Add other networks and their symbols as needed
+};
+
+const networkName = process.env.HARDHAT_NETWORK;
+
+async function main() {
+  // const spinner = term.spinner();
+  // Fetch the chain ID from the provider
+  const networkDetails = await ethers.provider.getNetwork();
+  const chainId = networkDetails.chainId;
+  if (!chainId || !nativeCurrencySymbols[chainId]) {
+    term.red(`Unsupported chain ID: ${chainId} (network: ${networkName})`);
+    term("\n");
+    process.exit();
+  }
+  const nativeCurrencySymbol =
+    nativeCurrencySymbols[chainId] || `Unknown chainId: ${chainId}`;
+
+  const pk = process.env.DEPLOYER_PRIVATE_KEY;
+  if (!pk) {
+    term.red("Please set your DEPLOYER_PRIVATE_KEY in your .env.local file");
+    term("\n");
+    process.exit();
+  }
+
+  const wallet = new ethers.Wallet(pk, ethers.provider);
+  const balanceWei = await wallet.getBalance();
+  term(
+    `The balance of the deployer wallet on ${networkName} is: ${ethers.utils.formatEther(
+      balanceWei
+    )} ${nativeCurrencySymbol}\n\n`
+  );
+
+  // Check if the balance is greater than 50 gwei
+  if (balanceWei.toBigInt() < BigInt(50 * 10 ** 9)) {
+    term.red(
+      `Insufficiant balance on ${wallet.address} to deploy a contract.\n`
+    );
+    term(
+      `Please add some ${nativeCurrencySymbol} to your wallet and try again.\n`
+    );
+    process.exit();
+  }
+
+  term("Choose a contract to deploy: ");
+
+  const files = listFiles("./contracts/tokens/", "*.sol");
+
+  const response = await term.singleColumnMenu(files).promise;
+
+  const contractName = response.selectedText.replace(".sol", "");
+  term("\n");
+  term
+    .green("I will now deploy ")
+    .green.bold(contractName)
+    .green(" on ")
+    .green.bold(networkName)
+    .green("\n");
+  term.green("Using the minters defined in your .env.local: \n");
+  const minter1 = process.env.MINTER1_ADDRESS;
+  const minter2 = process.env.MINTER2_ADDRESS;
+  if (!minter1 || !minter2) {
+    term.red(
+      "Please set your MINTER1_ADDRESS and MINTER2_ADDRESS in your .env.local file"
+    );
+    term("\n");
+    process.exit();
+  }
+
+  term.green("  Minter 1: %s\n", minter1);
+  term.green("  Minter 2: %s\n", minter2);
+
+  term("\n");
+
+  term("Enter a token name (My Test Token): ");
+
+  const tokenName: string =
+    (await term.inputField({}).promise) || "My Test Token";
+
+  term("\n");
+
+  term("Enter a token symbol (MTT): ");
+
+  const tokenSymbol: string = (await term.inputField({}).promise) || "MTT";
+
+  term("\n");
+
+  term("How many decimals should it have (6): ");
+
+  const tokenDecimalsInput: string = (await term.inputField({}).promise) || "6";
+  const tokenDecimals = parseInt(tokenDecimalsInput);
+
+  if (isNaN(tokenDecimals) || tokenDecimals < 0 || tokenDecimals > 18) {
+    term.red("Decimals should be between 0 and 18\n");
+    process.exit();
+  }
+
+  term("\n");
+  term("You are about to deploy the following contract:\n");
+  term.green("  Contract Name: %s\n", contractName);
+  term.green("  Network: %s\n", networkName);
+  term.green("  Minter 1: %s\n", minter1);
+  term.green("  Minter 2: %s\n", minter2);
+  term.green("  Token Name: %s\n", tokenName);
+  term.green("  Token Symbol: %s\n", tokenSymbol);
+  term.green("  Token Decimals: %s\n", tokenDecimals);
+  term("\n");
+
+  term("Continue? [Y/n]");
+  const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+    .promise;
+  if (confirm) {
+    term("\n").eraseLineAfter.green(
+      "Deploying %s on %s\n",
+      contractName,
+      networkName
+    );
+    await deployContract(
+      contractName,
+      minter1,
+      minter2,
+      tokenName,
+      tokenSymbol,
+      tokenDecimals
+    );
+  } else {
+    term.red("Exiting...\n");
+    process.exit();
+  }
+}
+
+async function deployContract(
+  contractName: string,
+  minter1: string,
+  minter2: string,
+  tokenName: string,
+  tokenSymbol: string,
+  tokenDecimals = 6
+) {
+  const Contract = await ethers.getContractFactory(contractName);
+  const deployedContract = await upgrades.deployProxy(
+    Contract,
+    [[minter1, minter2], tokenName, tokenSymbol],
+    {
+      kind: "uups",
+      initializer: "initialize",
+      constructorArgs: [tokenDecimals],
+    }
+  );
+
+  console.log("Deployed token address:", deployedContract.address);
+  term("\n");
+  term("Do you want to verify this new contract on etherscan? [Y/n]");
+  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+  if (confirmVerify) {
+    execSync(`npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} --network ${networkName} ${deployedContract.address} ${tokenDecimals} --network ${networkName}`, { stdio: "inherit" });
+  }
+  term("\n");
+  term("Do you want to deploy a community entry point for this token? [Y/n]");
+  const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+    .promise;
+  if (confirm) {
+    execSync(`COMMUNITY_TOKEN_ADDRESS=${deployedContract.address} npx hardhat run ./scripts/deploy-community-entrypoint.ts --network ${networkName}`, { stdio: "inherit" });  
+  } else {
+    term.red("Exiting...\n");
+    process.exit();
+  }
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
