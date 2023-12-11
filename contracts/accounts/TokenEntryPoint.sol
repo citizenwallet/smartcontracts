@@ -76,16 +76,23 @@ contract TokenEntryPoint is
         );
     }
 
-    mapping(address => uint256) public senderNonce;
+    mapping(address => mapping(uint192 => uint256)) public nonceSequenceNumber;
 
     function getNonce(
         address sender,
         uint192 key
     ) public view override returns (uint256 nonce) {
-        nonce = _entrypoint.getNonce(sender, key);
+        return _entrypoint.getNonce(sender, key);
     }
 
     function incrementNonce(uint192 key) external override onlyOwner {}
+
+    // parse uint192 key from uint256 nonce
+    function _parseNonce(
+        uint256 nonce
+    ) internal pure returns (uint192 key, uint64 seq) {
+        return (uint192(nonce >> 64), uint64(nonce));
+    }
 
     function paymaster() public view returns (address) {
         return _paymaster;
@@ -117,14 +124,16 @@ contract TokenEntryPoint is
 
             address sender = op.getSender();
 
+            (uint192 key, uint64 seq) = _parseNonce(op.nonce);
+
             // verify nonce
-            _validateNonce(op, sender);
+            _validateNonce(op, sender, key);
 
             // verify call data
             _validateCallData(op, sender);
 
             // verify account
-            _validateAccount(op, sender);
+            _validateAccount(op, sender, seq);
 
             // verify paymaster signature
             _validatePaymasterUserOp(op);
@@ -147,9 +156,10 @@ contract TokenEntryPoint is
      */
     function _validateNonce(
         UserOperation calldata op,
-        address sender
+        address sender,
+        uint192 key
     ) internal virtual {
-        uint256 nonce = getNonce(sender, 0);
+        uint256 nonce = getNonce(sender, key);
 
         // the nonce in the user op must match the nonce in the account
         require(nonce == op.nonce, "AA25 invalid account nonce");
@@ -162,10 +172,11 @@ contract TokenEntryPoint is
      */
     function _validateAccount(
         UserOperation calldata op,
-        address sender
+        address sender,
+        uint64 seq
     ) internal virtual {
         // call the initCode
-        if (op.nonce == 0 && !_contractExists(sender)) {
+        if (seq == 0 && !_contractExists(sender)) {
             _initAccount(op, sender);
         }
 
@@ -219,9 +230,8 @@ contract TokenEntryPoint is
         address paymasterAddress = _getPaymaster(op);
 
         // verify paymasterAndData signature
-        (bytes memory context, uint256 validationData) = IPaymaster(
-            paymasterAddress
-        ).validatePaymasterUserOp(op, op.hash(), 0);
+        (, uint256 validationData) = IPaymaster(paymasterAddress)
+            .validatePaymasterUserOp(op, op.hash(), 0);
 
         address pmAggregator;
         bool outOfTimeRange;

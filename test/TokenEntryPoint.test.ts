@@ -24,15 +24,22 @@ interface IUserOp {
 interface UserOpCreation {
   sender: string;
   signerAddress: string;
+  receiverAddress?: string;
   accountFactoryAddress: string;
   entrypoint: any; // using Contract type causes errors
   callData: BytesLike;
 }
 
-interface UserOpPaymasterData {
-  userop: IUserOp;
+interface PaymasterOOSignatureCreation {
+  sender: string;
   paymasterContract: any; // using Contract type causes errors
+  entrypoint: any; // using Contract type causes errors
   sponsor: SignerWithAddress;
+}
+
+interface UserOpPaymasterData {
+  paymasterContract: any; // using Contract type causes errors
+  hashData: string;
 }
 
 const transferCallData = (
@@ -46,6 +53,16 @@ const transferCallData = (
     erc20Token.encodeFunctionData("transfer", [receiver, amount]),
   ]);
 
+const emptyTransferCallData = () =>
+  accountExecute.encodeFunctionData("execute", [
+    ethers.constants.AddressZero,
+    ethers.constants.Zero,
+    erc20Token.encodeFunctionData("transfer", [
+      ethers.constants.AddressZero,
+      ethers.constants.Zero,
+    ]),
+  ]);
+
 const upgradeCallData = (accountAddress: string, implementation: string) =>
   accountExecute.encodeFunctionData("execute", [
     accountAddress,
@@ -56,6 +73,7 @@ const upgradeCallData = (accountAddress: string, implementation: string) =>
 const createUserOp = async ({
   sender,
   signerAddress,
+  receiverAddress,
   accountFactoryAddress,
   entrypoint,
   callData,
@@ -74,13 +92,26 @@ const createUserOp = async ({
     signature: ethers.utils.arrayify("0x"),
   };
 
-  // nonce
-  const nonce: BigNumber = await entrypoint.getNonce(sender, 0);
+  // key is a uint192
+  let key = BigNumber.from(0);
+  if (receiverAddress) {
+    // convert address to uint192
+    const receiver = ethers.BigNumber.from(receiverAddress);
+    key = receiver.shl(32);
+  }
 
-  userop.nonce = nonce;
+  // nonce is uint256
+  const nonce: BigNumber = await entrypoint.getNonce(sender, key);
+
+  // get the uint64 seq from the nonce
+  const seq = nonce.mask(64);
+
+  // combine the uint64 nonce and uint192 key
+  const combined = key.shl(64).add(seq);
+  userop.nonce = combined;
 
   // initCode
-  if (userop.nonce.eq(ethers.constants.Zero)) {
+  if (seq.eq(ethers.constants.Zero)) {
     const accountCreationCode = accountCreate.encodeFunctionData(
       "createAccount",
       [signerAddress, ethers.BigNumber.from(0)]
@@ -98,29 +129,78 @@ const createUserOp = async ({
   return userop;
 };
 
-const getPaymasterAndData = async ({
-  userop,
+const getPaymasterOOSignature = async ({
+  sender,
   paymasterContract,
+  entrypoint,
   sponsor,
-}: UserOpPaymasterData): Promise<string> => {
-  // paymasterAndData
+}: PaymasterOOSignatureCreation) => {
+  // Generate a random 24-byte value
+  const randomBytes = ethers.utils.randomBytes(24);
+
+  // Interpret the random bytes as a uint192
+  const key = ethers.BigNumber.from(randomBytes);
+
+  const seq = ethers.BigNumber.from("0");
+
+  const nonce = key.shl(64).add(seq);
+
+  // nonce is uint256
+  const epNonce: BigNumber = await entrypoint.getNonce(sender, key);
+  if (!epNonce.eq(nonce)) {
+    throw Error("nonce already used");
+  }
+
+  const userop: IUserOp = {
+    sender,
+    nonce: nonce,
+    initCode: ethers.utils.arrayify("0x"),
+    callData: emptyTransferCallData(),
+    callGasLimit: ethers.BigNumber.from("0"),
+    verificationGasLimit: ethers.BigNumber.from("1500000"),
+    preVerificationGas: ethers.BigNumber.from("21000"),
+    maxFeePerGas: ethers.BigNumber.from("0"),
+    maxPriorityFeePerGas: ethers.BigNumber.from("1000000000"),
+    paymasterAndData: ethers.utils.arrayify("0x"),
+    signature: ethers.utils.arrayify("0x"),
+  };
 
   const current = await time.latest();
 
-  const validUntil = current + 86400;
+  const validUntil = current + 2592000; // 30 days
   const validAfter = current;
 
   const hash = ethers.utils.arrayify(
     await paymasterContract.getHash(userop, validUntil, validAfter)
   );
 
-  const signedHash = await sponsor.signMessage(hash);
+  return `${await sponsor.signMessage(hash)}|${validUntil}|${validAfter}`;
+};
+
+const getPaymasterAndData = async ({
+  paymasterContract,
+  hashData,
+}: UserOpPaymasterData): Promise<string> => {
+  // paymasterAndData
+
+  const current = await time.latest();
+
+  const [signedHash, sValidUntil, sValidAfter] = hashData.split("|");
+
+  const validUntil = ethers.BigNumber.from(sValidUntil);
+  const validAfter = ethers.BigNumber.from(sValidAfter);
+
+  // const hash = ethers.utils.arrayify(
+  //   await paymasterContract.getHash(userop, validUntil, validAfter)
+  // );
+
+  // const signedHash = await sponsor.signMessage(hash);
 
   // Define the types of the values
   const types = ["uint48", "uint48"];
 
   // Define the values
-  const values = [validUntil, validAfter];
+  const values: BigNumber[] = [validUntil, validAfter];
 
   // ABI encode the values
   const encoded = ethers.utils.defaultAbiCoder.encode(types, values);
@@ -355,7 +435,6 @@ describe("Account", function () {
 
     it("TokenEntryPoint should be able to transfer ERC20 if user op signed by user (sponsor)", async function () {
       const {
-        entrypoint,
         owner,
         token,
         tokenEntryPointContract,
@@ -385,11 +464,19 @@ describe("Account", function () {
 
       const transferAmount = 100n;
 
+      const hashData = await getPaymasterOOSignature({
+        sender: address,
+        paymasterContract,
+        entrypoint: tokenEntryPointContract,
+        sponsor,
+      });
+
       const userop = await createUserOp({
         sender: address,
         signerAddress: friend3.address,
+        receiverAddress: accountAddress2,
         accountFactoryAddress: accountFactory.address,
-        entrypoint,
+        entrypoint: tokenEntryPointContract,
         callData: transferCallData(
           token.address,
           accountAddress2,
@@ -398,9 +485,8 @@ describe("Account", function () {
       });
 
       const paymasterAndData = await getPaymasterAndData({
-        userop,
         paymasterContract,
-        sponsor,
+        hashData,
       });
 
       userop.paymasterAndData = paymasterAndData;
@@ -430,9 +516,182 @@ describe("Account", function () {
       ).to.be.revertedWith("AA25 invalid account nonce");
     });
 
-    it("Updating the verifying address of the paymaster should allow this new address to be used instead", async function () {
+    it("TokenEntryPoint should be able to transfer ERC20 with keyed nonces based on receiver of the transfer (out of order)", async function () {
       const {
-        entrypoint,
+        owner,
+        token,
+        tokenEntryPointContract,
+        paymasterContract,
+        friend1,
+        friend2,
+        friend3,
+        sponsor,
+        accountFactory,
+      } = await loadFixture(deployAccountFactoryFixture);
+
+      const address = await accountFactory.getAddress(
+        friend3.address,
+        ethers.BigNumber.from(0)
+      );
+
+      const accountAddress2 = await accountFactory.getAddress(
+        friend2.address,
+        ethers.BigNumber.from(0)
+      );
+
+      const accountAddress1 = await accountFactory.getAddress(
+        friend1.address,
+        ethers.BigNumber.from(0)
+      );
+
+      const mintedAmount = BigNumber.from(1000000000);
+
+      await token.connect(owner).mint(address, mintedAmount, "owner");
+
+      // balance should match what was minted
+      expect(await token.balanceOf(address)).to.equal(mintedAmount);
+
+      const transferAmount = BigNumber.from(100);
+
+      const hashData = await getPaymasterOOSignature({
+        sender: address,
+        paymasterContract,
+        entrypoint: tokenEntryPointContract,
+        sponsor,
+      });
+
+      const userop = await createUserOp({
+        sender: address,
+        signerAddress: friend3.address,
+        receiverAddress: accountAddress2,
+        accountFactoryAddress: accountFactory.address,
+        entrypoint: tokenEntryPointContract,
+        callData: transferCallData(
+          token.address,
+          accountAddress2,
+          transferAmount
+        ),
+      });
+
+      const paymasterAndData = await getPaymasterAndData({
+        paymasterContract,
+        hashData,
+      });
+
+      userop.paymasterAndData = paymasterAndData;
+
+      userop.signature = await signUserOp(
+        userop,
+        tokenEntryPointContract,
+        friend3
+      );
+
+      await expect(
+        tokenEntryPointContract.handleOps([userop], sponsor.address)
+      ).to.be.revertedWith("AA28 contract not whitelisted");
+
+      await tokenEntryPointContract
+        .connect(sponsor)
+        .updateWhitelist([token.address]);
+
+      await tokenEntryPointContract.handleOps([userop], sponsor.address);
+
+      // balance should match what was sent
+      expect(await token.balanceOf(accountAddress2)).to.equal(transferAmount);
+
+      // cannot replay transaction
+      await expect(
+        tokenEntryPointContract.handleOps([userop], sponsor.address)
+      ).to.be.revertedWith("AA25 invalid account nonce");
+
+      const hashData2 = await getPaymasterOOSignature({
+        sender: address,
+        paymasterContract,
+        entrypoint: tokenEntryPointContract,
+        sponsor,
+      });
+
+      const userop2 = await createUserOp({
+        sender: address,
+        signerAddress: friend3.address,
+        receiverAddress: accountAddress1,
+        accountFactoryAddress: accountFactory.address,
+        entrypoint: tokenEntryPointContract,
+        callData: transferCallData(
+          token.address,
+          accountAddress1,
+          transferAmount
+        ),
+      });
+
+      const paymasterAndData2 = await getPaymasterAndData({
+        paymasterContract,
+        hashData: hashData2,
+      });
+
+      userop2.paymasterAndData = paymasterAndData2;
+
+      userop2.signature = await signUserOp(
+        userop2,
+        tokenEntryPointContract,
+        friend3
+      );
+
+      await tokenEntryPointContract.handleOps([userop2], sponsor.address);
+
+      // balance should match what was sent
+      expect(await token.balanceOf(accountAddress1)).to.equal(transferAmount);
+
+      // balance should match what was sent
+      expect(await token.balanceOf(address)).to.equal(
+        mintedAmount.sub(transferAmount.mul(2))
+      );
+
+      const hashData3 = await getPaymasterOOSignature({
+        sender: address,
+        paymasterContract,
+        entrypoint: tokenEntryPointContract,
+        sponsor,
+      });
+
+      const userop3 = await createUserOp({
+        sender: address,
+        signerAddress: friend3.address,
+        receiverAddress: accountAddress2,
+        accountFactoryAddress: accountFactory.address,
+        entrypoint: tokenEntryPointContract,
+        callData: transferCallData(
+          token.address,
+          accountAddress2,
+          transferAmount
+        ),
+      });
+
+      const paymasterAndData3 = await getPaymasterAndData({
+        paymasterContract,
+        hashData: hashData3,
+      });
+
+      userop3.paymasterAndData = paymasterAndData3;
+
+      userop3.signature = await signUserOp(
+        userop3,
+        tokenEntryPointContract,
+        friend3
+      );
+
+      await tokenEntryPointContract.handleOps([userop3], sponsor.address);
+
+      // balance should match what was sent
+      expect(await token.balanceOf(accountAddress2)).to.equal(
+        transferAmount.mul(2)
+      );
+
+      console.log("END");
+    });
+
+    it("Updating the sponsor address of the paymaster should allow this new address to be used instead", async function () {
+      const {
         owner,
         token,
         tokenEntryPointContract,
@@ -463,11 +722,19 @@ describe("Account", function () {
 
       const transferAmount = 100n;
 
+      const hashData = await getPaymasterOOSignature({
+        sender: address,
+        paymasterContract,
+        entrypoint: tokenEntryPointContract,
+        sponsor: sponsor2,
+      });
+
       const userop = await createUserOp({
         sender: address,
         signerAddress: friend3.address,
+        receiverAddress: accountAddress2,
         accountFactoryAddress: accountFactory.address,
-        entrypoint,
+        entrypoint: tokenEntryPointContract,
         callData: transferCallData(
           token.address,
           accountAddress2,
@@ -476,9 +743,8 @@ describe("Account", function () {
       });
 
       const paymasterAndData = await getPaymasterAndData({
-        userop,
         paymasterContract,
-        sponsor: sponsor2,
+        hashData,
       });
 
       userop.paymasterAndData = paymasterAndData;
@@ -502,6 +768,26 @@ describe("Account", function () {
       ).to.be.revertedWith("Ownable: caller is not the owner");
 
       await paymasterContract.connect(owner).updateSponsor(sponsor2.address);
+
+      const hashData2 = await getPaymasterOOSignature({
+        sender: address,
+        paymasterContract,
+        entrypoint: tokenEntryPointContract,
+        sponsor: sponsor2,
+      });
+
+      const paymasterAndData2 = await getPaymasterAndData({
+        paymasterContract,
+        hashData: hashData2,
+      });
+
+      userop.paymasterAndData = paymasterAndData2;
+
+      userop.signature = await signUserOp(
+        userop,
+        tokenEntryPointContract,
+        friend3
+      );
 
       await tokenEntryPointContract.handleOps([userop], sponsor2.address);
 
@@ -607,7 +893,6 @@ describe("Account", function () {
 
     it("Should allow account upgrades through a user op", async function () {
       const {
-        entrypoint,
         accountFactory,
         accountFactory2,
         friend1,
@@ -652,20 +937,26 @@ describe("Account", function () {
         await ethers.provider.getStorageAt(newAccount.address, slot)
       ).slice(26)}`;
 
+      const hashData = await getPaymasterOOSignature({
+        sender: account1.address,
+        paymasterContract,
+        entrypoint: tokenEntryPointContract,
+        sponsor,
+      });
+
       // upgrade account 1 to the new implementation by using a user op
       // await account1.connect(friend1).upgradeTo(implementation); << this but with a user op
       const userop = await createUserOp({
         sender: account1.address,
         signerAddress: friend1.address,
         accountFactoryAddress: accountFactory2.address,
-        entrypoint,
+        entrypoint: tokenEntryPointContract,
         callData: upgradeCallData(account1.address, implementation),
       });
 
       const paymasterAndData = await getPaymasterAndData({
-        userop,
         paymasterContract,
-        sponsor: sponsor,
+        hashData,
       });
 
       userop.paymasterAndData = paymasterAndData;
@@ -764,6 +1055,38 @@ describe("Account", function () {
       expect(await account1.tokenEntryPoint()).equal(
         tokenEntryPointContract.address
       );
+    });
+  });
+
+  describe("Account Recovery", function () {
+    it("Token EntryPoint owner should be able to recovery ownership for an account", async function () {
+      const { owner, sponsor, friend1, friend2, account1 } = await loadFixture(
+        deployAccountFactoryFixture
+      );
+
+      expect(await account1.owner()).equal(friend1.address);
+
+      await expect(
+        account1.connect(owner).transferOwnership(friend2.address)
+      ).to.be.revertedWith("Ownable: caller is not the owner or the contract");
+
+      await account1.connect(sponsor).recoverOwnership(friend2.address);
+
+      expect(await account1.owner()).equal(friend2.address);
+    });
+
+    it("A random person shouldn't be able to recovery ownership for an account", async function () {
+      const { owner, friend3, friend1, friend2, account1 } = await loadFixture(
+        deployAccountFactoryFixture
+      );
+
+      expect(await account1.owner()).equal(friend1.address);
+
+      await expect(
+        account1.connect(friend3).recoverOwnership(friend2.address)
+      ).to.be.revertedWith("Ownable: not TokenEntryPoint owner");
+
+      expect(await account1.owner()).equal(friend1.address);
     });
   });
 });
