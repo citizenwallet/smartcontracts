@@ -166,10 +166,11 @@ contract Paymaster is
 
         senderNonce[userOp.getSender()]++;
 
-        require(sponsor() == hash.recover(signature), "AA34 signature error");
+        if (sponsor() != hash.recover(signature)) {
+            return ("", _packValidationData(true, validUntil, validAfter));
+        }
 
-        context = "";
-        validationData = 0;
+        return ("", _packValidationData(false, validUntil, validAfter));
     }
 
     function _parsePaymasterAndData(

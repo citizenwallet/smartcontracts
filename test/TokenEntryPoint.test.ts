@@ -1,10 +1,9 @@
-import fs from "fs";
-import path from "path";
+import EntryPointArtifact from "@account-abstraction/contracts/artifacts/EntryPoint.json";
 import "@nomicfoundation/hardhat-toolbox";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { ethers, upgrades, network } from "hardhat";
+import { ethers, upgrades, network, artifacts } from "hardhat";
 import { config } from "dotenv";
 import { ContractFactory, BigNumber, BigNumberish, BytesLike } from "ethers";
 
@@ -67,10 +66,10 @@ const createUserOp = async ({
     initCode: ethers.utils.arrayify("0x"),
     callData: ethers.utils.arrayify("0x"),
     callGasLimit: ethers.BigNumber.from("0"),
-    verificationGasLimit: ethers.BigNumber.from("0"),
-    preVerificationGas: ethers.BigNumber.from("0"),
+    verificationGasLimit: ethers.BigNumber.from("1500000"),
+    preVerificationGas: ethers.BigNumber.from("21000"),
     maxFeePerGas: ethers.BigNumber.from("0"),
-    maxPriorityFeePerGas: ethers.BigNumber.from("0"),
+    maxPriorityFeePerGas: ethers.BigNumber.from("1000000000"),
     paymasterAndData: ethers.utils.arrayify("0x"),
     signature: ethers.utils.arrayify("0x"),
   };
@@ -133,53 +132,16 @@ const getPaymasterAndData = async ({
   ]);
 };
 
-const getUserOpHash = (userop: IUserOp, tokenEntryPointContract: any) => {
-  const packedData = ethers.utils.defaultAbiCoder.encode(
-    [
-      "address",
-      "uint256",
-      "bytes32",
-      "bytes32",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-      "uint256",
-      "bytes32",
-    ],
-    [
-      userop.sender,
-      userop.nonce,
-      ethers.utils.keccak256(userop.initCode),
-      ethers.utils.keccak256(userop.callData),
-      userop.callGasLimit,
-      userop.verificationGasLimit,
-      userop.preVerificationGas,
-      userop.maxFeePerGas,
-      userop.maxPriorityFeePerGas,
-      ethers.utils.keccak256(userop.paymasterAndData),
-    ]
-  );
-
-  const enc = ethers.utils.defaultAbiCoder.encode(
-    ["bytes32", "address", "uint256"],
-    [
-      ethers.utils.keccak256(packedData),
-      tokenEntryPointContract.address,
-      network.config.chainId,
-    ]
-  );
-  return ethers.utils.keccak256(enc);
-};
-
 const signUserOp = async (
   userop: IUserOp,
   tokenEntryPointContract: any,
   signer: SignerWithAddress
 ) => {
-  const userOpHash = getUserOpHash(userop, tokenEntryPointContract);
+  const userOpHash = ethers.utils.arrayify(
+    await tokenEntryPointContract.getUserOpHash(userop)
+  );
 
-  return await signer.signMessage(ethers.utils.arrayify(userOpHash));
+  return await signer.signMessage(userOpHash);
 };
 
 const accountExecuteABI = [
@@ -223,18 +185,9 @@ describe("Account", function () {
       }
     );
 
-    const entrypointBin = fs
-      .readFileSync(path.join(__dirname, "data", "entrypoint.bin"))
-      .toString();
-    const entrypointABI = JSON.parse(
-      fs
-        .readFileSync(path.join(__dirname, "data", "entrypoint.abi.json"))
-        .toString()
-    );
-
     const EntryPointContract = await ethers.getContractFactory(
-      entrypointABI,
-      entrypointBin,
+      EntryPointArtifact.abi,
+      EntryPointArtifact.bytecode,
       owner
     );
     const entrypoint = await EntryPointContract.deploy();

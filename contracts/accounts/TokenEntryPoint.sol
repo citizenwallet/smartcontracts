@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
+import "@account-abstraction/contracts/core/Helpers.sol";
 import "@account-abstraction/contracts/core/SenderCreator.sol";
 import "@account-abstraction/contracts/interfaces/UserOperation.sol";
 import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
@@ -222,9 +223,29 @@ contract TokenEntryPoint is
             paymasterAddress
         ).validatePaymasterUserOp(op, op.hash(), 0);
 
-        if (validationData != 0) {
-            revert(string(context));
+        address pmAggregator;
+        bool outOfTimeRange;
+        (pmAggregator, outOfTimeRange) = _getValidationData(validationData);
+        if (pmAggregator != address(0)) {
+            revert("AA34 signature error");
         }
+        if (outOfTimeRange) {
+            revert("AA32 paymaster expired or not due");
+        }
+    }
+
+    function _getValidationData(
+        uint256 validationData
+    ) internal view returns (address aggregator, bool outOfTimeRange) {
+        if (validationData == 0) {
+            return (address(0), false);
+        }
+        ValidationData memory data = _parseValidationData(validationData);
+        // solhint-disable-next-line not-rely-on-time
+        outOfTimeRange =
+            block.timestamp > data.validUntil ||
+            block.timestamp < data.validAfter;
+        aggregator = data.aggregator;
     }
 
     function _getPaymaster(
