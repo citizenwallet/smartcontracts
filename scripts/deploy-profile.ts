@@ -1,3 +1,4 @@
+import "@nomicfoundation/hardhat-toolbox";
 import { ethers, upgrades } from "hardhat";
 import { config } from "dotenv";
 
