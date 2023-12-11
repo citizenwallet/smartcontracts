@@ -82,10 +82,12 @@ contract Paymaster is
         // lighter signature scheme. must match UserOp.ts#packUserOp
         address sender = userOp.getSender();
 
+        uint256 nonce = userOp.nonce;
+
         // we only allow execute or executeBatch calls
         bytes4 selector = bytes4(userOp.callData[0:4]);
 
-        return abi.encode(sender, selector);
+        return abi.encode(sender, nonce, selector);
     }
 
     /**
