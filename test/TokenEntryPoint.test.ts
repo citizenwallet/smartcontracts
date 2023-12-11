@@ -516,7 +516,7 @@ describe("Account", function () {
       ).to.be.revertedWith("AA25 invalid account nonce");
     });
 
-    it("TokenEntryPoint should be able to transfer ERC20 with keyed nonces based on receiver of the transfer (out of order)", async function () {
+    it("TokenEntryPoint should be able to transfer ERC20 in any order (out of order)", async function () {
       const {
         owner,
         token,
@@ -593,16 +593,6 @@ describe("Account", function () {
         .connect(sponsor)
         .updateWhitelist([token.address]);
 
-      await tokenEntryPointContract.handleOps([userop], sponsor.address);
-
-      // balance should match what was sent
-      expect(await token.balanceOf(accountAddress2)).to.equal(transferAmount);
-
-      // cannot replay transaction
-      await expect(
-        tokenEntryPointContract.handleOps([userop], sponsor.address)
-      ).to.be.revertedWith("AA25 invalid account nonce");
-
       const [hashData2, nonce2] = await getPaymasterOOSignature({
         sender: address,
         paymasterContract,
@@ -633,16 +623,6 @@ describe("Account", function () {
         userop2,
         tokenEntryPointContract,
         friend3
-      );
-
-      await tokenEntryPointContract.handleOps([userop2], sponsor.address);
-
-      // balance should match what was sent
-      expect(await token.balanceOf(accountAddress1)).to.equal(transferAmount);
-
-      // balance should match what was sent
-      expect(await token.balanceOf(address)).to.equal(
-        mintedAmount.sub(transferAmount.mul(2))
       );
 
       const [hashData3, nonce3] = await getPaymasterOOSignature({
@@ -677,14 +657,34 @@ describe("Account", function () {
         friend3
       );
 
+      // op 3
       await tokenEntryPointContract.handleOps([userop3], sponsor.address);
+
+      // op 2
+      await tokenEntryPointContract.handleOps([userop2], sponsor.address);
+
+      // op 1
+      await tokenEntryPointContract.handleOps([userop], sponsor.address);
+
+      // cannot replay transaction
+      await expect(
+        tokenEntryPointContract.handleOps([userop], sponsor.address)
+      ).to.be.revertedWith("AA25 invalid account nonce");
+
+      // check all balances are correct
+
+      // balance should match what was sent
+      expect(await token.balanceOf(accountAddress1)).to.equal(transferAmount);
+
+      // balance should match what was sent
+      expect(await token.balanceOf(address)).to.equal(
+        mintedAmount.sub(transferAmount.mul(3))
+      );
 
       // balance should match what was sent
       expect(await token.balanceOf(accountAddress2)).to.equal(
         transferAmount.mul(2)
       );
-
-      console.log("END");
     });
 
     it("Updating the sponsor address of the paymaster should allow this new address to be used instead", async function () {
