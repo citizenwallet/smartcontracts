@@ -23,10 +23,9 @@ interface IUserOp {
 
 interface UserOpCreation {
   sender: string;
+  nonce: BigNumber;
   signerAddress: string;
-  receiverAddress?: string;
   accountFactoryAddress: string;
-  entrypoint: any; // using Contract type causes errors
   callData: BytesLike;
 }
 
@@ -72,15 +71,14 @@ const upgradeCallData = (accountAddress: string, implementation: string) =>
 
 const createUserOp = async ({
   sender,
+  nonce,
   signerAddress,
-  receiverAddress,
   accountFactoryAddress,
-  entrypoint,
   callData,
 }: UserOpCreation) => {
   const userop: IUserOp = {
     sender,
-    nonce: ethers.BigNumber.from("0"),
+    nonce: nonce,
     initCode: ethers.utils.arrayify("0x"),
     callData: ethers.utils.arrayify("0x"),
     callGasLimit: ethers.BigNumber.from("0"),
@@ -93,22 +91,22 @@ const createUserOp = async ({
   };
 
   // key is a uint192
-  let key = BigNumber.from(0);
-  if (receiverAddress) {
-    // convert address to uint192
-    const receiver = ethers.BigNumber.from(receiverAddress);
-    key = receiver.shl(32);
-  }
+  // let key = BigNumber.from(0);
+  // if (receiverAddress) {
+  //   // convert address to uint192
+  //   const receiver = ethers.BigNumber.from(receiverAddress);
+  //   key = receiver.shl(32);
+  // }
 
-  // nonce is uint256
-  const nonce: BigNumber = await entrypoint.getNonce(sender, key);
+  // // nonce is uint256
+  // const nonce: BigNumber = await entrypoint.getNonce(sender, key);
 
   // get the uint64 seq from the nonce
   const seq = nonce.mask(64);
 
-  // combine the uint64 nonce and uint192 key
-  const combined = key.shl(64).add(seq);
-  userop.nonce = combined;
+  // // combine the uint64 nonce and uint192 key
+  // const combined = key.shl(64).add(seq);
+  // userop.nonce = combined;
 
   // initCode
   if (seq.eq(ethers.constants.Zero)) {
@@ -134,7 +132,7 @@ const getPaymasterOOSignature = async ({
   paymasterContract,
   entrypoint,
   sponsor,
-}: PaymasterOOSignatureCreation) => {
+}: PaymasterOOSignatureCreation): Promise<[string, BigNumber]> => {
   // Generate a random 24-byte value
   const randomBytes = ethers.utils.randomBytes(24);
 
@@ -174,7 +172,10 @@ const getPaymasterOOSignature = async ({
     await paymasterContract.getHash(userop, validUntil, validAfter)
   );
 
-  return `${await sponsor.signMessage(hash)}|${validUntil}|${validAfter}`;
+  return [
+    `${await sponsor.signMessage(hash)}|${validUntil}|${validAfter}`,
+    nonce,
+  ];
 };
 
 const getPaymasterAndData = async ({
@@ -464,7 +465,7 @@ describe("Account", function () {
 
       const transferAmount = 100n;
 
-      const hashData = await getPaymasterOOSignature({
+      const [hashData, nonce] = await getPaymasterOOSignature({
         sender: address,
         paymasterContract,
         entrypoint: tokenEntryPointContract,
@@ -473,10 +474,9 @@ describe("Account", function () {
 
       const userop = await createUserOp({
         sender: address,
+        nonce,
         signerAddress: friend3.address,
-        receiverAddress: accountAddress2,
         accountFactoryAddress: accountFactory.address,
-        entrypoint: tokenEntryPointContract,
         callData: transferCallData(
           token.address,
           accountAddress2,
@@ -553,7 +553,7 @@ describe("Account", function () {
 
       const transferAmount = BigNumber.from(100);
 
-      const hashData = await getPaymasterOOSignature({
+      const [hashData, nonce] = await getPaymasterOOSignature({
         sender: address,
         paymasterContract,
         entrypoint: tokenEntryPointContract,
@@ -562,10 +562,9 @@ describe("Account", function () {
 
       const userop = await createUserOp({
         sender: address,
+        nonce,
         signerAddress: friend3.address,
-        receiverAddress: accountAddress2,
         accountFactoryAddress: accountFactory.address,
-        entrypoint: tokenEntryPointContract,
         callData: transferCallData(
           token.address,
           accountAddress2,
@@ -604,7 +603,7 @@ describe("Account", function () {
         tokenEntryPointContract.handleOps([userop], sponsor.address)
       ).to.be.revertedWith("AA25 invalid account nonce");
 
-      const hashData2 = await getPaymasterOOSignature({
+      const [hashData2, nonce2] = await getPaymasterOOSignature({
         sender: address,
         paymasterContract,
         entrypoint: tokenEntryPointContract,
@@ -613,10 +612,9 @@ describe("Account", function () {
 
       const userop2 = await createUserOp({
         sender: address,
+        nonce: nonce2,
         signerAddress: friend3.address,
-        receiverAddress: accountAddress1,
         accountFactoryAddress: accountFactory.address,
-        entrypoint: tokenEntryPointContract,
         callData: transferCallData(
           token.address,
           accountAddress1,
@@ -647,7 +645,7 @@ describe("Account", function () {
         mintedAmount.sub(transferAmount.mul(2))
       );
 
-      const hashData3 = await getPaymasterOOSignature({
+      const [hashData3, nonce3] = await getPaymasterOOSignature({
         sender: address,
         paymasterContract,
         entrypoint: tokenEntryPointContract,
@@ -656,10 +654,9 @@ describe("Account", function () {
 
       const userop3 = await createUserOp({
         sender: address,
+        nonce: nonce3,
         signerAddress: friend3.address,
-        receiverAddress: accountAddress2,
         accountFactoryAddress: accountFactory.address,
-        entrypoint: tokenEntryPointContract,
         callData: transferCallData(
           token.address,
           accountAddress2,
@@ -722,7 +719,7 @@ describe("Account", function () {
 
       const transferAmount = 100n;
 
-      const hashData = await getPaymasterOOSignature({
+      const [hashData, nonce] = await getPaymasterOOSignature({
         sender: address,
         paymasterContract,
         entrypoint: tokenEntryPointContract,
@@ -731,10 +728,9 @@ describe("Account", function () {
 
       const userop = await createUserOp({
         sender: address,
+        nonce,
         signerAddress: friend3.address,
-        receiverAddress: accountAddress2,
         accountFactoryAddress: accountFactory.address,
-        entrypoint: tokenEntryPointContract,
         callData: transferCallData(
           token.address,
           accountAddress2,
@@ -769,11 +765,23 @@ describe("Account", function () {
 
       await paymasterContract.connect(owner).updateSponsor(sponsor2.address);
 
-      const hashData2 = await getPaymasterOOSignature({
+      const [hashData2, nonce2] = await getPaymasterOOSignature({
         sender: address,
         paymasterContract,
         entrypoint: tokenEntryPointContract,
         sponsor: sponsor2,
+      });
+
+      const userop2 = await createUserOp({
+        sender: address,
+        nonce: nonce2,
+        signerAddress: friend3.address,
+        accountFactoryAddress: accountFactory.address,
+        callData: transferCallData(
+          token.address,
+          accountAddress2,
+          transferAmount
+        ),
       });
 
       const paymasterAndData2 = await getPaymasterAndData({
@@ -781,22 +789,22 @@ describe("Account", function () {
         hashData: hashData2,
       });
 
-      userop.paymasterAndData = paymasterAndData2;
+      userop2.paymasterAndData = paymasterAndData2;
 
-      userop.signature = await signUserOp(
-        userop,
+      userop2.signature = await signUserOp(
+        userop2,
         tokenEntryPointContract,
         friend3
       );
 
-      await tokenEntryPointContract.handleOps([userop], sponsor2.address);
+      await tokenEntryPointContract.handleOps([userop2], sponsor2.address);
 
       // balance should match what was sent
       expect(await token.balanceOf(accountAddress2)).to.equal(transferAmount);
 
       // cannot replay transaction
       await expect(
-        tokenEntryPointContract.handleOps([userop], sponsor.address)
+        tokenEntryPointContract.handleOps([userop2], sponsor.address)
       ).to.be.revertedWith("AA25 invalid account nonce");
     });
   });
@@ -937,7 +945,7 @@ describe("Account", function () {
         await ethers.provider.getStorageAt(newAccount.address, slot)
       ).slice(26)}`;
 
-      const hashData = await getPaymasterOOSignature({
+      const [hashData, nonce] = await getPaymasterOOSignature({
         sender: account1.address,
         paymasterContract,
         entrypoint: tokenEntryPointContract,
@@ -948,9 +956,9 @@ describe("Account", function () {
       // await account1.connect(friend1).upgradeTo(implementation); << this but with a user op
       const userop = await createUserOp({
         sender: account1.address,
+        nonce,
         signerAddress: friend1.address,
         accountFactoryAddress: accountFactory2.address,
-        entrypoint: tokenEntryPointContract,
         callData: upgradeCallData(account1.address, implementation),
       });
 
