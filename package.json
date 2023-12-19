@@ -9,6 +9,7 @@
     "verify:contract": "ts-node scripts/verify-contract.ts",
     "deploy:community": "ts-node scripts/deploy.ts community",
     "deploy:community-entrypoint": "ts-node scripts/deploy.ts community-entrypoint",
+    "unblock": "ts-node scripts/deploy.ts unblock-nonce",
     "test": "npx hardhat test"
   },
   "author": "Xavier Damman",

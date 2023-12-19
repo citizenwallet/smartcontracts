@@ -1,4 +1,4 @@
-import { ethers, network, upgrades } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import dotenv from "dotenv";
 import { terminal as term } from "terminal-kit";
 import fs from "fs";
@@ -207,16 +207,22 @@ async function deployContract(
   console.log("Deployed token address:", deployedContract.address);
   term("\n");
   term("Do you want to verify this new contract on etherscan? [Y/n]");
-  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] });
   if (confirmVerify) {
-    execSync(`npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} --network ${networkName} ${deployedContract.address} ${tokenDecimals} --network ${networkName}`, { stdio: "inherit" });
+    execSync(
+      `npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} --network ${networkName} ${deployedContract.address} ${tokenDecimals} --network ${networkName}`,
+      { stdio: "inherit" }
+    );
   }
   term("\n");
   term("Do you want to deploy a community entry point for this token? [Y/n]");
   const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
     .promise;
   if (confirm) {
-    execSync(`COMMUNITY_TOKEN_ADDRESS=${deployedContract.address} npx hardhat run ./scripts/deploy-community-entrypoint.ts --network ${networkName}`, { stdio: "inherit" });  
+    execSync(
+      `COMMUNITY_TOKEN_ADDRESS=${deployedContract.address} npx hardhat run ./scripts/deploy-community-entrypoint.ts --network ${networkName}`,
+      { stdio: "inherit" }
+    );
   } else {
     term.red("Exiting...\n");
     process.exit();
