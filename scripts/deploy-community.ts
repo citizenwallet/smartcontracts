@@ -209,7 +209,7 @@ async function deployContract(
   term("Do you want to verify this new contract on etherscan? [Y/n]");
   const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
   if (confirmVerify) {
-    execSync(`npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} --network ${networkName} ${deployedContract.address} ${tokenDecimals} --network ${networkName}`, { stdio: "inherit" });
+    execSync(`npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} --network ${networkName} ${deployedContract.address} ${tokenDecimals}`, { stdio: "inherit" });
   }
   term("\n");
   term("Do you want to deploy a community entry point for this token? [Y/n]");

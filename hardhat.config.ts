@@ -25,7 +25,7 @@ const hhconfig: HardhatUserConfig = {
     polygon_mainnet: {
       url: process.env.POLYGON_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: 90000000000, // this is 90 Gwei
+      gasPrice: 190000000000, // this is 190 Gwei
       timeout: 999999,
       throwOnTransactionFailures: true,
       throwOnCallFailures: true,
