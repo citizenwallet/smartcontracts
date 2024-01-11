@@ -9,6 +9,7 @@
     "verify:contract": "ts-node scripts/verify-contract.ts",
     "deploy:community": "ts-node scripts/deploy.ts community",
     "deploy:community-entrypoint": "ts-node scripts/deploy.ts community-entrypoint",
+    "unblock": "ts-node scripts/deploy.ts unblock-nonce",
     "test": "npx hardhat test"
   },
   "author": "Xavier Damman",
@@ -16,8 +17,8 @@
   "devDependencies": {
     "@account-abstraction/contracts": "^0.6.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
-    "@openzeppelin/contracts": "^4.9.3",
-    "@openzeppelin/contracts-upgradeable": "^4.9.3",
+    "@openzeppelin/contracts": "^4.2.0",
+    "@openzeppelin/contracts-upgradeable": "^4.2.0",
     "@openzeppelin/hardhat-upgrades": "^1.25.0",
     "@openzeppelin/test-helpers": "^0.5.16",
     "@types/node": "^20.10.3",

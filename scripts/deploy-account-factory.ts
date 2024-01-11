@@ -1,4 +1,5 @@
-import { ethers, upgrades, run } from "hardhat";
+import "@nomicfoundation/hardhat-toolbox";
+import { ethers, run } from "hardhat";
 import { config } from "dotenv";
 
 async function main() {
