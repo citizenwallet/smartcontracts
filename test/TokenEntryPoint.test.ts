@@ -191,12 +191,6 @@ const getPaymasterAndData = async ({
   const validUntil = ethers.BigNumber.from(sValidUntil);
   const validAfter = ethers.BigNumber.from(sValidAfter);
 
-  // const hash = ethers.utils.arrayify(
-  //   await paymasterContract.getHash(userop, validUntil, validAfter)
-  // );
-
-  // const signedHash = await sponsor.signMessage(hash);
-
   // Define the types of the values
   const types = ["uint48", "uint48"];
 
