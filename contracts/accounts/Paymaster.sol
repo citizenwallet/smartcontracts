@@ -26,7 +26,6 @@ import "@account-abstraction/contracts/interfaces/INonceManager.sol";
  */
 contract Paymaster is
     IPaymaster,
-    INonceManager,
     Initializable,
     OwnableUpgradeable,
     UUPSUpgradeable
@@ -51,6 +50,13 @@ contract Paymaster is
 
     function _initialize(address aSponsor) internal virtual {
         _sponsor = aSponsor;
+
+        executeSelector = bytes4(
+            keccak256(bytes("execute(address,uint256,bytes)"))
+        );
+        executeBatchSelector = bytes4(
+            keccak256(bytes("executeBatch(address[],uint256[],bytes[])"))
+        );
     }
 
     ////////////////////////////////////////////////
@@ -61,49 +67,27 @@ contract Paymaster is
         return _sponsor;
     }
 
-    function updateSponsor(address aSponsor) public onlyOwner {
-        _sponsor = aSponsor;
+    function updateSponsor(address newSponsor) public onlyOwner {
+        _sponsor = newSponsor;
     }
 
     ////////////////////////////////////////////////
 
-    mapping(address => uint256) public senderNonce;
-
-    function getNonce(
-        address sender,
-        uint192 key
-    ) public view returns (uint256 nonce) {
-        return senderNonce[sender] | (uint256(0) << 64);
-    }
-
-    function incrementNonce(uint192 key) external onlyOwner {}
+    bytes4 private executeSelector;
+    bytes4 private executeBatchSelector;
 
     function pack(
         UserOperation calldata userOp
     ) internal pure returns (bytes memory ret) {
         // lighter signature scheme. must match UserOp.ts#packUserOp
         address sender = userOp.getSender();
-        uint256 nonce = userOp.nonce;
-        bytes32 hashInitCode = calldataKeccak(userOp.initCode);
-        bytes32 hashCallData = calldataKeccak(userOp.callData);
-        uint256 callGasLimit = userOp.callGasLimit;
-        uint256 verificationGasLimit = userOp.verificationGasLimit;
-        uint256 preVerificationGas = userOp.preVerificationGas;
-        uint256 maxFeePerGas = userOp.maxFeePerGas;
-        uint256 maxPriorityFeePerGas = userOp.maxPriorityFeePerGas;
 
-        return
-            abi.encode(
-                sender,
-                nonce,
-                hashInitCode,
-                hashCallData,
-                callGasLimit,
-                verificationGasLimit,
-                preVerificationGas,
-                maxFeePerGas,
-                maxPriorityFeePerGas
-            );
+        uint256 nonce = userOp.nonce;
+
+        // we only allow execute or executeBatch calls
+        bytes4 selector = bytes4(userOp.callData[0:4]);
+
+        return abi.encode(sender, nonce, selector);
     }
 
     /**
@@ -120,13 +104,24 @@ contract Paymaster is
     ) public view returns (bytes32) {
         // can't use userOp.hash(), since it contains also the paymasterAndData itself.
 
+        bytes4 selector = bytes4(userOp.callData[0:4]);
+
+        // the function selector must be valid
+        require(selector != bytes4(0), "AA27 invalid function selector");
+
+        // we only allow execute or executeBatch calls
+        require(
+            selector == executeSelector || selector == executeBatchSelector,
+            "AA27 invalid function selector"
+        );
+
         return
             keccak256(
                 abi.encode(
                     pack(userOp),
                     block.chainid,
                     address(this),
-                    senderNonce[userOp.getSender()],
+                    sponsor(),
                     validUntil,
                     validAfter
                 )
@@ -144,7 +139,7 @@ contract Paymaster is
         UserOperation calldata userOp,
         bytes32 userOpHash,
         uint256 maxCost
-    ) public returns (bytes memory context, uint256 validationData) {
+    ) public view returns (bytes memory context, uint256 validationData) {
         (
             uint48 validUntil,
             uint48 validAfter,
@@ -154,7 +149,7 @@ contract Paymaster is
         // we only "require" it here so that the revert reason on invalid signature will be of "VerifyingPaymaster", and not "ECDSA"
         require(
             signature.length == 64 || signature.length == 65,
-            "AA34 signature error"
+            "AA35 invalid signature length"
         );
 
         uint48 currentTime = uint48(block.timestamp);
@@ -164,12 +159,11 @@ contract Paymaster is
         bytes32 hash = getHash(userOp, validUntil, validAfter)
             .toEthSignedMessageHash();
 
-        senderNonce[userOp.getSender()]++;
+        if (sponsor() != hash.recover(signature)) {
+            return ("", _packValidationData(true, validUntil, validAfter));
+        }
 
-        require(sponsor() == hash.recover(signature), "AA34 signature error");
-
-        context = "";
-        validationData = 0;
+        return ("", _packValidationData(false, validUntil, validAfter));
     }
 
     function _parsePaymasterAndData(
