@@ -18,6 +18,43 @@ const listFiles = (directory: string, pattern: string): string[] => {
   }
 };
 
+async function deployContract(
+  contractName: string,
+  minter1: string,
+  minter2: string,
+  tokenName: string,
+  tokenSymbol: string,
+  tokenDecimals = 6
+) {
+  const Contract = await ethers.getContractFactory(contractName);
+  const deployedContract = await upgrades.deployProxy(
+    Contract,
+    [[minter1, minter2], tokenName, tokenSymbol],
+    {
+      kind: "uups",
+      initializer: "initialize",
+      constructorArgs: [tokenDecimals],
+    }
+  );
+
+  console.log("Deployed token address:", deployedContract.address);
+  return deployedContract.address;
+}
+
+async function verifyContract(networkName: string, contractName: string, deployedContractAddress: string, tokenDecimals: number) {
+  execSync(
+    `HARDHAT_NETWORK=${networkName} npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} ${deployedContractAddress} ${tokenDecimals}`,
+    { stdio: "inherit" }
+  );
+}
+
+async function deployCommunityEntrypoint(networkName: string, deployedContractAddress: string) {
+  execSync(
+    `HARDHAT_NETWORK=${networkName} COMMUNITY_TOKEN_ADDRESS=${deployedContractAddress} npx hardhat run ./scripts/deploy-community-entrypoint.ts`,
+    { stdio: "inherit" }
+  );
+}
+
 function terminate() {
   term.grabInput(false);
   setTimeout(function () {
@@ -57,7 +94,7 @@ const nativeCurrencySymbols: { [chainId: number]: string } = {
   // Add other networks and their symbols as needed
 };
 
-const networkName = process.env.HARDHAT_NETWORK;
+const networkName = process.env.HARDHAT_NETWORK || "";
 
 async function main() {
   // const spinner = term.spinner();
@@ -106,124 +143,123 @@ async function main() {
 
   const contractName = response.selectedText.replace(".sol", "");
   term("\n");
-  term
-    .green("I will now deploy ")
-    .green.bold(contractName)
-    .green(" on ")
-    .green.bold(networkName)
-    .green("\n");
-  term.green("Using the minters defined in your .env.local: \n");
-  const minter1 = process.env.MINTER1_ADDRESS;
-  const minter2 = process.env.MINTER2_ADDRESS;
-  if (!minter1 || !minter2) {
-    term.red(
-      "Please set your MINTER1_ADDRESS and MINTER2_ADDRESS in your .env.local file"
-    );
+
+  let tokenDecimals: number, tokenSymbol: string, deployedContractAddress: string;
+
+  if (process.env.TOKEN_ADDRESS) {
+    deployedContractAddress = process.env.TOKEN_ADDRESS;
+    const contract = await ethers.getContractAt(contractName, process.env.TOKEN_ADDRESS);
+    tokenDecimals = await contract.decimals();
+    tokenSymbol = await contract.symbol();
+    term.green("  Contract Name: %s\n", contractName);
+    term.green("  Network: %s\n", networkName);
+    // term.green("  Token Name: %s\n", tokenName);
+    term.green("  Token Symbol: %s\n", tokenSymbol);
+    term.green("  Token Decimals: %s\n", tokenDecimals);
+      term.green("  Token Address: %s\n", process.env.TOKEN_ADDRESS);
     term("\n");
-    process.exit();
-  }
-
-  term.green("  Minter 1: %s\n", minter1);
-  term.green("  Minter 2: %s\n", minter2);
-
-  term("\n");
-
-  term("Enter a token name (My Test Token): ");
-
-  const tokenName: string =
-    (await term.inputField({}).promise) || "My Test Token";
-
-  term("\n");
-
-  term("Enter a token symbol (MTT): ");
-
-  const tokenSymbol: string = (await term.inputField({}).promise) || "MTT";
-
-  term("\n");
-
-  term("How many decimals should it have (6): ");
-
-  const tokenDecimalsInput: string = (await term.inputField({}).promise) || "6";
-  const tokenDecimals = parseInt(tokenDecimalsInput);
-
-  if (isNaN(tokenDecimals) || tokenDecimals < 0 || tokenDecimals > 18) {
-    term.red("Decimals should be between 0 and 18\n");
-    process.exit();
-  }
-
-  term("\n");
-  term("You are about to deploy the following contract:\n");
-  term.green("  Contract Name: %s\n", contractName);
-  term.green("  Network: %s\n", networkName);
-  term.green("  Minter 1: %s\n", minter1);
-  term.green("  Minter 2: %s\n", minter2);
-  term.green("  Token Name: %s\n", tokenName);
-  term.green("  Token Symbol: %s\n", tokenSymbol);
-  term.green("  Token Decimals: %s\n", tokenDecimals);
-  term("\n");
-
-  term("Continue? [Y/n]");
-  const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
-    .promise;
-  if (confirm) {
-    term("\n").eraseLineAfter.green(
-      "Deploying %s on %s\n",
-      contractName,
-      networkName
-    );
-    await deployContract(
-      contractName,
-      minter1,
-      minter2,
-      tokenName,
-      tokenSymbol,
-      tokenDecimals
-    );
+    term("Continue? [Y/n]");
   } else {
-    term.red("Exiting...\n");
-    process.exit();
-  }
-}
-
-async function deployContract(
-  contractName: string,
-  minter1: string,
-  minter2: string,
-  tokenName: string,
-  tokenSymbol: string,
-  tokenDecimals = 6
-) {
-  const Contract = await ethers.getContractFactory(contractName);
-  const deployedContract = await upgrades.deployProxy(
-    Contract,
-    [[minter1, minter2], tokenName, tokenSymbol],
-    {
-      kind: "uups",
-      initializer: "initialize",
-      constructorArgs: [tokenDecimals],
+    term
+      .green("I will now deploy ")
+      .green.bold(contractName)
+      .green(" on ")
+      .green.bold(networkName)
+      .green("\n");
+    term.green("Using the minters defined in your .env.local: \n");
+    const minter1 = process.env.MINTER1_ADDRESS;
+    const minter2 = process.env.MINTER2_ADDRESS;
+    if (!minter1 || !minter2) {
+      term.red(
+        "Please set your MINTER1_ADDRESS and MINTER2_ADDRESS in your .env.local file"
+      );
+      term("\n");
+      process.exit();
     }
-  );
 
-  console.log("Deployed token address:", deployedContract.address);
+    term.green("  Minter 1: %s\n", minter1);
+    term.green("  Minter 2: %s\n", minter2);
+
+    term("\n");
+
+    term("Enter a token name (My Test Token): ");
+
+    const tokenName: string =
+      (await term.inputField({}).promise) || "My Test Token";
+
+    term("\n");
+
+    term("Enter a token symbol (MTT): ");
+
+    tokenSymbol = (await term.inputField({}).promise) || "MTT";
+
+    term("\n");
+
+    term("How many decimals should it have (6): ");
+
+    const tokenDecimalsInput: string = (await term.inputField({}).promise) || "6";
+    tokenDecimals = parseInt(tokenDecimalsInput);
+
+    if (isNaN(tokenDecimals) || tokenDecimals < 0 || tokenDecimals > 18) {
+      term.red("Decimals should be between 0 and 18\n");
+      process.exit();
+    }
+
+    term("\n");
+    term("You are about to deploy the following contract:\n");
+    term.green("  Contract Name: %s\n", contractName);
+    term.green("  Network: %s\n", networkName);
+    term.green("  Minter 1: %s\n", minter1);
+    term.green("  Minter 2: %s\n", minter2);
+    term.green("  Token Name: %s\n", tokenName);
+    term.green("  Token Symbol: %s\n", tokenSymbol);
+    term.green("  Token Decimals: %s\n", tokenDecimals);
+    term("\n");
+    term("Deploy contract? [Y/n]");  
+    const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+    .promise;
+    if (!confirm) {
+      term("\n");
+      term.red("Exiting...\n");
+      process.exit();
+    } else {
+      term("\n").eraseLineAfter.green(
+        "Deploying %s on %s\n",
+        contractName,
+        networkName
+      );
+      deployedContractAddress = await deployContract(
+        contractName,
+        minter1,
+        minter2,
+        tokenName,
+        tokenSymbol,
+        tokenDecimals
+      );
+    }
+  }
+
   term("\n");
   term("Do you want to verify this new contract on etherscan? [Y/n]");
+  term("\n");
+
   const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] });
   if (confirmVerify) {
-    execSync(
-      `npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} --network ${networkName} ${deployedContract.address} ${tokenDecimals}`,
-      { stdio: "inherit" }
-    );
+    try {
+      await verifyContract(networkName, contractName, deployedContractAddress, tokenDecimals);
+    } catch (error) {
+      term.red("Error verifying contract: %s\n", error.message);
+    }
   }
+
   term("\n");
   term("Do you want to deploy a community entry point for this token? [Y/n]");
-  const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+  const confirmDeployEntryPoint = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
     .promise;
-  if (confirm) {
-    execSync(
-      `COMMUNITY_TOKEN_ADDRESS=${deployedContract.address} npx hardhat run ./scripts/deploy-community-entrypoint.ts --network ${networkName}`,
-      { stdio: "inherit" }
-    );
+  if (confirmDeployEntryPoint) {
+  await deployCommunityEntrypoint(networkName, deployedContractAddress);
   } else {
+    term("\n");
     term.red("Exiting...\n");
     process.exit();
   }
