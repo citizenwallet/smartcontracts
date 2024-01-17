@@ -97,8 +97,8 @@ contract Profile is
     function _beforeTokenTransfer(
         address from,
         address to,
-        uint256, // _firstTokenId,
-        uint256 // _batchSize
+        uint256 firstTokenId,
+        uint256 batchSize
     ) internal pure override {
         require(
             from == address(0) || to == address(0),

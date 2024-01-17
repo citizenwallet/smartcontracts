@@ -340,9 +340,7 @@ contract Account is
 
     mapping(address => bool) private _upgradedTo;
 
-    function migrateState(
-        address // _oldImplementation
-    ) internal onlyInitializing {
+    function migrateState(address oldImplementation) internal onlyInitializing {
         // check that we are allowed to migrate
 
         require(

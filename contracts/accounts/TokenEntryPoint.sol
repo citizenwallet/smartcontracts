@@ -107,13 +107,13 @@ contract TokenEntryPoint is
     /**
      * @dev Executes a batch of user operations.
      * @param ops Array of UserOperation structs containing the operations to execute.
-     * @param << kept to make sure we keep the same function signature.
+     * @param beneficiary << kept to make sure we keep the same function signature.
      * @notice This function is non-reentrant and requires at least one user operation.
      * @notice Each operation is validated for nonce, account, and paymaster signature before execution.
      */
     function handleOps(
         UserOperation[] calldata ops,
-        address // payable _beneficiary // kept to make sure we keep the same function signature
+        address payable beneficiary // kept to make sure we keep the same function signature
     ) public nonReentrant {
         require(ops.length > 0, "AA42 needs at least one user operation");
 
