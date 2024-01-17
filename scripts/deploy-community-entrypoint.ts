@@ -120,7 +120,7 @@ async function main() {
 
   await paymaster.deployed();
 
-  console.log(`✅ Paymaster deployed to: ${paymaster.address}`);
+  console.log(`✅ Paymaster contract deployed to: ${paymaster.address}`);
 
   console.log("\n");
 
@@ -287,15 +287,17 @@ async function main() {
   console.log("DEPLOYMENT COMPLETE 🎉");
   console.log(" ");
   console.log(" ");
-  console.log("Paymaster: ", paymaster.address);
-  console.log("paymaster sponsor address: ", sponsor.address);
+  console.log("Community token address: ", COMMUNITY_TOKEN_ADDRESS);
+  console.log(" ");
+  console.log("Paymaster contract address: ", paymaster.address);
+  console.log("Paymaster sponsor address (EOA to top up to sponsor gas fees): ", sponsor.address);
   console.log(
-    "paymaster sponsor private key: ",
+    "Paymaster sponsor private key: ",
     sponsor.privateKey.replace("0x", "")
   );
   console.log(" ");
   if (whiteListedAddresses.length > 0) {
-    console.log(`whitelisted contracts:`);
+    console.log(`Whitelisted contracts:`);
     whiteListedAddresses.forEach((addr) => console.log(addr));
     console.log(profileAddress);
     console.log("\n");
