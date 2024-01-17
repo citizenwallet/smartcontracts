@@ -137,8 +137,8 @@ contract Paymaster is
      */
     function validatePaymasterUserOp(
         UserOperation calldata userOp,
-        bytes32 userOpHash,
-        uint256 maxCost
+        bytes32, // _userOpHash, // intentionally not used
+        uint256 // _maxCost // intentionally not used
     ) public view returns (bytes memory context, uint256 validationData) {
         (
             uint48 validUntil,
