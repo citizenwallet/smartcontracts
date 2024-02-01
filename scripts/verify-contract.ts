@@ -83,7 +83,7 @@ async function main() {
   const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }).promise;
   if (confirm) {
     process.env.HARDHAT_NETWORK = networkName;
-    const cmd = `HARDHAT_NETWORK=${networkName} npx hardhat verify --network ${networkName} ${contractAddress} ${contractArguments}`;
+    const cmd = `HARDHAT_NETWORK=${networkName} npx hardhat verify ${contractAddress} ${contractArguments}`;
     term("\n\n");
     term.yellow(cmd);
     term("\n\n");
