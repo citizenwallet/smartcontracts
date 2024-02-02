@@ -45,12 +45,12 @@ const hhconfig: HardhatUserConfig = {
     base_mainnet: {
       url: process.env.BASE_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
+      gasPrice: ethers.utils.parseUnits("0.03", "gwei").toNumber(), // this is 30 Gwei
     },
     base_testnet: {
       url: process.env.BASE_TESTNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
+      gasPrice: ethers.utils.parseUnits("0.03", "gwei").toNumber(), // this is 30 Gwei
     },
     celo_mainnet: {
       url: process.env.CELO_MAINNET_RPC_URL,
