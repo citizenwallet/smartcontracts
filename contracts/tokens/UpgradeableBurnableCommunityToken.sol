@@ -24,8 +24,8 @@ contract UpgradeableBurnableCommunityToken is
     event Minted(address indexed to, uint256 amount, string description);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(uint8 initDecimals) {
-        _decimals = initDecimals;
+    constructor() {
+        _decimals = 6;
         _disableInitializers();
     }
 
@@ -33,12 +33,17 @@ contract UpgradeableBurnableCommunityToken is
         address[] memory minters,
         string memory name,
         string memory symbol
-    ) public initializer {
+    )
+        public
+        // uint8 initDecimals
+        initializer
+    {
         __ERC20_init(name, symbol);
         __ERC20Burnable_init();
         __Ownable_init();
         __AccessControl_init();
         __Pausable_init();
+        // _decimals = initDecimals;
 
         _setupRole(PAUSER_ROLE, _msgSender());
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
