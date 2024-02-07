@@ -7,9 +7,10 @@
     "typechain": "typechain --target ethers-v5 --out-dir typechain-types --glob 'artifacts/contracts/*/*[!dbg].json'",
     "compile": "rm -rf cache && npx hardhat compile",
     "verify:contract": "ts-node scripts/verify-contract.ts",
-    "deploy:community": "ts-node scripts/deploy.ts community",
-    "deploy:community-entrypoint": "ts-node scripts/deploy.ts community-entrypoint",
-    "unblock": "ts-node scripts/deploy.ts unblock-nonce",
+    "deploy:community": "ts-node scripts/selectNetwork.ts deploy-community",
+    "upgrade:community-token": "ts-node scripts/selectNetwork.ts upgrade-community-token",
+    "deploy:community-entrypoint": "ts-node scripts/selectNetwork.ts deploy-community-entrypoint",
+    "unblock": "ts-node scripts/selectNetwork.ts unblock-nonce",
     "test": "npx hardhat test"
   },
   "author": "Xavier Damman",
