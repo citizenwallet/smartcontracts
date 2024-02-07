@@ -8,6 +8,7 @@
     "compile": "rm -rf cache && npx hardhat compile",
     "verify:contract": "ts-node scripts/verify-contract.ts",
     "migrate:profile": "ts-node scripts/selectNetwork.ts migrations/profiles/index",
+    "migrate:token-balances": "ts-node scripts/selectNetwork.ts migrations/tokenBalances/index",
     "deploy:token": "ts-node scripts/selectNetwork.ts deploy-token",
     "deploy:profile": "ts-node scripts/selectNetwork.ts deploy-profile",
     "deploy:community": "ts-node scripts/selectNetwork.ts deploy-community",
