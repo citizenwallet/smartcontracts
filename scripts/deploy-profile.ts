@@ -15,6 +15,19 @@ async function verifyContract(
   );
 }
 
+function terminate() {
+  term.grabInput(false);
+  setTimeout(function () {
+    process.exit();
+  }, 100);
+}
+
+term.on("key", function (name: string, _: any, __: any) {
+  if (name === "CTRL_C") {
+    terminate();
+  }
+});
+
 const networkName = process.env.HARDHAT_NETWORK || "";
 if (!networkName) {
   term.red("HARDHAT_NETWORK missing in your environment");
