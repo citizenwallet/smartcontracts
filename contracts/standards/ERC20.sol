@@ -92,4 +92,8 @@ abstract contract ERC20 {
     function symbol() external view virtual returns (string memory);
 
     function decimals() external view virtual returns (uint8);
+
+    function mint(address to, uint256 amount) external virtual returns (bool);
+
+    function burn(address from, uint256 amount) external virtual returns (bool);
 }
