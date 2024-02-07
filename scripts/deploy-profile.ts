@@ -1,6 +1,26 @@
 import "@nomicfoundation/hardhat-toolbox";
 import { ethers, upgrades } from "hardhat";
+import { terminal as term } from "terminal-kit";
 import { config } from "dotenv";
+import { execSync } from "child_process";
+
+async function verifyContract(
+  networkName: string,
+  contractName: string,
+  deployedContractAddress: string
+) {
+  execSync(
+    `HARDHAT_NETWORK=${networkName} npx hardhat verify --contract contracts/apps/${contractName}.sol:${contractName} ${deployedContractAddress}`,
+    { stdio: "inherit" }
+  );
+}
+
+const networkName = process.env.HARDHAT_NETWORK || "";
+if (!networkName) {
+  term.red("HARDHAT_NETWORK missing in your environment");
+  term("\n");
+  process.exit();
+}
 
 async function main() {
   console.log("reading config...");
@@ -18,6 +38,15 @@ async function main() {
 
   console.log("🚀 request sent...");
   await profile.deployed();
+
+  // wait 2 seconds for the transaction to be mined
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  try {
+    await verifyContract(networkName, "Profile", profile.address);
+  } catch (error: any) {
+    console.log("Error verifying contract: %s\n", error && error.message);
+  }
 
   console.log(`Profile deployed to ${profile.address}`);
 }

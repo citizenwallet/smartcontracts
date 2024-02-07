@@ -40,7 +40,7 @@ contract Profile is
         bytes32 _username,
         string memory _uri
     ) public returns (uint256) {
-        require(profile == msg.sender, "Only the profile owner can set it.");
+        require(owner() == msg.sender || profile == msg.sender, "Only the profile owner or contract owner can set it.");
 
         bytes32 currentUsername = usernames[profile];
 

@@ -60,7 +60,7 @@ describe("Profile", function () {
       );
     });
 
-    it("Should only allow the profile owner to set", async function () {
+    it("Should only allow the profile owner or contract owner to set", async function () {
       const { profile, owner, friend1, friend2 } = await loadFixture(
         deployProfileFixture
       );
@@ -68,13 +68,15 @@ describe("Profile", function () {
         profile
           .connect(friend2)
           .set(friend1.address, friend1UsernameA, "https://test.com")
-      ).to.be.revertedWith("Only the profile owner can set it.");
+      ).to.be.revertedWith(
+        "Only the profile owner or contract owner can set it."
+      );
 
       await expect(
         profile
           .connect(owner)
           .set(friend1.address, friend1UsernameA, "https://test.com")
-      ).to.be.revertedWith("Only the profile owner can set it.");
+      ).to.be.ok;
     });
 
     it("Should set the profile metadata uri and mint if not already minted", async function () {
