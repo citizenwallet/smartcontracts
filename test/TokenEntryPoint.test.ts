@@ -255,8 +255,7 @@ describe("Account", function () {
       [[owner.address], "My Token", "MT"],
       {
         kind: "uups",
-        initializer: "initialize",
-        constructorArgs: [6],
+        initializer: "initialize"
       }
     );
 

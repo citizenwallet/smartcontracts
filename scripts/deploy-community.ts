@@ -23,8 +23,7 @@ async function deployContract(
   minter1: string,
   minter2: string,
   tokenName: string,
-  tokenSymbol: string,
-  tokenDecimals = 6
+  tokenSymbol: string
 ) {
   const Contract = await ethers.getContractFactory(contractName);
   const deployedContract = await upgrades.deployProxy(
@@ -32,8 +31,7 @@ async function deployContract(
     [[minter1, minter2], tokenName, tokenSymbol],
     {
       kind: "uups",
-      initializer: "initialize",
-      constructorArgs: [tokenDecimals],
+      initializer: "initialize"
     }
   );
 
@@ -41,9 +39,9 @@ async function deployContract(
   return deployedContract.address;
 }
 
-async function verifyContract(networkName: string, contractName: string, deployedContractAddress: string, tokenDecimals: number) {
+async function verifyContract(networkName: string, contractName: string, deployedContractAddress: string) {
   execSync(
-    `HARDHAT_NETWORK=${networkName} npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} ${deployedContractAddress} ${tokenDecimals}`,
+    `HARDHAT_NETWORK=${networkName} npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} ${deployedContractAddress}`,
     { stdio: "inherit" }
   );
 }
@@ -68,7 +66,8 @@ term.on("key", function (name: string, _: any, __: any) {
   }
 });
 
-if (!process.env.DEPLOYER_PRIVATE_KEY) {
+const pk = process.env.DEPLOYER_PRIVATE_KEY;
+if (!pk) {
   term.red("Please set your DEPLOYER_PRIVATE_KEY in your .env.local file");
   term("\n");
   process.exit();
@@ -95,12 +94,28 @@ const nativeCurrencySymbols: { [chainId: number]: string } = {
 };
 
 const networkName = process.env.HARDHAT_NETWORK || "";
+if (!networkName) {
+  term.red("HARDHAT_NETWORK missing in your environment");
+  term("\n");
+  process.exit();
+}
+
+async function getChainId() {
+  const networkDetails = await ethers.provider.getNetwork();
+  return networkDetails.chainId;
+}
 
 async function main() {
   // const spinner = term.spinner();
   // Fetch the chain ID from the provider
-  const networkDetails = await ethers.provider.getNetwork();
-  const chainId = networkDetails.chainId;
+  let chainId;
+  try {
+    chainId = await getChainId();
+  } catch (e) {
+    term.red("Error fetching chain ID: %s\n", e && e.message);
+    process.exit();
+  }
+
   if (!chainId || !nativeCurrencySymbols[chainId]) {
     term.red(`Unsupported chain ID: ${chainId} (network: ${networkName})`);
     term("\n");
@@ -108,13 +123,6 @@ async function main() {
   }
   const nativeCurrencySymbol =
     nativeCurrencySymbols[chainId] || `Unknown chainId: ${chainId}`;
-
-  const pk = process.env.DEPLOYER_PRIVATE_KEY;
-  if (!pk) {
-    term.red("Please set your DEPLOYER_PRIVATE_KEY in your .env.local file");
-    term("\n");
-    process.exit();
-  }
 
   const wallet = new ethers.Wallet(pk, ethers.provider);
   const balanceWei = await wallet.getBalance();
@@ -194,18 +202,6 @@ async function main() {
     tokenSymbol = (await term.inputField({}).promise) || "MTT";
 
     term("\n");
-
-    term("How many decimals should it have (6): ");
-
-    const tokenDecimalsInput: string = (await term.inputField({}).promise) || "6";
-    tokenDecimals = parseInt(tokenDecimalsInput);
-
-    if (isNaN(tokenDecimals) || tokenDecimals < 0 || tokenDecimals > 18) {
-      term.red("Decimals should be between 0 and 18\n");
-      process.exit();
-    }
-
-    term("\n");
     term("You are about to deploy the following contract:\n");
     term.green("  Contract Name: %s\n", contractName);
     term.green("  Network: %s\n", networkName);
@@ -213,7 +209,6 @@ async function main() {
     term.green("  Minter 2: %s\n", minter2);
     term.green("  Token Name: %s\n", tokenName);
     term.green("  Token Symbol: %s\n", tokenSymbol);
-    term.green("  Token Decimals: %s\n", tokenDecimals);
     term("\n");
     term("Deploy contract? [Y/n]");  
     const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
@@ -233,8 +228,7 @@ async function main() {
         minter1,
         minter2,
         tokenName,
-        tokenSymbol,
-        tokenDecimals
+        tokenSymbol
       );
     }
   }
@@ -243,12 +237,12 @@ async function main() {
   term("Do you want to verify this new contract on etherscan? [Y/n]");
   term("\n");
 
-  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] });
+  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }).promise;
   if (confirmVerify) {
     try {
-      await verifyContract(networkName, contractName, deployedContractAddress, tokenDecimals);
+      await verifyContract(networkName, contractName, deployedContractAddress);
     } catch (error) {
-      term.red("Error verifying contract: %s\n", error.message);
+      term.red("Error verifying contract: %s\n", error && error.message);
     }
   }
 

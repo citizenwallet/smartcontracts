@@ -23,12 +23,6 @@ contract UpgradeableCommunityToken is
 
     event Minted(address indexed to, uint256 amount, string description);
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(uint8 initDecimals) {
-        _decimals = initDecimals;
-        _disableInitializers();
-    }
-
     function initialize(
         address[] memory minters,
         string memory name,
@@ -47,11 +41,8 @@ contract UpgradeableCommunityToken is
         }
     }
 
-    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
-    uint8 private immutable _decimals;
-
     function decimals() public view virtual override returns (uint8) {
-        return _decimals;
+        return 6;
     }
 
     function mint(

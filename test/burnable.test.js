@@ -21,7 +21,7 @@ describe("UpgradeableBurnableCommunityToken", function () {
     erc20Token = await upgrades.deployProxy(
       UpgradeableCommunityToken,
       [[minter1.address], "Regens Unite Token", "RGN"],
-      { kind: "uups", initializer: "initialize", constructorArgs: [6] }
+      { kind: "uups", initializer: "initialize" }
     );
   });
 

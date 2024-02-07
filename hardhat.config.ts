@@ -35,7 +35,7 @@ const hhconfig: HardhatUserConfig = {
     polygon_testnet: {
       url: process.env.POLYGON_TESTNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: ethers.utils.parseUnits("90", "gwei").toNumber(), // this is 90 Gwei
+      gasPrice: ethers.utils.parseUnits("5", "gwei").toNumber(), // this is 90 Gwei
       timeout: 999999,
       gas: 12400000,
       throwOnTransactionFailures: true,
