@@ -106,7 +106,8 @@ async function main() {
 
   term("Enter the address of your community token that you want to upgrade: ");
   const communityTokenAddress = await term.inputField({}).promise;
-
+  term("\n");
+  term("\n");
   term("Choose a contract to upgrade to: ");
 
   const files = listFiles("./contracts/tokens/", "*.sol");
@@ -131,7 +132,7 @@ async function main() {
   // term.green("  Token Name: %s\n", tokenName);
   term.green("  Token Symbol: %s\n", tokenSymbol);
   term.green("  Token Decimals: %s\n", tokenDecimals);
-    term.green("  Token Address: %s\n", communityTokenAddress);
+  term.green("  Token Address: %s\n", communityTokenAddress);
   term("\n");  
 
   term
@@ -144,7 +145,7 @@ async function main() {
       .green("\n");
 
       term("\n");
-      term("Continue? [Y/n]");
+      term("Continue? [Y/n]\n");
   const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }).promise;
   if (!confirm) {
     term("\n");
@@ -168,7 +169,7 @@ async function main() {
   term("Do you want to verify this new contract on etherscan? [Y/n]");
   term("\n");
 
-  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] });
+  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }).promise;
   if (confirmVerify) {
     try {
       await verifyContract(networkName, contractName, communityTokenAddress, tokenDecimals);
