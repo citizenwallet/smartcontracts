@@ -47,17 +47,34 @@ describe("TokenIOU", function () {
       }
     );
 
+    const tokeniou2 = await upgrades.deployProxy(
+      TokenIOUContract,
+      [token.address],
+      {
+        kind: "uups",
+        initializer: "initialize",
+      }
+    );
+
     const network = await ethers.provider.getNetwork();
 
     const current = await time.latest();
 
-    return { network, current, tokeniou, token, owner, friend1, friend2 };
+    return {
+      network,
+      current,
+      tokeniou,
+      tokeniou2,
+      token,
+      owner,
+      friend1,
+      friend2,
+    };
   }
 
   async function redeemFixture() {
-    const { current, tokeniou, token, friend1, friend2 } = await loadFixture(
-      deployTokenIOUFixture
-    );
+    const { current, tokeniou, tokeniou2, token, friend1, friend2 } =
+      await loadFixture(deployTokenIOUFixture);
 
     const validUntil = current + 2592000; // 30 days
     const validAfter = current;
@@ -78,6 +95,7 @@ describe("TokenIOU", function () {
 
     return {
       tokeniou,
+      tokeniou2,
       token,
       friend1,
       friend2,
@@ -235,6 +253,17 @@ describe("TokenIOU", function () {
           .connect(friend1)
           .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
       ).to.be.revertedWith("TokenIOU: expired or not due");
+    });
+
+    it("Should not allow redeeming on another contract", async function () {
+      const { tokeniou2, friend1, friend2, validUntil, validAfter, signature } =
+        await loadFixture(redeemFixture);
+
+      await expect(
+        tokeniou2
+          .connect(friend1)
+          .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
+      ).to.be.revertedWith("TokenIOU: Invalid signature");
     });
   });
 });
