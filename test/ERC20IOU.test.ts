@@ -7,13 +7,13 @@ const getHash = (
   amount: number,
   validUntil: number,
   validFrom: number,
-  salt: number,
+  sequence: number,
   chainId: number,
   contract: string
 ) => {
   return ethers.utils.solidityKeccak256(
     ["address", "uint256", "uint48", "uint48", "uint256", "uint256", "address"],
-    [from, amount, validUntil, validFrom, salt, chainId, contract]
+    [from, amount, validUntil, validFrom, sequence, chainId, contract]
   );
 };
 
