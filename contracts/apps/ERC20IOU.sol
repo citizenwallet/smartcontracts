@@ -31,8 +31,8 @@ contract ERC20IOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     * @param amount     The uint256 amount of tokens to redeem
     * @param validUntil The uint48 timestamp until which the redeem is valid
     * @param validAfter The uint48 timestamp from which the redeem is valid
-    * @param sequence       The uint256 unique number to prevent replay attacks
-    * @return bytes32 The hash of an IOU
+    * @param sequence   The uint256 unique number to prevent replay attacks
+    * @return bytes32   The hash of an IOU
 
     Can be used to easily generate a valid IOU signature for the redeem function
 */
@@ -63,7 +63,7 @@ contract ERC20IOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      * @param amount     The uint256 amount of tokens to redeem
      * @param validUntil The uint48 timestamp until which the redeem is valid
      * @param validAfter The uint48 timestamp from which the redeem is valid
-     * @param sequence       The uint256 unique number to prevent replay attacks
+     * @param sequence   The uint256 unique number to prevent replay attacks
      * @param signature  The bytes calldata signature of the IOU
      */
     function redeem(
