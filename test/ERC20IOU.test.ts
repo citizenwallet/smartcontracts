@@ -7,18 +7,18 @@ const getHash = (
   amount: number,
   validUntil: number,
   validFrom: number,
-  nonce: number,
+  salt: number,
   chainId: number,
   contract: string
 ) => {
   return ethers.utils.solidityKeccak256(
     ["address", "uint256", "uint48", "uint48", "uint256", "uint256", "address"],
-    [from, amount, validUntil, validFrom, nonce, chainId, contract]
+    [from, amount, validUntil, validFrom, salt, chainId, contract]
   );
 };
 
 // sould bound ERC721 with tokeniou metadata uri
-describe("TokenIOU", function () {
+describe("ERC20IOU", function () {
   async function deployTokenIOUFixture() {
     const [owner, friend1, friend2] = await ethers.getSigners();
 
@@ -37,7 +37,7 @@ describe("TokenIOU", function () {
       }
     );
 
-    const TokenIOUContract = await ethers.getContractFactory("TokenIOU");
+    const TokenIOUContract = await ethers.getContractFactory("ERC20IOU");
     const tokeniou = await upgrades.deployProxy(
       TokenIOUContract,
       [token.address],
@@ -178,7 +178,7 @@ describe("TokenIOU", function () {
         tokeniou
           .connect(friend1)
           .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
-      ).to.be.revertedWith("TokenIOU: Already redeemed");
+      ).to.be.revertedWith("ERC20IOU: already redeemed");
     });
 
     it("Should not allow someone to redeem with someone else's signature", async function () {
@@ -189,7 +189,7 @@ describe("TokenIOU", function () {
         tokeniou
           .connect(friend2)
           .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
-      ).to.be.revertedWith("TokenIOU: Invalid signature");
+      ).to.be.revertedWith("ERC20IOU: invalid signature");
     });
 
     it("Should not allow tampering with validity", async function () {
@@ -202,7 +202,7 @@ describe("TokenIOU", function () {
         tokeniou
           .connect(friend1)
           .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
-      ).to.be.revertedWith("TokenIOU: Invalid signature");
+      ).to.be.revertedWith("ERC20IOU: invalid signature");
     });
 
     it("Should not allow redeeming before validity", async function () {
@@ -227,7 +227,7 @@ describe("TokenIOU", function () {
         tokeniou
           .connect(friend1)
           .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
-      ).to.be.revertedWith("TokenIOU: expired or not due");
+      ).to.be.revertedWith("ERC20IOU: expired or not valid yet");
     });
 
     it("Should not allow redeeming after validity", async function () {
@@ -252,7 +252,7 @@ describe("TokenIOU", function () {
         tokeniou
           .connect(friend1)
           .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
-      ).to.be.revertedWith("TokenIOU: expired or not due");
+      ).to.be.revertedWith("ERC20IOU: expired or not valid yet");
     });
 
     it("Should not allow redeeming on another contract", async function () {
@@ -263,7 +263,7 @@ describe("TokenIOU", function () {
         tokeniou2
           .connect(friend1)
           .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
-      ).to.be.revertedWith("TokenIOU: Invalid signature");
+      ).to.be.revertedWith("ERC20IOU: invalid signature");
     });
   });
 });

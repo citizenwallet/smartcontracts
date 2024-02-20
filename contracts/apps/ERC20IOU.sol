@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
-contract TokenIOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract ERC20IOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     IERC20Upgradeable public token;
 
     /// only a single redeem per hash
@@ -26,22 +26,22 @@ contract TokenIOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     /**
-        * @notice Get the hash of the redeem request
-        * @param from       The address of the redeemer
+        * @notice Get the hash of an IOU
+        * @param from       The address of the issuer
         * @param amount     The amount of tokens to redeem
         * @param validUntil The timestamp until which the redeem is valid
         * @param validAfter  The timestamp from which the redeem is valid
-        * @param nonce      A unique number to prevent replay attacks
-        * @return The hash of the redeem request
+        * @param salt      A unique number to prevent replay attacks
+        * @return The hash of an IOU
 
-        Can be used to easily generate a valid hash for the redeem function
+        Can be used to easily generate a valid IOU signature for the redeem function
     */
     function getHash(
         address from,
         uint256 amount,
         uint48 validUntil,
         uint48 validAfter,
-        uint256 nonce
+        uint256 salt
     ) public view returns (bytes32) {
         return
             keccak256(
@@ -50,7 +50,7 @@ contract TokenIOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
                     amount,
                     validUntil,
                     validAfter,
-                    nonce,
+                    salt,
                     block.chainid,
                     address(this)
                 )
@@ -59,62 +59,60 @@ contract TokenIOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     /**
      * @notice Redeem tokens
-     * @param from       The address of the redeemer
+     * @param from       The address of the issuer
      * @param amount     The amount of tokens to redeem
      * @param validUntil The timestamp until which the redeem is valid
      * @param validAfter  The timestamp from which the redeem is valid
-     * @param nonce      A unique number to prevent replay attacks
-     * @param signature  The signature of the redeem request
+     * @param salt      A unique number to prevent replay attacks
+     * @param signature  The signature of the IOU
      */
     function redeem(
         address from,
         uint256 amount,
         uint48 validUntil,
         uint48 validAfter,
-        uint256 nonce,
+        uint256 salt,
         bytes calldata signature
     ) public {
         uint48 currentTime = uint48(block.timestamp);
-        require(currentTime >= validAfter, "TokenIOU: expired or not due");
-        require(currentTime < validUntil, "TokenIOU: expired or not due");
+        require(
+            currentTime >= validAfter && currentTime < validUntil,
+            "ERC20IOU: expired or not valid yet"
+        );
 
         bytes32 redeemHash = keccak256(
             abi.encodePacked(
                 "\x19Ethereum Signed Message:\n32",
-                getHash(from, amount, validUntil, validAfter, nonce)
+                getHash(from, amount, validUntil, validAfter, salt)
             )
         );
 
-        require(redeemed[redeemHash] == 0, "TokenIOU: Already redeemed");
+        require(redeemed[redeemHash] == 0, "ERC20IOU: already redeemed");
 
         // check the sender's signature
-        address to = msg.sender;
 
         // check if the msg.sender is a smart contract
-        if (_contractExists(to)) {
+        if (_contractExists(msg.sender)) {
             // check ownership of the contract
-            IERC1271 account = IERC1271(to);
+            IERC1271 account = IERC1271(msg.sender);
 
             require(
                 account.isValidSignature(redeemHash, signature) == 0x1626ba7e,
-                "TokenIOU: Invalid signature"
+                "ERC20IOU: invalid signature"
             );
         } else {
             // check the signature of the sender
             require(
-                _recoverSigner(redeemHash, signature) == to,
-                "TokenIOU: Invalid signature"
+                _recoverSigner(redeemHash, signature) == msg.sender,
+                "ERC20IOU: invalid signature"
             );
         }
 
-        require(
-            token.transferFrom(from, msg.sender, amount),
-            "TokenIOU: Transfer failed"
-        );
+        token.transferFrom(from, msg.sender, amount);
 
         redeemed[redeemHash] = currentTime;
 
-        emit Redeem(from, to, amount);
+        emit Redeem(from, msg.sender, amount);
     }
 
     // ************************
