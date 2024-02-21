@@ -9,7 +9,7 @@ typechain
 typechain-types
 
 # Hardhat files
-cache
+# cache
 *.dbg.json
 # artifacts
 
