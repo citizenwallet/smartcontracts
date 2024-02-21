@@ -39,7 +39,8 @@ CW_ACCOUNT_CONTRACTS=('account,Account' \
 
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \
-        'profile,Profile')
+        'profile,Profile' \
+        'erc20IOU,ERC20IOU')
 
 CW_STD_CONTRACTS=('erc20,ERC20' \
         'erc721,ERC721' \
