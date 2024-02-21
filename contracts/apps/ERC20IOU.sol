@@ -89,9 +89,9 @@ contract ERC20IOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
         require(redeemed[redeemHash] == 0, "ERC20IOU: already redeemed");
 
-        // check the sender's signature
+        // check the issuer's signature
 
-        // check if the msg.sender is a smart contract
+        // check if the issuer is a smart contract
         if (_contractExists(from)) {
             // check ownership of the contract
             IERC1271 account = IERC1271(from);
@@ -101,7 +101,7 @@ contract ERC20IOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
                 "ERC20IOU: invalid signature"
             );
         } else {
-            // check the signature of the sender
+            // check the signature of the issuer
             require(
                 _recoverSigner(redeemHash, signature) == from,
                 "ERC20IOU: invalid signature"
