@@ -10,7 +10,8 @@ typechain-types
 
 # Hardhat files
 cache
-artifacts
+*.dbg.json
+# artifacts
 
 # https://dart.dev/guides/libraries/private-files
 # Created by `dart pub`
