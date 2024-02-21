@@ -91,7 +91,18 @@ describe("ERC20IOU", function () {
 
     await token.connect(friend2).approve(tokeniou.address, 1);
 
-    const signature = await friend1.signMessage(ethers.utils.arrayify(hash));
+    const signature = await friend2.signMessage(ethers.utils.arrayify(hash));
+
+    console.log(
+      [
+        friend2.address,
+        ethers.utils.hexValue(1),
+        ethers.utils.hexValue(validUntil),
+        ethers.utils.hexValue(validAfter),
+        ethers.utils.hexValue(0),
+        signature,
+      ].join("|")
+    );
 
     return {
       tokeniou,
@@ -182,13 +193,13 @@ describe("ERC20IOU", function () {
     });
 
     it("Should not allow someone to redeem with someone else's signature", async function () {
-      const { tokeniou, friend2, validUntil, validAfter, signature } =
+      const { tokeniou, friend1, validUntil, validAfter, signature } =
         await loadFixture(redeemFixture);
 
       await expect(
         tokeniou
-          .connect(friend2)
-          .redeem(friend2.address, 1, validUntil, validAfter, 0, signature)
+          .connect(friend1)
+          .redeem(friend1.address, 1, validUntil, validAfter, 0, signature)
       ).to.be.revertedWith("ERC20IOU: invalid signature");
     });
 
