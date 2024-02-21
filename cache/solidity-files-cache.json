@@ -2895,8 +2895,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/ERC20IOU.sol": {
-      "lastModificationDate": 1708525293163,
-      "contentHash": "9d7f49080f7551049b39cbde57e1aca1",
+      "lastModificationDate": 1708536344729,
+      "contentHash": "eef71e69f3e9134e01ca6c073eb40a08",
       "sourceName": "contracts/apps/ERC20IOU.sol",
       "solcConfig": {
         "version": "0.8.20",
