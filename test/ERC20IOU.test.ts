@@ -93,17 +93,6 @@ describe("ERC20IOU", function () {
 
     const signature = await friend2.signMessage(ethers.utils.arrayify(hash));
 
-    console.log(
-      [
-        friend2.address,
-        ethers.utils.hexValue(1),
-        ethers.utils.hexValue(validUntil),
-        ethers.utils.hexValue(validAfter),
-        ethers.utils.hexValue(0),
-        signature,
-      ].join("|")
-    );
-
     return {
       tokeniou,
       tokeniou2,
