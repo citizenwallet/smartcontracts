@@ -45,8 +45,8 @@ describe("SimpleFaucet", function () {
       }
     );
 
-    await token.mint(singleRedeemFaucet.address, 100, "hello");
-    await token.mint(intervalRedeemFaucet.address, 100, "hello");
+    await token.mint(singleRedeemFaucet.address, 20, "hello");
+    await token.mint(intervalRedeemFaucet.address, 40, "hello");
 
     const network = await ethers.provider.getNetwork();
 
@@ -122,7 +122,6 @@ describe("SimpleFaucet", function () {
       expect(await token.balanceOf(friend2.address)).to.equal(0);
 
       await intervalRedeemFaucet.connect(friend1).redeem();
-
       await intervalRedeemFaucet.connect(friend2).redeem();
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
@@ -134,7 +133,6 @@ describe("SimpleFaucet", function () {
         await loadFixture(deployOnboardingFaucetFixture);
 
       await intervalRedeemFaucet.connect(friend1).redeem();
-
       await intervalRedeemFaucet.connect(friend2).redeem();
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
@@ -163,6 +161,31 @@ describe("SimpleFaucet", function () {
 
       await intervalRedeemFaucet.connect(friend1).redeem();
       await intervalRedeemFaucet.connect(friend2).redeem();
+    });
+
+    it("Should not allow redeeming if there are no more tokens", async function () {
+      const { friend1, friend2, token, intervalRedeemFaucet, redeemInterval } =
+        await loadFixture(deployOnboardingFaucetFixture);
+
+      await intervalRedeemFaucet.connect(friend1).redeem();
+      await intervalRedeemFaucet.connect(friend2).redeem();
+
+      expect(await token.balanceOf(friend1.address)).to.equal(10);
+      expect(await token.balanceOf(friend2.address)).to.equal(10);
+
+      await time.increase(redeemInterval);
+
+      await intervalRedeemFaucet.connect(friend1).redeem();
+      await intervalRedeemFaucet.connect(friend2).redeem();
+
+      await time.increase(redeemInterval);
+
+      await expect(
+        intervalRedeemFaucet.connect(friend1).redeem()
+      ).to.be.revertedWith("SimpleFaucet: insufficient balance");
+      await expect(
+        intervalRedeemFaucet.connect(friend2).redeem()
+      ).to.be.revertedWith("SimpleFaucet: insufficient balance");
     });
   });
 });
