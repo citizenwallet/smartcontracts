@@ -7,11 +7,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
-import "@openzeppelin/contracts/interfaces/IERC1271.sol";
-
 /**
  * @title RedeemCodeFaucet
- * @dev A simple faucet contract that allows users to redeem tokens at a specified interval.
+ * @dev A contract that allows users to redeem codes
+ * It is upgradeable and has access control functionality.
  */
 contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
     bytes32 public constant ISSUER_ROLE = keccak256("ISSUER_ROLE");
@@ -20,13 +19,23 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
     uint48 public redeemInterval;
 
     /**
-     * @dev A mapping that keeps track of the last time each address redeemed from the faucet.
-     * The key of the mapping is the address of the sender, and the value is the timestamp (in seconds) when the redemption occurred.
+     * @dev Mapping to store the amount for each redeemable code.
      */
     mapping(bytes32 codeHash => uint256 amount) private amounts;
+
+    /**
+     * @dev Mapping to store the validity period of each redeemable code.
+     */
     mapping(bytes32 codeHash => uint48 validUntil) private validity;
+
+    /**
+     * @dev Mapping to store the time when each redeemable code was redeemed.
+     */
     mapping(bytes32 codeHash => uint48 time) public redeemed;
 
+    /**
+     * @dev Mapping to store the time when each address redeemed from the faucet.
+     */
     mapping(address sender => uint48 time) public lastRedeem;
 
     function initialize(IERC20Upgradeable _token, uint48 _redeemInterval, address issuer) public initializer {
@@ -37,6 +46,12 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
         _setupRole(ISSUER_ROLE, issuer);
     }
 
+    /**
+     * @dev Calculates the hash value for a given address and code.
+     * @param from The address of the sender.
+     * @param code The code to be hashed.
+     * @return The calculated hash value.
+     */
     function _getHash(
         address from,
         uint256 code
@@ -52,6 +67,17 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
             );
     }
 
+    /**
+     * @dev Adds a redeem code to the faucet.
+     * @param code The redeem code to add.
+     * @param amount The amount associated with the redeem code.
+     * @param validUntil The expiration timestamp for the redeem code.
+     * Requirements:
+     * - `code` cannot be zero.
+     * - `amount` must be greater than zero.
+     * - `validUntil` must be in the future.
+     * - The redeem code must not have been already redeemed.
+     */
     function addRedeemCode(uint256 code, uint256 amount, uint48 validUntil) public onlyRole(ISSUER_ROLE) {
         require(
             code != 0,
@@ -86,6 +112,16 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
     }
 
 
+    /**
+     * @dev Allows an address to redeem a code and receive tokens from the faucet.
+     * @param issuer The address that issued the code.
+     * @param code The code to redeem.
+     * Requirements:
+     * - The redeem interval must have passed since the last redemption by the caller.
+     * - The code must not have been previously redeemed.
+     * - The code must not have expired.
+     * - The faucet must have sufficient balance of tokens.
+     */
     function redeem(address issuer, uint256 code) public {
         uint48 currentTime = uint48(block.timestamp);
 
