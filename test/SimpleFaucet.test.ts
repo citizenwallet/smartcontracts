@@ -2,7 +2,6 @@ import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 
-// sould bound ERC721 with tokeniou metadata uri
 describe("SimpleFaucet", function () {
   async function deployOnboardingFaucetFixture() {
     const [owner, friend1, friend2] = await ethers.getSigners();
