@@ -17,6 +17,7 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
 
     IERC20Upgradeable public token;
     uint48 public redeemInterval;
+    address private issuer;
 
     /**
      * @dev Mapping to store the amount for each redeemable code.
@@ -38,12 +39,13 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
      */
     mapping(address sender => uint48 time) public lastRedeem;
 
-    function initialize(IERC20Upgradeable _token, uint48 _redeemInterval, address issuer) public initializer {
+    function initialize(IERC20Upgradeable _token, uint48 _redeemInterval, address _issuer) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         token = _token;
         redeemInterval = _redeemInterval;
-        _setupRole(ISSUER_ROLE, issuer);
+        issuer = _issuer;
+        _setupRole(ISSUER_ROLE, _issuer);
     }
 
     /**
@@ -114,7 +116,6 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
 
     /**
      * @dev Allows an address to redeem a code and receive tokens from the faucet.
-     * @param issuer The address that issued the code.
      * @param code The code to redeem.
      * Requirements:
      * - The redeem interval must have passed since the last redemption by the caller.
@@ -122,7 +123,7 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
      * - The code must not have expired.
      * - The faucet must have sufficient balance of tokens.
      */
-    function redeem(address issuer, uint256 code) public {
+    function redeem(uint256 code) public {
         uint48 currentTime = uint48(block.timestamp);
 
         // stop a single address from redeeming too often
@@ -157,6 +158,15 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
 
         redeemed[codeHash] = currentTime;
         lastRedeem[msg.sender] = currentTime;
+    }
+
+    function grantRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) {
+        require(
+            role != ISSUER_ROLE,
+            "AccessControl: cannot grant issuer role"
+        );
+
+        _grantRole(role, account);
     }
 
     function _authorizeUpgrade(

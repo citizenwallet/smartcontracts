@@ -92,7 +92,7 @@ describe("RedeemCodeFaucet", function () {
         .connect(issuer)
         .addRedeemCode(code, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(issuer.address, code);
+      await redeemCodeFaucet.connect(friend1).redeem(code);
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
     });
@@ -115,14 +115,14 @@ describe("RedeemCodeFaucet", function () {
         .connect(issuer)
         .addRedeemCode(code, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(issuer.address, code);
+      await redeemCodeFaucet.connect(friend1).redeem(code);
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
 
       await time.increase(redeemInterval);
 
       await expect(
-        redeemCodeFaucet.connect(friend1).redeem(issuer.address, code)
+        redeemCodeFaucet.connect(friend1).redeem(code)
       ).to.be.revertedWith("RedeemCodeFaucet: code already redeemed");
     });
 
@@ -138,12 +138,12 @@ describe("RedeemCodeFaucet", function () {
         .connect(issuer)
         .addRedeemCode(code, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(issuer.address, code);
+      await redeemCodeFaucet.connect(friend1).redeem(code);
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
 
       await expect(
-        redeemCodeFaucet.connect(friend1).redeem(issuer.address, code)
+        redeemCodeFaucet.connect(friend1).redeem(code)
       ).to.be.revertedWith("RedeemCodeFaucet: redeem interval not passed");
     });
 
@@ -165,7 +165,7 @@ describe("RedeemCodeFaucet", function () {
         .connect(issuer)
         .addRedeemCode(code, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(issuer.address, code);
+      await redeemCodeFaucet.connect(friend1).redeem(code);
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
 
@@ -177,7 +177,7 @@ describe("RedeemCodeFaucet", function () {
         .connect(issuer)
         .addRedeemCode(code2, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(issuer.address, code2);
+      await redeemCodeFaucet.connect(friend1).redeem(code2);
 
       await time.increase(redeemInterval);
 
@@ -188,7 +188,7 @@ describe("RedeemCodeFaucet", function () {
         .addRedeemCode(code3, 10, current + 100);
 
       await expect(
-        redeemCodeFaucet.connect(friend1).redeem(issuer.address, code3)
+        redeemCodeFaucet.connect(friend1).redeem(code3)
       ).to.be.revertedWith("RedeemCodeFaucet: insufficient balance");
     });
   });
