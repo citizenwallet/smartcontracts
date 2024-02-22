@@ -100,6 +100,8 @@ contract Profile is
         uint256 firstTokenId,
         uint256 batchSize
     ) internal pure override {
+        (firstTokenId);
+        (batchSize);
         require(
             from == address(0) || to == address(0),
             "This a Soulbound token. It cannot be transferred. It can only be burned by the token owner."

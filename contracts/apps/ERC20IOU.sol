@@ -12,8 +12,6 @@ contract ERC20IOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     IERC20Upgradeable public token;
 
     /// only a single redeem per hash
-    ///
-    /// allows us to check which username was already reserved by a profile
     mapping(bytes32 redeemHash => uint48 time) public redeemed;
 
     // Redeem event
@@ -208,5 +206,7 @@ contract ERC20IOU is Initializable, OwnableUpgradeable, UUPSUpgradeable {
 
     function _authorizeUpgrade(
         address newImplementation
-    ) internal override onlyOwner {}
+    ) internal view override onlyOwner {
+        (newImplementation);
+    }
 }

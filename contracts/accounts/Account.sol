@@ -342,6 +342,7 @@ contract Account is
 
     function migrateState(address oldImplementation) internal onlyInitializing {
         // check that we are allowed to migrate
+        (oldImplementation);
 
         require(
             _upgradedTo[_getImplementation()] == false,
