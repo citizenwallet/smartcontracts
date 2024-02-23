@@ -91,6 +91,43 @@ describe("RedeemCodeFaucet", function () {
     });
   });
 
+  describe("Withdraw", function () {
+    it("Should allow codeCreator to withdraw", async function () {
+      const { redeemCodeFaucet, token, codeCreator } = await loadFixture(
+        deployOnboardingFaucetFixture
+      );
+
+      expect(await token.balanceOf(codeCreator.address)).to.equal(0);
+
+      const faucetBalance = await token.balanceOf(redeemCodeFaucet.address);
+
+      await redeemCodeFaucet.connect(codeCreator).withdraw();
+
+      expect(await token.balanceOf(codeCreator.address)).to.equal(
+        faucetBalance
+      );
+
+      expect(
+        await redeemCodeFaucet.hasRole(
+          await redeemCodeFaucet.REDEEM_CODE_CREATOR_ROLE(),
+          codeCreator.address
+        )
+      ).to.equal(true);
+    });
+
+    it("Should only allow codeCreator to withdraw", async function () {
+      const { redeemCodeFaucet, owner } = await loadFixture(
+        deployOnboardingFaucetFixture
+      );
+
+      await expect(
+        redeemCodeFaucet.connect(owner).withdraw()
+      ).to.be.revertedWith(
+        `AccessControl: account ${owner.address.toLowerCase()} is missing role ${await redeemCodeFaucet.REDEEM_CODE_CREATOR_ROLE()}`
+      );
+    });
+  });
+
   describe("Redeem", async function () {
     it("Should generate matching local hash", async function () {
       const { friend1, token, redeemCodeFaucet, network, codeCreator } =

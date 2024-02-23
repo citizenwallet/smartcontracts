@@ -4,7 +4,7 @@ import { ethers, upgrades } from "hardhat";
 
 describe("SimpleFaucet", function () {
   async function deployOnboardingFaucetFixture() {
-    const [owner, friend1, friend2] = await ethers.getSigners();
+    const [owner, redeemAdmin, friend1, friend2] = await ethers.getSigners();
 
     const TokenContract = await ethers.getContractFactory(
       "UpgradeableBurnableCommunityToken",
@@ -26,7 +26,7 @@ describe("SimpleFaucet", function () {
     );
     const singleRedeemFaucet = await upgrades.deployProxy(
       OnboardingFaucetContract,
-      [token.address, 10, 0],
+      [token.address, 10, 0, redeemAdmin.address],
       {
         kind: "uups",
         initializer: "initialize",
@@ -37,7 +37,7 @@ describe("SimpleFaucet", function () {
 
     const intervalRedeemFaucet = await upgrades.deployProxy(
       OnboardingFaucetContract,
-      [token.address, 10, redeemInterval],
+      [token.address, 10, redeemInterval, redeemAdmin.address],
       {
         kind: "uups",
         initializer: "initialize",
@@ -61,6 +61,7 @@ describe("SimpleFaucet", function () {
       owner,
       friend1,
       friend2,
+      redeemAdmin,
     };
   }
 
@@ -71,6 +72,43 @@ describe("SimpleFaucet", function () {
 
       expect(await singleRedeemFaucet.owner()).to.equal(owner.address);
       expect(await intervalRedeemFaucet.owner()).to.equal(owner.address);
+    });
+  });
+
+  describe("Withdraw", function () {
+    it("Should allow codeCreator to withdraw", async function () {
+      const { singleRedeemFaucet, token, redeemAdmin } = await loadFixture(
+        deployOnboardingFaucetFixture
+      );
+
+      expect(await token.balanceOf(redeemAdmin.address)).to.equal(0);
+
+      const faucetBalance = await token.balanceOf(singleRedeemFaucet.address);
+
+      await singleRedeemFaucet.connect(redeemAdmin).withdraw();
+
+      expect(await token.balanceOf(redeemAdmin.address)).to.equal(
+        faucetBalance
+      );
+
+      expect(
+        await singleRedeemFaucet.hasRole(
+          await singleRedeemFaucet.REDEEM_ADMIN_ROLE(),
+          redeemAdmin.address
+        )
+      ).to.equal(true);
+    });
+
+    it("Should only allow codeCreator to withdraw", async function () {
+      const { singleRedeemFaucet, owner } = await loadFixture(
+        deployOnboardingFaucetFixture
+      );
+
+      await expect(
+        singleRedeemFaucet.connect(owner).withdraw()
+      ).to.be.revertedWith(
+        `AccessControl: account ${owner.address.toLowerCase()} is missing role ${await singleRedeemFaucet.REDEEM_ADMIN_ROLE()}`
+      );
     });
   });
 

@@ -4,16 +4,20 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 
 /**
  * @title SimpleFaucet
  * @dev A simple faucet contract that allows users to redeem tokens at a specified interval.
  */
-contract SimpleFaucet is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
+    bytes32 public constant REDEEM_ADMIN_ROLE = keccak256("REDEEM_ADMIN_ROLE");
+
     IERC20Upgradeable public token;
     uint256 public amount;
     uint48 public redeemInterval;
+    address public redeemAdmin;
 
     /**
      * @dev A mapping that keeps track of the last time each address redeemed from the faucet.
@@ -21,12 +25,14 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, UUPSUpgradeable {
      */
     mapping(address receiver => uint48 time) public redeemed;
 
-    function initialize(IERC20Upgradeable _token, uint256 _amount, uint48 _redeemInterval) public initializer {
+    function initialize(IERC20Upgradeable _token, uint256 _amount, uint48 _redeemInterval, address _redeemAdmin) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         token = _token;
         amount = _amount;
         redeemInterval = _redeemInterval;
+        redeemAdmin = _redeemAdmin;
+        _setupRole(REDEEM_ADMIN_ROLE, _redeemAdmin);
     }
 
     /**
@@ -64,6 +70,13 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         token.transfer(msg.sender, amount);
 
         redeemed[msg.sender] = currentTime;
+    }
+
+        /**
+     * @dev Allows the redeem code creator to withdraw all the tokens from the contract.
+     */
+    function withdraw() public onlyRole(REDEEM_ADMIN_ROLE) {
+        token.transfer(redeemAdmin, token.balanceOf(address(this)));
     }
 
     function _authorizeUpgrade(
