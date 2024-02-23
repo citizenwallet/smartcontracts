@@ -115,6 +115,7 @@ contract TokenEntryPoint is
         UserOperation[] calldata ops,
         address payable beneficiary // kept to make sure we keep the same function signature
     ) public nonReentrant {
+        (beneficiary);
         require(ops.length > 0, "AA42 needs at least one user operation");
 
         uint len = ops.length;

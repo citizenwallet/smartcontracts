@@ -40,7 +40,9 @@ CW_ACCOUNT_CONTRACTS=('account,Account' \
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \
         'profile,Profile' \
-        'erc20IOU,ERC20IOU')
+        'erc20IOU,ERC20IOU' \
+        'simpleFaucet,SimpleFaucet' \
+        'redeemCodeFaucet,RedeemCodeFaucet')
 
 CW_STD_CONTRACTS=('erc20,ERC20' \
         'erc721,ERC721' \

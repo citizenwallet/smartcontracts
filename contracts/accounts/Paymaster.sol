@@ -140,6 +140,8 @@ contract Paymaster is
         bytes32 userOpHash,
         uint256 maxCost
     ) public view returns (bytes memory context, uint256 validationData) {
+        (userOpHash);
+        (maxCost);
         (
             uint48 validUntil,
             uint48 validAfter,
