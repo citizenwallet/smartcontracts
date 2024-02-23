@@ -3,6 +3,18 @@ import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
 import { getRandomNumber } from "../scripts/functions/randomNumber";
 
+const getHash = (
+  from: string,
+  code: number,
+  chainId: number,
+  contract: string
+) => {
+  return ethers.utils.solidityKeccak256(
+    ["address", "uint256", "uint256", "address"],
+    [from, code, chainId, contract]
+  );
+};
+
 describe("RedeemCodeFaucet", function () {
   async function deployOnboardingFaucetFixture() {
     const [owner, issuer, friend1, friend2] = await ethers.getSigners();
@@ -72,7 +84,7 @@ describe("RedeemCodeFaucet", function () {
       expect(await redeemCodeFaucet.owner()).to.equal(owner.address);
       expect(
         await redeemCodeFaucet.hasRole(
-          await redeemCodeFaucet.ISSUER_ROLE(),
+          await redeemCodeFaucet.REDEEM_CODE_CREATOR_ROLE(),
           issuer.address
         )
       ).to.equal(true);
@@ -80,17 +92,48 @@ describe("RedeemCodeFaucet", function () {
   });
 
   describe("Redeem", async function () {
-    it("Should allow redeeming", async function () {
-      const { friend1, token, current, redeemCodeFaucet, issuer } =
+    it("Should generate matching local hash", async function () {
+      const { friend1, token, current, redeemCodeFaucet, network, issuer } =
         await loadFixture(deployOnboardingFaucetFixture);
 
       expect(await token.balanceOf(friend1.address)).to.equal(0);
 
       const code = getRandomNumber(6);
 
+      const codeCreator = await redeemCodeFaucet.codeCreator();
+
+      const localHash = getHash(
+        codeCreator,
+        code,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
+      const codeHash = await redeemCodeFaucet.getHash(codeCreator, code);
+
+      expect(localHash).to.equal(codeHash);
+    });
+
+    it("Should allow redeeming", async function () {
+      const { friend1, token, current, redeemCodeFaucet, network, issuer } =
+        await loadFixture(deployOnboardingFaucetFixture);
+
+      expect(await token.balanceOf(friend1.address)).to.equal(0);
+
+      const code = getRandomNumber(6);
+
+      const codeCreator = await redeemCodeFaucet.codeCreator();
+
+      const codeHash = getHash(
+        codeCreator,
+        code,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
       await redeemCodeFaucet
         .connect(issuer)
-        .addRedeemCode(code, 10, current + 100);
+        .addRedeemCode(codeHash, 10, current + 100);
 
       await redeemCodeFaucet.connect(friend1).redeem(code);
 
@@ -105,15 +148,25 @@ describe("RedeemCodeFaucet", function () {
         current,
         redeemCodeFaucet,
         issuer,
+        network,
       } = await loadFixture(deployOnboardingFaucetFixture);
 
       expect(await token.balanceOf(friend1.address)).to.equal(0);
 
       const code = getRandomNumber(6);
 
+      const codeCreator = await redeemCodeFaucet.codeCreator();
+
+      const codeHash = getHash(
+        codeCreator,
+        code,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
       await redeemCodeFaucet
         .connect(issuer)
-        .addRedeemCode(code, 10, current + 100);
+        .addRedeemCode(codeHash, 10, current + 100);
 
       await redeemCodeFaucet.connect(friend1).redeem(code);
 
@@ -127,16 +180,25 @@ describe("RedeemCodeFaucet", function () {
     });
 
     it("Should not allow redeeming again immediately", async function () {
-      const { friend1, token, current, redeemCodeFaucet, issuer } =
+      const { friend1, token, current, redeemCodeFaucet, issuer, network } =
         await loadFixture(deployOnboardingFaucetFixture);
 
       expect(await token.balanceOf(friend1.address)).to.equal(0);
 
       const code = getRandomNumber(6);
 
+      const codeCreator = await redeemCodeFaucet.codeCreator();
+
+      const codeHash = getHash(
+        codeCreator,
+        code,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
       await redeemCodeFaucet
         .connect(issuer)
-        .addRedeemCode(code, 10, current + 100);
+        .addRedeemCode(codeHash, 10, current + 100);
 
       await redeemCodeFaucet.connect(friend1).redeem(code);
 
@@ -155,15 +217,25 @@ describe("RedeemCodeFaucet", function () {
         current,
         redeemCodeFaucet,
         issuer,
+        network,
       } = await loadFixture(deployOnboardingFaucetFixture);
 
       expect(await token.balanceOf(friend1.address)).to.equal(0);
 
       const code = getRandomNumber(6);
 
+      const codeCreator = await redeemCodeFaucet.codeCreator();
+
+      const codeHash = getHash(
+        codeCreator,
+        code,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
       await redeemCodeFaucet
         .connect(issuer)
-        .addRedeemCode(code, 10, current + 100);
+        .addRedeemCode(codeHash, 10, current + 100);
 
       await redeemCodeFaucet.connect(friend1).redeem(code);
 
@@ -173,9 +245,16 @@ describe("RedeemCodeFaucet", function () {
 
       const code2 = getRandomNumber(6);
 
+      const codeHash2 = getHash(
+        codeCreator,
+        code2,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
       await redeemCodeFaucet
         .connect(issuer)
-        .addRedeemCode(code2, 10, current + 100);
+        .addRedeemCode(codeHash2, 10, current + 100);
 
       await redeemCodeFaucet.connect(friend1).redeem(code2);
 
@@ -183,9 +262,16 @@ describe("RedeemCodeFaucet", function () {
 
       const code3 = getRandomNumber(6);
 
+      const codeHash3 = getHash(
+        codeCreator,
+        code3,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
       await redeemCodeFaucet
         .connect(issuer)
-        .addRedeemCode(code3, 10, current + 100);
+        .addRedeemCode(codeHash3, 10, current + 100);
 
       await expect(
         redeemCodeFaucet.connect(friend1).redeem(code3)

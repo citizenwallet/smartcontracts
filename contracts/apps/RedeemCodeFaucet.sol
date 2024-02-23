@@ -13,16 +13,16 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
  * It is upgradeable and has access control functionality.
  */
 contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
-    bytes32 public constant ISSUER_ROLE = keccak256("ISSUER_ROLE");
+    bytes32 public constant REDEEM_CODE_CREATOR_ROLE = keccak256("REDEEM_CODE_CREATOR_ROLE");
 
     IERC20Upgradeable public token;
     uint48 public redeemInterval;
-    address private issuer;
+    address public codeCreator;
 
     /**
-     * @dev Mapping to store the amount for each redeemable code.
+     * @dev Mapping to store the redeemableAmount for each redeemable code.
      */
-    mapping(bytes32 codeHash => uint256 amount) private amounts;
+    mapping(bytes32 codeHash => uint256 redeemableAmount) private redeemableAmounts;
 
     /**
      * @dev Mapping to store the validity period of each redeemable code.
@@ -39,29 +39,29 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
      */
     mapping(address sender => uint48 time) public lastRedeem;
 
-    function initialize(IERC20Upgradeable _token, uint48 _redeemInterval, address _issuer) public initializer {
+    function initialize(IERC20Upgradeable _token, uint48 _redeemInterval, address _codeCreator) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         token = _token;
         redeemInterval = _redeemInterval;
-        issuer = _issuer;
-        _setupRole(ISSUER_ROLE, _issuer);
+        codeCreator = _codeCreator;
+        _setupRole(REDEEM_CODE_CREATOR_ROLE, _codeCreator);
     }
 
     /**
      * @dev Calculates the hash value for a given address and code.
-     * @param from The address of the sender.
+     * @param _codeCreator The address of the code creator.
      * @param code The code to be hashed.
      * @return The calculated hash value.
      */
-    function _getHash(
-        address from,
+    function getHash(
+        address _codeCreator,
         uint256 code
-    ) internal view returns (bytes32) {
+    ) public view returns (bytes32) {
         return
             keccak256(
                 abi.encodePacked(
-                    from,
+                    _codeCreator,
                     code,
                     block.chainid,
                     address(this)
@@ -71,26 +71,19 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
 
     /**
      * @dev Adds a redeem code to the faucet.
-     * @param code The redeem code to add.
-     * @param amount The amount associated with the redeem code.
+     * @param codeHash The redeem code hash to add.
+     * @param redeemableAmount The redeemableAmount associated with the redeem code.
      * @param validUntil The expiration timestamp for the redeem code.
      * Requirements:
-     * - `code` cannot be zero.
-     * - `amount` must be greater than zero.
+     * - `redeemableAmount` must be greater than zero.
      * - `validUntil` must be in the future.
      * - The redeem code must not have been already redeemed.
      */
-    function addRedeemCode(uint256 code, uint256 amount, uint48 validUntil) public onlyRole(ISSUER_ROLE) {
+    function addRedeemCode(bytes32 codeHash, uint256 redeemableAmount, uint48 validUntil) public onlyRole(REDEEM_CODE_CREATOR_ROLE) {
         require(
-            code != 0,
-            "RedeemCodeFaucet: code cannot be zero"
+            redeemableAmount > 0,
+            "RedeemCodeFaucet: redeemableAmount must be greater than zero"
         );
-
-        require(
-            amount > 0,
-            "RedeemCodeFaucet: amount must be greater than zero"
-        );
-
 
         uint48 currentTime = uint48(block.timestamp);
 
@@ -99,17 +92,12 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
             "RedeemCodeFaucet: validUntil must be in the future"
         );
 
-        bytes32 codeHash = _getHash(
-                    msg.sender,
-                    code
-                );
-
         require(
             redeemed[codeHash] == 0,
             "RedeemCodeFaucet: already redeemed"
         );
 
-        amounts[codeHash] = amount;
+        redeemableAmounts[codeHash] = redeemableAmount;
         validity[codeHash] = validUntil;
     }
 
@@ -132,8 +120,8 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
             "RedeemCodeFaucet: redeem interval not passed"
         );
 
-        bytes32 codeHash = _getHash(
-                    issuer,
+        bytes32 codeHash = getHash(
+                    codeCreator,
                     code
                 );
 
@@ -148,22 +136,29 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
         );
 
         require(
-            token.balanceOf(address(this)) >= amounts[codeHash],
+            token.balanceOf(address(this)) >= redeemableAmounts[codeHash],
             "RedeemCodeFaucet: insufficient balance"
         );
 
-        uint256 amount = amounts[codeHash];
+        uint256 redeemableAmount = redeemableAmounts[codeHash];
 
-        token.transfer(msg.sender, amount);
+        token.transfer(msg.sender, redeemableAmount);
 
         redeemed[codeHash] = currentTime;
         lastRedeem[msg.sender] = currentTime;
     }
 
+    /**
+     * @dev Allows the redeem code creator to withdraw all the tokens from the contract.
+     */
+    function withdraw() public onlyRole(REDEEM_CODE_CREATOR_ROLE) {
+        token.transfer(codeCreator, token.balanceOf(address(this)));
+    }
+
     function grantRole(bytes32 role, address account) public virtual override onlyRole(getRoleAdmin(role)) {
         require(
-            role != ISSUER_ROLE,
-            "AccessControl: cannot grant issuer role"
+            role != REDEEM_CODE_CREATOR_ROLE,
+            "AccessControl: cannot grant codeCreator role"
         );
 
         _grantRole(role, account);
