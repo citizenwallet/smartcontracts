@@ -39,8 +39,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/Account.sol": {
-      "lastModificationDate": 1708525293159,
-      "contentHash": "6026f40cbe05de4303fed50fa6397c48",
+      "lastModificationDate": 1708682414929,
+      "contentHash": "0cd1db23e5c6b3b77f835174d50c7f8d",
       "sourceName": "contracts/accounts/Account.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -1161,7 +1161,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/AccountFactory.sol": {
-      "lastModificationDate": 1708525293159,
+      "lastModificationDate": 1708682414929,
       "contentHash": "ddd2167fdff5289cee4256e88846540f",
       "sourceName": "contracts/accounts/AccountFactory.sol",
       "solcConfig": {
@@ -1595,8 +1595,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/TokenEntryPoint.sol": {
-      "lastModificationDate": 1708525293159,
-      "contentHash": "bda370fe64fdd75e2336e46c96ba9161",
+      "lastModificationDate": 1708682414929,
+      "contentHash": "6e31a3ff5258f90f92b1e5939d4d58f9",
       "sourceName": "contracts/accounts/TokenEntryPoint.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -2694,8 +2694,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/Profile.sol": {
-      "lastModificationDate": 1708525293163,
-      "contentHash": "1aaa5979c5dc8110d77d6bb3af5bdc67",
+      "lastModificationDate": 1708682414933,
+      "contentHash": "de1c02ad75d404642c8b38e8c0ed25b6",
       "sourceName": "contracts/apps/Profile.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -2895,8 +2895,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/ERC20IOU.sol": {
-      "lastModificationDate": 1708536344729,
-      "contentHash": "eef71e69f3e9134e01ca6c073eb40a08",
+      "lastModificationDate": 1708682414929,
+      "contentHash": "7941d73c26b853353d690ac084055ce0",
       "sourceName": "contracts/apps/ERC20IOU.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3233,8 +3233,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/Paymaster.sol": {
-      "lastModificationDate": 1708525293159,
-      "contentHash": "942bb34c05e353c3d2b0200780b0c07f",
+      "lastModificationDate": 1708682414929,
+      "contentHash": "03d3308234778302eac9163ef067c4e0",
       "sourceName": "contracts/accounts/Paymaster.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3465,6 +3465,92 @@
       ],
       "artifacts": [
         "ERC721"
+      ]
+    },
+    "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/SimpleFaucet.sol": {
+      "lastModificationDate": 1708682414933,
+      "contentHash": "0da670f657343c801efb56fd9031019f",
+      "sourceName": "contracts/apps/SimpleFaucet.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SimpleFaucet"
+      ]
+    },
+    "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/RedeemCodeFaucet.sol": {
+      "lastModificationDate": 1708682414933,
+      "contentHash": "56f22dc89949d057efae836d17c0a4a7",
+      "sourceName": "contracts/apps/RedeemCodeFaucet.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "RedeemCodeFaucet"
       ]
     }
   }
