@@ -39,13 +39,14 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
      */
     mapping(address sender => uint48 time) public lastRedeem;
 
-    function initialize(IERC20Upgradeable _token, uint48 _redeemInterval, address _codeCreator) public initializer {
+    function initialize(address owner, IERC20Upgradeable _token, uint48 _redeemInterval, address _codeCreator) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         token = _token;
         redeemInterval = _redeemInterval;
         codeCreator = _codeCreator;
         _setupRole(REDEEM_CODE_CREATOR_ROLE, _codeCreator);
+        transferOwnership(owner);
     }
 
     /**

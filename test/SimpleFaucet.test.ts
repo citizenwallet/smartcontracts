@@ -21,27 +21,54 @@ describe("SimpleFaucet", function () {
       }
     );
 
-    const OnboardingFaucetContract = await ethers.getContractFactory(
-      "SimpleFaucet"
+    const FaucetFactoryContract = await ethers.getContractFactory(
+      "FaucetFactory"
     );
-    const singleRedeemFaucet = await upgrades.deployProxy(
-      OnboardingFaucetContract,
-      [token.address, 10, 0, redeemAdmin.address],
-      {
-        kind: "uups",
-        initializer: "initialize",
-      }
+
+    const faucetFactory = await FaucetFactoryContract.deploy();
+
+    await faucetFactory.createSimpleFaucet(
+      owner.address,
+      0n,
+      token.address,
+      10,
+      0,
+      redeemAdmin.address
+    );
+
+    const singleRedeemFaucet = await ethers.getContractAt(
+      "SimpleFaucet",
+      await faucetFactory.getSimpleFaucetAddress(
+        owner.address,
+        0n,
+        token.address,
+        10,
+        0,
+        redeemAdmin.address
+      )
     );
 
     const redeemInterval = 10;
 
-    const intervalRedeemFaucet = await upgrades.deployProxy(
-      OnboardingFaucetContract,
-      [token.address, 10, redeemInterval, redeemAdmin.address],
-      {
-        kind: "uups",
-        initializer: "initialize",
-      }
+    await faucetFactory.createSimpleFaucet(
+      owner.address,
+      1n,
+      token.address,
+      10,
+      redeemInterval,
+      redeemAdmin.address
+    );
+
+    const intervalRedeemFaucet = await ethers.getContractAt(
+      "SimpleFaucet",
+      await faucetFactory.getSimpleFaucetAddress(
+        owner.address,
+        1n,
+        token.address,
+        10,
+        redeemInterval,
+        redeemAdmin.address
+      )
     );
 
     await token.mint(singleRedeemFaucet.address, 20, "hello");

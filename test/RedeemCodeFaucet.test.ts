@@ -34,18 +34,31 @@ describe("RedeemCodeFaucet", function () {
       }
     );
 
+    const FaucetFactoryContract = await ethers.getContractFactory(
+      "FaucetFactory"
+    );
+
+    const faucetFactory = await FaucetFactoryContract.deploy();
+
     const redeemInterval = 10;
 
-    const OnboardingFaucetContract = await ethers.getContractFactory(
-      "RedeemCodeFaucet"
+    await faucetFactory.createRedeemCodeFaucet(
+      owner.address,
+      0n,
+      token.address,
+      redeemInterval,
+      codeCreator.address
     );
-    const redeemCodeFaucet = await upgrades.deployProxy(
-      OnboardingFaucetContract,
-      [token.address, redeemInterval, codeCreator.address],
-      {
-        kind: "uups",
-        initializer: "initialize",
-      }
+
+    const redeemCodeFaucet = await ethers.getContractAt(
+      "RedeemCodeFaucet",
+      await faucetFactory.getRedeemCodeFaucetAddress(
+        owner.address,
+        0n,
+        token.address,
+        redeemInterval,
+        codeCreator.address
+      )
     );
 
     await token.mint(redeemCodeFaucet.address, 20, "hello");

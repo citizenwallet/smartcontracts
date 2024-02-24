@@ -25,7 +25,7 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
      */
     mapping(address receiver => uint48 time) public redeemed;
 
-    function initialize(IERC20Upgradeable _token, uint256 _amount, uint48 _redeemInterval, address _redeemAdmin) public initializer {
+    function initialize(address owner, IERC20Upgradeable _token, uint256 _amount, uint48 _redeemInterval, address _redeemAdmin) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         token = _token;
@@ -33,6 +33,7 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
         redeemInterval = _redeemInterval;
         redeemAdmin = _redeemAdmin;
         _setupRole(REDEEM_ADMIN_ROLE, _redeemAdmin);
+        transferOwnership(owner);
     }
 
     /**
