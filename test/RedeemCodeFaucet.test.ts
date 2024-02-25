@@ -40,13 +40,13 @@ describe("RedeemCodeFaucet", function () {
 
     const faucetFactory = await FaucetFactoryContract.deploy();
 
-    const redeemInterval = 10;
+    const callInterval = 10;
 
     await faucetFactory.createRedeemCodeFaucet(
       owner.address,
       0n,
       token.address,
-      redeemInterval,
+      callInterval,
       codeCreator.address
     );
 
@@ -56,7 +56,7 @@ describe("RedeemCodeFaucet", function () {
         owner.address,
         0n,
         token.address,
-        redeemInterval,
+        callInterval,
         codeCreator.address
       )
     );
@@ -71,7 +71,7 @@ describe("RedeemCodeFaucet", function () {
       network,
       current,
       redeemCodeFaucet,
-      redeemInterval,
+      callInterval,
       token,
       owner,
       codeCreator,
@@ -190,7 +190,11 @@ describe("RedeemCodeFaucet", function () {
         .connect(codeCreator)
         .addRedeemCode(codeHash, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(code);
+      const tx = await redeemCodeFaucet.connect(friend1).redeem(code);
+      const receipt = await tx.wait();
+
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.not.be
+        .undefined;
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
     });
@@ -199,7 +203,7 @@ describe("RedeemCodeFaucet", function () {
       const {
         friend1,
         token,
-        redeemInterval,
+        callInterval,
         current,
         redeemCodeFaucet,
         codeCreator,
@@ -221,11 +225,15 @@ describe("RedeemCodeFaucet", function () {
         .connect(codeCreator)
         .addRedeemCode(codeHash, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(code);
+      const tx = await redeemCodeFaucet.connect(friend1).redeem(code);
+      const receipt = await tx.wait();
+
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.not.be
+        .undefined;
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
 
-      await time.increase(redeemInterval);
+      await time.increase(callInterval);
 
       await expect(
         redeemCodeFaucet.connect(friend1).redeem(code)
@@ -257,20 +265,88 @@ describe("RedeemCodeFaucet", function () {
         .connect(codeCreator)
         .addRedeemCode(codeHash, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(code);
+      let tx = await redeemCodeFaucet.connect(friend1).redeem(code);
+      let receipt = await tx.wait();
+
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.not.be
+        .undefined;
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
 
-      await expect(
-        redeemCodeFaucet.connect(friend1).redeem(code)
-      ).to.be.revertedWith("RedeemCodeFaucet: redeem interval not passed");
+      tx = await redeemCodeFaucet.connect(friend1).redeem(code);
+      receipt = await tx.wait();
+
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.be
+        .undefined;
+    });
+
+    it("Should not allow calling the redeem function too often", async function () {
+      const {
+        friend1,
+        token,
+        current,
+        redeemCodeFaucet,
+        codeCreator,
+        network,
+        callInterval,
+      } = await loadFixture(deployOnboardingFaucetFixture);
+
+      expect(await token.balanceOf(friend1.address)).to.equal(0);
+
+      const code = getRandomNumber(6);
+
+      const codeHash = getHash(
+        codeCreator.address,
+        code,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
+      await redeemCodeFaucet
+        .connect(codeCreator)
+        .addRedeemCode(codeHash, 10, current + 100);
+
+      let tx = await redeemCodeFaucet.connect(friend1).redeem(code);
+      let receipt = await tx.wait();
+
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.not.be
+        .undefined;
+
+      expect(await token.balanceOf(friend1.address)).to.equal(10);
+
+      const code2 = getRandomNumber(6);
+
+      const codeHash2 = getHash(
+        codeCreator.address,
+        code2,
+        network.chainId,
+        redeemCodeFaucet.address
+      );
+
+      await redeemCodeFaucet
+        .connect(codeCreator)
+        .addRedeemCode(codeHash2, 10, current + 100);
+
+      tx = await redeemCodeFaucet.connect(friend1).redeem(code2);
+      receipt = await tx.wait();
+
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.be
+        .undefined;
+
+      await time.increase(callInterval);
+
+      tx = await redeemCodeFaucet.connect(friend1).redeem(code2);
+      receipt = await tx.wait();
+
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.not.be
+        .undefined;
     });
 
     it("Should fail when insufficient balance", async function () {
       const {
         friend1,
         token,
-        redeemInterval,
+        callInterval,
         current,
         redeemCodeFaucet,
         codeCreator,
@@ -292,11 +368,15 @@ describe("RedeemCodeFaucet", function () {
         .connect(codeCreator)
         .addRedeemCode(codeHash, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(code);
+      let tx = await redeemCodeFaucet.connect(friend1).redeem(code);
+      let receipt = await tx.wait();
+
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.not.be
+        .undefined;
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
 
-      await time.increase(redeemInterval);
+      await time.increase(callInterval);
 
       const code2 = getRandomNumber(6);
 
@@ -311,9 +391,13 @@ describe("RedeemCodeFaucet", function () {
         .connect(codeCreator)
         .addRedeemCode(codeHash2, 10, current + 100);
 
-      await redeemCodeFaucet.connect(friend1).redeem(code2);
+      tx = await redeemCodeFaucet.connect(friend1).redeem(code2);
+      receipt = await tx.wait();
 
-      await time.increase(redeemInterval);
+      expect(receipt.events?.find((e) => e.event === "CodeRedeemed")).to.not.be
+        .undefined;
+
+      await time.increase(callInterval);
 
       const code3 = getRandomNumber(6);
 

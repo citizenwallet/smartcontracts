@@ -114,7 +114,22 @@ contract FaucetFactory {
         uint48 _redeemInterval, 
         address _codeCreator
     ) public returns (RedeemCodeFaucet ret) {
-        // ...
+       address addr = getRedeemCodeFaucetAddress(owner, salt, _token, _redeemInterval, _codeCreator);
+
+        emit RedeemCodeFaucetCreated(addr, address(_token), 0, _redeemInterval);
+
+        uint codeSize = addr.code.length;
+        if (codeSize > 0) {
+            return RedeemCodeFaucet(payable(addr));
+        }
+        ret = RedeemCodeFaucet(
+            payable(
+                new ERC1967Proxy{salt: bytes32(salt)}(
+                    address(redeemCodeFaucetImplementation),
+                    abi.encodeCall(RedeemCodeFaucet.initialize, (owner, _token, _redeemInterval, _codeCreator))
+                )
+            )
+        );
     }
 
     /**

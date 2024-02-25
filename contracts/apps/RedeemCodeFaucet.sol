@@ -16,8 +16,10 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
     bytes32 public constant REDEEM_CODE_CREATOR_ROLE = keccak256("REDEEM_CODE_CREATOR_ROLE");
 
     IERC20Upgradeable public token;
-    uint48 public redeemInterval;
+    uint48 public callInterval;
     address public codeCreator;
+
+    event CodeRedeemed(address indexed receiver, uint256 amount);
 
     /**
      * @dev Mapping to store the redeemableAmount for each redeemable code.
@@ -35,15 +37,20 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
     mapping(bytes32 codeHash => uint48 time) public redeemed;
 
     /**
-     * @dev Mapping to store the time when each address redeemed from the faucet.
+     * @dev Mapping to store the time when each address called to redeem from the faucet.
      */
-    mapping(address sender => uint48 time) public lastRedeem;
+    mapping(address sender => uint48 time) private lastCall;
 
-    function initialize(address owner, IERC20Upgradeable _token, uint48 _redeemInterval, address _codeCreator) public initializer {
+    /**
+     * @dev Mapping to store the cooldown time when an address is allowed to call redeem from the faucet again.
+     */
+    mapping(address sender => uint48 time) private redeemCooldown;
+
+    function initialize(address owner, IERC20Upgradeable _token, uint48 _callInterval, address _codeCreator) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         token = _token;
-        redeemInterval = _redeemInterval;
+        callInterval = _callInterval;
         codeCreator = _codeCreator;
         _setupRole(REDEEM_CODE_CREATOR_ROLE, _codeCreator);
         transferOwnership(owner);
@@ -115,11 +122,15 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
     function redeem(uint256 code) public {
         uint48 currentTime = uint48(block.timestamp);
 
-        // stop a single address from redeeming too often
-        require(
-            lastRedeem[msg.sender] + redeemInterval < currentTime,
-            "RedeemCodeFaucet: redeem interval not passed"
-        );
+        redeemCooldown[msg.sender] = callInterval;
+        uint48 previousCall = lastCall[msg.sender];
+        lastCall[msg.sender] = currentTime;
+    
+        // stop a single address from calling this function too often
+        if (previousCall + redeemCooldown[msg.sender] >= currentTime) {
+            redeemCooldown[msg.sender] += callInterval; // add a penalty to the cooldown
+            return;
+        }
 
         bytes32 codeHash = getHash(
                     codeCreator,
@@ -146,7 +157,8 @@ contract RedeemCodeFaucet is Initializable, OwnableUpgradeable, AccessControlUpg
         token.transfer(msg.sender, redeemableAmount);
 
         redeemed[codeHash] = currentTime;
-        lastRedeem[msg.sender] = currentTime;
+        
+        emit CodeRedeemed(msg.sender, redeemableAmount);
     }
 
     /**
