@@ -9,3 +9,4 @@ export 'contracts/apps/Profile.g.dart';
 export 'contracts/apps/ERC20IOU.g.dart';
 export 'contracts/apps/SimpleFaucet.g.dart';
 export 'contracts/apps/RedeemCodeFaucet.g.dart';
+export 'contracts/apps/FaucetFactory.g.dart';
