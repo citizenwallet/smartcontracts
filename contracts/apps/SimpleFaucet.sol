@@ -73,7 +73,7 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
         redeemed[msg.sender] = currentTime;
     }
 
-        /**
+    /**
      * @dev Allows the redeem code creator to withdraw all the tokens from the contract.
      */
     function withdraw() public onlyRole(REDEEM_ADMIN_ROLE) {

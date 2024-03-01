@@ -2,7 +2,6 @@ import "@nomicfoundation/hardhat-toolbox";
 import { ethers, upgrades, run } from "hardhat";
 import { terminal as term } from "terminal-kit";
 import { config } from "dotenv";
-import { contractExists } from "./functions/contracts";
 
 const networkName = process.env.HARDHAT_NETWORK || "";
 if (!networkName) {

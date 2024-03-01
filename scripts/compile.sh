@@ -35,7 +35,9 @@ CW_CONTRACT_EXT_PATH='contracts/external'
 CW_ACCOUNT_CONTRACTS=('account,Account' \ 
         'accfactory,AccountFactory' \
         'tokenEntryPoint,TokenEntryPoint' \
-        'paymaster,Paymaster')
+        'paymaster,Paymaster',
+        'voucher,Voucher' \
+        'voucherFactory,VoucherFactory')
 
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \
