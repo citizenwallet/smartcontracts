@@ -12,6 +12,7 @@
     "deploy:token": "ts-node scripts/selectNetwork.ts deploy-token",
     "deploy:profile": "ts-node scripts/selectNetwork.ts deploy-profile",
     "deploy:erc20-iou": "ts-node scripts/selectNetwork.ts deploy-erc20-iou",
+    "deploy:voucher-factory": "ts-node scripts/selectNetwork.ts deploy-voucher-factory",
     "deploy:faucet-factory": "ts-node scripts/selectNetwork.ts deploy-faucet-factory",
     "deploy:community": "ts-node scripts/selectNetwork.ts deploy-community",
     "upgrade:community-token": "ts-node scripts/selectNetwork.ts upgrade-community-token",
