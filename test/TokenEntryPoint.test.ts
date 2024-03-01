@@ -3,9 +3,9 @@ import "@nomicfoundation/hardhat-toolbox";
 import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { ethers, upgrades, network, artifacts } from "hardhat";
+import { ethers, upgrades } from "hardhat";
 import { config } from "dotenv";
-import { ContractFactory, BigNumber, BigNumberish, BytesLike } from "ethers";
+import { BigNumber, BigNumberish, BytesLike } from "ethers";
 
 interface IUserOp {
   sender: string;
@@ -255,7 +255,7 @@ describe("Account", function () {
       [[owner.address], "My Token", "MT"],
       {
         kind: "uups",
-        initializer: "initialize"
+        initializer: "initialize",
       }
     );
 
