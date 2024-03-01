@@ -98,7 +98,7 @@ const createUserOp = async ({
   // initCode
   if (seq.eq(ethers.constants.Zero)) {
     const accountCreationCode = voucherCreate.encodeFunctionData(
-      "createVoucher",
+      "claimVoucher",
       [owner, code]
     );
 
@@ -171,8 +171,6 @@ const getPaymasterAndData = async ({
 }: UserOpPaymasterData): Promise<string> => {
   // paymasterAndData
 
-  const current = await time.latest();
-
   const [signedHash, sValidUntil, sValidAfter] = hashData.split("|");
 
   const validUntil = ethers.BigNumber.from(sValidUntil);
@@ -209,7 +207,7 @@ const signUserOp = async (
 const accountExecuteABI = [
   "function execute(address to, uint256 value, bytes data)",
 ];
-const voucherCreateABI = ["function createVoucher(address, uint256)"];
+const voucherCreateABI = ["function claimVoucher(address, uint256)"];
 const accountUpgradeABI = ["function upgradeTo(address newImplementation)"];
 
 // An ABI can be fragments and does not have to include the entire interface.
@@ -348,28 +346,28 @@ describe("Voucher", function () {
 
     await voucherFactory
       .connect(friend1)
-      .createVoucher(friend1.address, ethers.BigNumber.from(123));
+      .claimVoucher(friend1.address, ethers.BigNumber.from(123));
 
     await voucherFactory
       .connect(friend2)
-      .createVoucher(friend2.address, ethers.BigNumber.from(456));
+      .claimVoucher(friend2.address, ethers.BigNumber.from(456));
 
-    const voucher1Hash = await voucherFactory.getHash(
+    const voucher1Hash = await voucherFactory.getCodeHash(
       ethers.BigNumber.from(123)
     );
 
     const voucher1 = await ethers.getContractAt(
       "Voucher",
-      await voucherFactory.getAddress(voucher1Hash)
+      await voucherFactory.getVoucherAddress(voucher1Hash)
     );
 
-    const voucher2Hash = await voucherFactory.getHash(
+    const voucher2Hash = await voucherFactory.getCodeHash(
       ethers.BigNumber.from(456)
     );
 
     const voucher2 = await ethers.getContractAt(
       "Voucher",
-      await voucherFactory.getAddress(voucher2Hash)
+      await voucherFactory.getVoucherAddress(voucher2Hash)
     );
 
     await entrypoint.connect(owner).depositTo(owner.address, {
@@ -474,9 +472,9 @@ describe("Voucher", function () {
 
       const code = ethers.BigNumber.from(888);
 
-      const codeHash1 = await voucherFactory.getHash(code);
+      const codeHash1 = await voucherFactory.getCodeHash(code);
 
-      const address = await voucherFactory.getAddress(codeHash1);
+      const address = await voucherFactory.getVoucherAddress(codeHash1);
 
       const accountAddress2 = await accountFactory.getAddress(
         friend2.address,
@@ -551,17 +549,17 @@ describe("Voucher", function () {
         deployAccountFactoryFixture
       );
 
-      const codeHash1 = await voucherFactory.getHash(
+      const codeHash1 = await voucherFactory.getCodeHash(
         ethers.BigNumber.from(999)
       );
 
       await voucherFactory
         .connect(friend2)
-        .createVoucher(friend2.address, ethers.BigNumber.from(999));
+        .claimVoucher(friend2.address, ethers.BigNumber.from(999));
 
       const voucher = await ethers.getContractAt(
         "Voucher",
-        await voucherFactory.getAddress(codeHash1)
+        await voucherFactory.getVoucherAddress(codeHash1)
       );
 
       expect(await voucher.owner()).to.equal(friend2.address);
@@ -582,20 +580,20 @@ describe("Voucher", function () {
     it("Should return the same address twice", async function () {
       const { voucherFactory } = await loadFixture(deployAccountFactoryFixture);
 
-      const codeHash1 = await voucherFactory.getHash(
+      const codeHash1 = await voucherFactory.getCodeHash(
         ethers.BigNumber.from(111)
       );
 
-      const codeHash2 = await voucherFactory.getHash(
+      const codeHash2 = await voucherFactory.getCodeHash(
         ethers.BigNumber.from(222)
       );
 
-      expect(await voucherFactory.getAddress(codeHash1)).to.equal(
-        await voucherFactory.getAddress(codeHash1)
+      expect(await voucherFactory.getVoucherAddress(codeHash1)).to.equal(
+        await voucherFactory.getVoucherAddress(codeHash1)
       );
 
-      expect(await voucherFactory.getAddress(codeHash1)).not.equal(
-        await voucherFactory.getAddress(codeHash2)
+      expect(await voucherFactory.getVoucherAddress(codeHash1)).not.equal(
+        await voucherFactory.getVoucherAddress(codeHash2)
       );
     });
 
@@ -604,16 +602,16 @@ describe("Voucher", function () {
         deployAccountFactoryFixture
       );
 
-      const codeHash1 = await voucherFactory.getHash(
+      const codeHash1 = await voucherFactory.getCodeHash(
         ethers.BigNumber.from(111)
       );
 
-      const codeHash2 = await voucherFactory.getHash(
+      const codeHash2 = await voucherFactory.getCodeHash(
         ethers.BigNumber.from(222)
       );
 
-      expect(await voucherFactory.getAddress(codeHash1)).not.equal(
-        await voucherFactory.getAddress(codeHash2)
+      expect(await voucherFactory.getVoucherAddress(codeHash1)).not.equal(
+        await voucherFactory.getVoucherAddress(codeHash2)
       );
     });
   });

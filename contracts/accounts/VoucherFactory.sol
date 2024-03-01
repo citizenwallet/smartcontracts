@@ -12,9 +12,7 @@ import "./interfaces/ITokenEntryPoint.sol";
 
 /**
  * @title VoucherFactory
- * @dev Contract for creating new accounts and calculating their counterfactual addresses.
- *
- * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/SimpleAccountFactory.sol
+ * @dev A factory contract that creates Voucher contracts.
  */
 contract VoucherFactory {
     Voucher public immutable voucherImplementation;
@@ -26,13 +24,13 @@ contract VoucherFactory {
     }
 
     /**
-     * @dev Calculates the hash value for a given address and code.
+     * @dev Calculates the hash value for a given code.
      * This function should only be used to test hash values.
      *
      * @param code The code to be hashed.
      * @return The calculated hash value.
      */
-    function getHash(
+    function getCodeHash(
         uint256 code
     ) public view returns (bytes32) {
         return
@@ -46,18 +44,18 @@ contract VoucherFactory {
     }
 
     /**
-     * create an account, and return its address.
-     * returns the address even if the account is already deployed.
-     * Note that during UserOperation execution, this method is called only if the account is not deployed.
-     * This method returns an existing account address so that entryPoint.getSenderAddress() would work even after account creation
+     * claims a voucher, and return its address.
+     * returns the address even if the voucher is already deployed.
+     * Note that during UserOperation execution, this method is called only if the voucher is not deployed.
+     * This method returns an existing voucher address so that entryPoint.getSenderAddress() would work even after voucher creation
      */
-    function createVoucher(
+    function claimVoucher(
         address owner,
         uint256 code
     ) public returns (Voucher ret) {
-        bytes32 codeHash = getHash(code);
+        bytes32 codeHash = getCodeHash(code);
 
-        address addr = getAddress(codeHash);
+        address addr = getVoucherAddress(codeHash);
 
         emit VoucherCreated(addr);
 
@@ -78,9 +76,9 @@ contract VoucherFactory {
     }
 
     /**
-     * calculate the counterfactual address of this account as it would be returned by createAccount()
+     * calculate the counterfactual address of this voucher as it would be returned by claimVoucher()
      */
-    function getAddress(
+    function getVoucherAddress(
         bytes32 codeHash
     ) public view returns (address) {
         return
