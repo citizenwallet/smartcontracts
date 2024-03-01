@@ -5,7 +5,7 @@ import 'package:web3dart/web3dart.dart' as _i1;
 import 'dart:typed_data' as _i2;
 
 final _contractAbi = _i1.ContractAbi.fromJson(
-  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"_entryPoint","type":"address"},{"internalType":"contract ITokenEntryPoint","name":"_tokenEntryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"voucher","type":"address"}],"name":"VoucherCreated","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"code","type":"uint256"}],"name":"createVoucher","outputs":[{"internalType":"contract Voucher","name":"ret","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes32","name":"codeHash","type":"bytes32"}],"name":"getAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"code","type":"uint256"}],"name":"getHash","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"voucherImplementation","outputs":[{"internalType":"contract Voucher","name":"","type":"address"}],"stateMutability":"view","type":"function"}]',
+  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"_entryPoint","type":"address"},{"internalType":"contract ITokenEntryPoint","name":"_tokenEntryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"voucher","type":"address"}],"name":"VoucherCreated","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"code","type":"uint256"}],"name":"claimVoucher","outputs":[{"internalType":"contract Voucher","name":"ret","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"code","type":"uint256"}],"name":"getCodeHash","outputs":[{"internalType":"bytes32","name":"","type":"bytes32"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes32","name":"codeHash","type":"bytes32"}],"name":"getVoucherAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"voucherImplementation","outputs":[{"internalType":"contract Voucher","name":"","type":"address"}],"stateMutability":"view","type":"function"}]',
   'VoucherFactory',
 );
 
@@ -26,14 +26,14 @@ class VoucherFactory extends _i1.GeneratedContract {
   /// The optional [transaction] parameter can be used to override parameters
   /// like the gas price, nonce and max gas. The `data` and `to` fields will be
   /// set by the contract.
-  Future<String> createVoucher(
+  Future<String> claimVoucher(
     _i1.EthereumAddress owner,
     BigInt code, {
     required _i1.Credentials credentials,
     _i1.Transaction? transaction,
   }) async {
     final function = self.abi.functions[1];
-    assert(checkSignature(function, '94daf2ab'));
+    assert(checkSignature(function, '1a431e14'));
     final params = [
       owner,
       code,
@@ -49,30 +49,12 @@ class VoucherFactory extends _i1.GeneratedContract {
   /// The optional [atBlock] parameter can be used to view historical data. When
   /// set, the function will be evaluated in the specified block. By default, the
   /// latest on-chain block will be used.
-  Future<_i1.EthereumAddress> getAddress(
-    _i2.Uint8List codeHash, {
-    _i1.BlockNum? atBlock,
-  }) async {
-    final function = self.abi.functions[2];
-    assert(checkSignature(function, '21f8a721'));
-    final params = [codeHash];
-    final response = await read(
-      function,
-      params,
-      atBlock,
-    );
-    return (response[0] as _i1.EthereumAddress);
-  }
-
-  /// The optional [atBlock] parameter can be used to view historical data. When
-  /// set, the function will be evaluated in the specified block. By default, the
-  /// latest on-chain block will be used.
-  Future<_i2.Uint8List> getHash(
+  Future<_i2.Uint8List> getCodeHash(
     BigInt code, {
     _i1.BlockNum? atBlock,
   }) async {
-    final function = self.abi.functions[3];
-    assert(checkSignature(function, '6b2fafa9'));
+    final function = self.abi.functions[2];
+    assert(checkSignature(function, 'e03fe177'));
     final params = [code];
     final response = await read(
       function,
@@ -80,6 +62,24 @@ class VoucherFactory extends _i1.GeneratedContract {
       atBlock,
     );
     return (response[0] as _i2.Uint8List);
+  }
+
+  /// The optional [atBlock] parameter can be used to view historical data. When
+  /// set, the function will be evaluated in the specified block. By default, the
+  /// latest on-chain block will be used.
+  Future<_i1.EthereumAddress> getVoucherAddress(
+    _i2.Uint8List codeHash, {
+    _i1.BlockNum? atBlock,
+  }) async {
+    final function = self.abi.functions[3];
+    assert(checkSignature(function, 'b94fafa1'));
+    final params = [codeHash];
+    final response = await read(
+      function,
+      params,
+      atBlock,
+    );
+    return (response[0] as _i1.EthereumAddress);
   }
 
   /// The optional [atBlock] parameter can be used to view historical data. When
