@@ -3685,8 +3685,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/VoucherFactory.sol": {
-      "lastModificationDate": 1709330948082,
-      "contentHash": "62e247c04283c17b21004cec9c51f4ac",
+      "lastModificationDate": 1709331490575,
+      "contentHash": "2a659e0571d72ce0d1e4a9ccd17c67bf",
       "sourceName": "contracts/accounts/VoucherFactory.sol",
       "solcConfig": {
         "version": "0.8.20",
