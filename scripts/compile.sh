@@ -146,12 +146,13 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
                 docker run -v $(pwd):/root --platform linux/amd64  ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
+                mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.txt"
                 echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;" >> "lib/accounts.dart"
                 echo "[.abi] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
                 echo "[.bin] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
 
                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
                 echo "[.go] $CW_CONTRACT_ACCOUNT_PATH/$file package $pkg ✅";
         done <<< "$contract"
     done
@@ -173,12 +174,13 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
                 docker run -v $(pwd):/root --platform linux/amd64 ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_APP_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
+                mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.txt"
                 echo "export '$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.g.dart';" >> "lib/apps.dart"
                 echo "[.abi] $CW_CONTRACT_APP_PATH/$file ✅";
                 echo "[.bin] $CW_CONTRACT_APP_PATH/$file ✅";
 
                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
                 echo "[.go] $CW_CONTRACT_APP_PATH/$file package $pkg ✅";
         done <<< "$contract"
     done
@@ -200,12 +202,13 @@ for contract in ${CW_STD_CONTRACTS[@]} ;
                 docker run -v $(pwd):/root --platform linux/amd64 ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_STD_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_STD_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
+                mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.txt"
                 echo "export '$CW_CONTRACT_DART_STD_OUTPUT_PATH/$file.g.dart';" >> "lib/standards.dart"
                 echo "[.abi] $CW_CONTRACT_STD_PATH/$file ✅";
                 echo "[.bin] $CW_CONTRACT_STD_PATH/$file ✅";
 
                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
                 echo "[.go] $CW_CONTRACT_STD_PATH/$file package $pkg ✅";
         done <<< "$contract"
     done
@@ -223,14 +226,14 @@ for contract in ${CW_EXTERNAL_CONTRACTS[@]} ;
 
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
 
-                cp "$CW_CONTRACT_EXT_PATH/$file.abi" "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.abi.json"
-                mv "$CW_CONTRACT_EXT_PATH/$pkg/$file.abi" "$CW_CONTRACT_EXT_PATH/$pkg/$file.abi.json"
+                cp "$CW_CONTRACT_EXT_PATH/$file.abi.json" "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.abi.json"
+                mv "$CW_CONTRACT_EXT_PATH/$pkg/$file.abi.json" "$CW_CONTRACT_EXT_PATH/$pkg/$file.abi.json"
                 echo "export '$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.g.dart';" >> "lib/external.dart"
                 echo "[.abi] $CW_CONTRACT_EXT_PATH/$file ✅";
                 echo "[.bin] $CW_CONTRACT_EXT_PATH/$file ✅";
 
                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_EXT_PATH/$file.txt" --abi="$CW_CONTRACT_EXT_PATH/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                abigen --bin="$CW_CONTRACT_EXT_PATH/$file.bin.txt" --abi="$CW_CONTRACT_EXT_PATH/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
                 echo "[.go] $CW_CONTRACT_EXT_PATH/$file package $pkg ✅";
         done <<< "$contract"
     done
