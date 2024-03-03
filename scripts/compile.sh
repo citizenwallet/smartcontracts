@@ -151,7 +151,7 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
                 echo "[.bin] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
 
                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
                 echo "[.go] $CW_CONTRACT_ACCOUNT_PATH/$file package $pkg ✅";
         done <<< "$contract"
     done
@@ -178,7 +178,7 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
                 echo "[.bin] $CW_CONTRACT_APP_PATH/$file ✅";
 
                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
                 echo "[.go] $CW_CONTRACT_APP_PATH/$file package $pkg ✅";
         done <<< "$contract"
     done
@@ -205,7 +205,7 @@ for contract in ${CW_STD_CONTRACTS[@]} ;
                 echo "[.bin] $CW_CONTRACT_STD_PATH/$file ✅";
 
                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                abigen --bin="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.txt" --abi="$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
                 echo "[.go] $CW_CONTRACT_STD_PATH/$file package $pkg ✅";
         done <<< "$contract"
     done
@@ -230,7 +230,7 @@ for contract in ${CW_EXTERNAL_CONTRACTS[@]} ;
                 echo "[.bin] $CW_CONTRACT_EXT_PATH/$file ✅";
 
                 mkdir $CW_CONTRACT_PKG_PATH/$pkg
-                abigen --bin="$CW_CONTRACT_EXT_PATH/$file.bin" --abi="$CW_CONTRACT_EXT_PATH/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
+                abigen --bin="$CW_CONTRACT_EXT_PATH/$file.txt" --abi="$CW_CONTRACT_EXT_PATH/$file.abi.json" --pkg="$pkg" --out="$CW_CONTRACT_PKG_PATH/$pkg/$file.go"
                 echo "[.go] $CW_CONTRACT_EXT_PATH/$file package $pkg ✅";
         done <<< "$contract"
     done
