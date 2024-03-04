@@ -147,8 +147,8 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
 
-                touch "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.js"
-                echo "module.exports = '$(cat $CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.js"
+                touch "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.js"
+                echo "module.exports = '$(cat $CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.js"
 
                 echo "export '$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;" >> "lib/accounts.dart"
                 echo "[.abi] $CW_CONTRACT_ACCOUNT_PATH/$file ✅";
@@ -178,8 +178,8 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
 
-                touch "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.js"
-                echo "module.exports = '$(cat $CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.js"
+                touch "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.js"
+                echo "module.exports = '$(cat $CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.js"
 
                 echo "export '$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.g.dart';" >> "lib/apps.dart"
                 echo "[.abi] $CW_CONTRACT_APP_PATH/$file ✅";
@@ -209,8 +209,8 @@ for contract in ${CW_STD_CONTRACTS[@]} ;
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_STD_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
 
-                touch "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.js"
-                echo "module.exports = '$(cat $CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin.js"
+                touch "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.js"
+                echo "module.exports = '$(cat $CW_CONTRACT_OUTPUT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.js"
 
                 echo "export '$CW_CONTRACT_DART_STD_OUTPUT_PATH/$file.g.dart';" >> "lib/standards.dart"
                 echo "[.abi] $CW_CONTRACT_STD_PATH/$file ✅";
@@ -238,8 +238,8 @@ for contract in ${CW_EXTERNAL_CONTRACTS[@]} ;
                 cp "$CW_CONTRACT_EXT_PATH/$file.abi.json" "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_EXT_PATH/$pkg/$file.abi.json" "$CW_CONTRACT_EXT_PATH/$pkg/$file.abi.json"
 
-                touch "$CW_CONTRACT_EXT_PATH/$pkg/$file.bin.js"
-                echo "module.exports = '$(cat $CW_CONTRACT_EXT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_EXT_PATH/$pkg/$file.bin.js"
+                touch "$CW_CONTRACT_EXT_PATH/$pkg/$file.js"
+                echo "module.exports = '$(cat $CW_CONTRACT_EXT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_EXT_PATH/$pkg/$file.js"
 
                 echo "export '$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.g.dart';" >> "lib/external.dart"
                 echo "[.abi] $CW_CONTRACT_EXT_PATH/$file ✅";
