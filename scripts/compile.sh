@@ -233,13 +233,12 @@ for contract in ${CW_EXTERNAL_CONTRACTS[@]} ;
             do
                 echo "Compiling $CW_CONTRACT_EXT_PATH/$file.sol..."
 
-                mkdir $CW_CONTRACT_EXT_PATH/$pkg
+                mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
 
                 cp "$CW_CONTRACT_EXT_PATH/$file.abi.json" "lib/$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.abi.json"
-                mv "$CW_CONTRACT_EXT_PATH/$pkg/$file.abi.json" "$CW_CONTRACT_EXT_PATH/$pkg/$file.abi.json"
 
-                touch "$CW_CONTRACT_EXT_PATH/$pkg/$file.js"
-                echo "module.exports = '$(cat $CW_CONTRACT_EXT_PATH/$pkg/$file.bin)';" >> "$CW_CONTRACT_EXT_PATH/$pkg/$file.js"
+                touch "$CW_CONTRACT_EXT_PATH/$file.js"
+                echo "module.exports = '$(cat $CW_CONTRACT_EXT_PATH/$file.bin)';" >> "$CW_CONTRACT_EXT_PATH/$file.js"
 
                 echo "export '$CW_CONTRACT_DART_EXT_OUTPUT_PATH/$file.g.dart';" >> "lib/external.dart"
                 echo "[.abi] $CW_CONTRACT_EXT_PATH/$file ✅";
