@@ -1,4 +1,4 @@
-import { ethers, upgrades } from "hardhat";
+import { ethers, upgrades, run } from "hardhat";
 import dotenv from "dotenv";
 import { terminal as term } from "terminal-kit";
 import fs from "fs";
@@ -31,7 +31,7 @@ async function deployContract(
     [[minter1, minter2], tokenName, tokenSymbol],
     {
       kind: "uups",
-      initializer: "initialize"
+      initializer: "initialize",
     }
   );
 
@@ -39,14 +39,20 @@ async function deployContract(
   return deployedContract.address;
 }
 
-async function verifyContract(networkName: string, contractName: string, deployedContractAddress: string) {
-  execSync(
-    `HARDHAT_NETWORK=${networkName} npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} ${deployedContractAddress}`,
-    { stdio: "inherit" }
-  );
+async function verifyContract(
+  address: string,
+  constructorArguments?: string[]
+) {
+  await run("verify:verify", {
+    address,
+    constructorArguments,
+  });
 }
 
-async function deployCommunityEntrypoint(networkName: string, deployedContractAddress: string) {
+async function deployCommunityEntrypoint(
+  networkName: string,
+  deployedContractAddress: string
+) {
   execSync(
     `HARDHAT_NETWORK=${networkName} COMMUNITY_TOKEN_ADDRESS=${deployedContractAddress} npx hardhat run ./scripts/deploy-community-entrypoint.ts`,
     { stdio: "inherit" }
@@ -152,11 +158,16 @@ async function main() {
   const contractName = response.selectedText.replace(".sol", "");
   term("\n");
 
-  let tokenDecimals: number, tokenSymbol: string, deployedContractAddress: string;
+  let tokenDecimals: number,
+    tokenSymbol: string,
+    deployedContractAddress: string;
 
   if (process.env.TOKEN_ADDRESS) {
     deployedContractAddress = process.env.TOKEN_ADDRESS;
-    const contract = await ethers.getContractAt(contractName, process.env.TOKEN_ADDRESS);
+    const contract = await ethers.getContractAt(
+      contractName,
+      process.env.TOKEN_ADDRESS
+    );
     tokenDecimals = await contract.decimals();
     tokenSymbol = await contract.symbol();
     term.green("  Contract Name: %s\n", contractName);
@@ -164,7 +175,7 @@ async function main() {
     // term.green("  Token Name: %s\n", tokenName);
     term.green("  Token Symbol: %s\n", tokenSymbol);
     term.green("  Token Decimals: %s\n", tokenDecimals);
-      term.green("  Token Address: %s\n", process.env.TOKEN_ADDRESS);
+    term.green("  Token Address: %s\n", process.env.TOKEN_ADDRESS);
     term("\n");
     term("Continue? [Y/n]");
   } else {
@@ -210,9 +221,9 @@ async function main() {
     term.green("  Token Name: %s\n", tokenName);
     term.green("  Token Symbol: %s\n", tokenSymbol);
     term("\n");
-    term("Deploy contract? [Y/n]");  
+    term("Deploy contract? [Y/n]");
     const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
-    .promise;
+      .promise;
     if (!confirm) {
       term("\n");
       term.red("Exiting...\n");
@@ -237,10 +248,11 @@ async function main() {
   term("Do you want to verify this new contract on etherscan? [Y/n]");
   term("\n");
 
-  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }).promise;
+  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+    .promise;
   if (confirmVerify) {
     try {
-      await verifyContract(networkName, contractName, deployedContractAddress);
+      await verifyContract(deployedContractAddress);
     } catch (error) {
       term.red("Error verifying contract: %s\n", error && error.message);
     }
@@ -248,10 +260,12 @@ async function main() {
 
   term("\n");
   term("Do you want to deploy a community entry point for this token? [Y/n]");
-  const confirmDeployEntryPoint = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
-    .promise;
+  const confirmDeployEntryPoint = await term.yesOrNo({
+    yes: ["y", "ENTER"],
+    no: ["n"],
+  }).promise;
   if (confirmDeployEntryPoint) {
-  await deployCommunityEntrypoint(networkName, deployedContractAddress);
+    await deployCommunityEntrypoint(networkName, deployedContractAddress);
   } else {
     term("\n");
     term.red("Exiting...\n");

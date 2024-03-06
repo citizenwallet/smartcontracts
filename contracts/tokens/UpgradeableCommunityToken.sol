@@ -21,7 +21,7 @@ contract UpgradeableCommunityToken is
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
-    event Minted(address indexed to, uint256 amount, string description);
+    event Minted(address indexed to, uint256 amount);
 
     function initialize(
         address[] memory minters,
@@ -47,15 +47,14 @@ contract UpgradeableCommunityToken is
 
     function mint(
         address to,
-        uint256 amount,
-        string memory description
+        uint256 amount
     ) public {
         require(
             hasRole(MINTER_ROLE, msg.sender),
             "Must have minter role to mint"
         );
         _mint(to, amount);
-        emit Minted(to, amount, description);
+        emit Minted(to, amount);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {

@@ -61,7 +61,7 @@ describe("RedeemCodeFaucet", function () {
       )
     );
 
-    await token.mint(redeemCodeFaucet.address, 20, "hello");
+    await token.mint(redeemCodeFaucet.address, 20);
 
     const network = await ethers.provider.getNetwork();
 

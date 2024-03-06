@@ -71,8 +71,8 @@ describe("SimpleFaucet", function () {
       )
     );
 
-    await token.mint(singleRedeemFaucet.address, 20, "hello");
-    await token.mint(intervalRedeemFaucet.address, 40, "hello");
+    await token.mint(singleRedeemFaucet.address, 20);
+    await token.mint(intervalRedeemFaucet.address, 40);
 
     const network = await ethers.provider.getNetwork();
 

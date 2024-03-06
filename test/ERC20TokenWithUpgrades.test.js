@@ -42,21 +42,9 @@ describe("UpgradeableCommunityToken", function () {
 
   describe("Minting", function () {
     it("Should allow minters to mint new tokens", async function () {
-      await erc20Token
-        .connect(minter1)
-        .mint(receiver.address, 100, "For services rendered");
+      await erc20Token.connect(minter1).mint(receiver.address, 100);
       const receiverBalance = await erc20Token.balanceOf(receiver.address);
       expect(receiverBalance).to.equal(100);
-    });
-
-    it("Should emit a Minted event", async function () {
-      await expect(
-        erc20Token
-          .connect(minter1)
-          .mint(receiver.address, 100, "For services rendered")
-      )
-        .to.emit(erc20Token, "Minted")
-        .withArgs(receiver.address, 100, "For services rendered");
     });
 
     it("Should allow owner to assign minter role to another account", async function () {
@@ -77,27 +65,21 @@ describe("UpgradeableCommunityToken", function () {
         await erc20Token.MINTER_ROLE(),
         minter2.address
       );
-      await erc20Token
-        .connect(minter2)
-        .mint(receiver.address, 100, "For additional services rendered");
+      await erc20Token.connect(minter2).mint(receiver.address, 100);
       const receiverBalance = await erc20Token.balanceOf(receiver.address);
       expect(receiverBalance).to.equal(100);
     });
 
     it("Should not allow non-minters to mint new tokens", async function () {
       await expect(
-        erc20Token
-          .connect(addr1)
-          .mint(receiver.address, 100, "For services rendered")
+        erc20Token.connect(addr1).mint(receiver.address, 100)
       ).to.be.revertedWith("Must have minter role to mint");
     });
   });
 
   describe("Burning", function () {
     it("Should allow token holders to burn their tokens", async function () {
-      await erc20Token
-        .connect(minter1)
-        .mint(addr1.address, 100, "Initial mint");
+      await erc20Token.connect(minter1).mint(addr1.address, 100);
       await erc20Token.connect(addr1).burn(50);
       const addr1Balance = await erc20Token.balanceOf(addr1.address);
       expect(addr1Balance).to.equal(50);

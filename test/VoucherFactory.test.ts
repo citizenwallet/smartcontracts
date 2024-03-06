@@ -410,7 +410,7 @@ describe("Voucher", function () {
 
       const mintedAmount = 1000000000n;
 
-      await token.connect(owner).mint(voucher1.address, mintedAmount, "owner");
+      await token.connect(owner).mint(voucher1.address, mintedAmount);
 
       // balance should match what was minted
       expect(await token.balanceOf(voucher1.address)).to.equal(mintedAmount);
@@ -435,7 +435,7 @@ describe("Voucher", function () {
 
       const mintedAmount = 1000000000;
 
-      await token.connect(owner).mint(voucher1.address, mintedAmount, "owner");
+      await token.connect(owner).mint(voucher1.address, mintedAmount);
 
       // balance should match what was minted
       expect(await token.balanceOf(voucher1.address)).to.equal(mintedAmount);
@@ -483,7 +483,7 @@ describe("Voucher", function () {
 
       const mintedAmount = 1000000000;
 
-      await token.connect(owner).mint(address, mintedAmount, "owner");
+      await token.connect(owner).mint(address, mintedAmount);
 
       // balance should match what was minted
       expect(await token.balanceOf(address)).to.equal(mintedAmount);

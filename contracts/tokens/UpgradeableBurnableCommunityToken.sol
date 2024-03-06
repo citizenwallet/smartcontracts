@@ -21,7 +21,7 @@ contract UpgradeableBurnableCommunityToken is
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
-    event Minted(address indexed to, uint256 amount, string description);
+    event Minted(address indexed to, uint256 amount);
 
     function initialize(
         address[] memory minters,
@@ -29,7 +29,6 @@ contract UpgradeableBurnableCommunityToken is
         string memory symbol
     )
         public
-        // uint8 initDecimals
         initializer
     {
         __ERC20_init(name, symbol);
@@ -37,7 +36,6 @@ contract UpgradeableBurnableCommunityToken is
         __Ownable_init();
         __AccessControl_init();
         __Pausable_init();
-        // _decimals = initDecimals;
 
         _setupRole(PAUSER_ROLE, _msgSender());
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -52,15 +50,14 @@ contract UpgradeableBurnableCommunityToken is
 
     function mint(
         address to,
-        uint256 amount,
-        string memory description
+        uint256 amount
     ) public {
         require(
             hasRole(MINTER_ROLE, msg.sender),
             "Must have minter role to mint"
         );
         _mint(to, amount);
-        emit Minted(to, amount, description);
+        emit Minted(to, amount);
     }
 
     // Allow the minter to also burn tokens from any account

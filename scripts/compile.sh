@@ -49,7 +49,8 @@ CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
 
 CW_STD_CONTRACTS=('erc20,ERC20' \
         'erc721,ERC721' \
-        'erc1155,ERC1155')
+        'erc1155,ERC1155'\
+        'accessControlUpgradeable,IAccessControlUpgradeable')
 
 CW_EXTERNAL_CONTRACTS=('simpleaccountfactory,SimpleAccountFactory' \
         'derc20,DERC20' \

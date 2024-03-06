@@ -87,7 +87,7 @@ describe("ERC20IOU", function () {
       0
     );
 
-    await token.mint(friend2.address, 1, "hello");
+    await token.mint(friend2.address, 1);
 
     await token.connect(friend2).approve(tokeniou.address, 1);
 

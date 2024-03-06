@@ -43,9 +43,7 @@ describe("UpgradeableBurnableCommunityToken", function () {
         .reverted;
 
       // // Existing functionalities should still work
-      await erc20Token
-        .connect(minter1)
-        .mint(addr1.address, 100, "For services rendered in V2");
+      await erc20Token.connect(minter1).mint(addr1.address, 100);
 
       let ownerBalance = await erc20Token.balanceOf(addr1.address);
       expect(ownerBalance).to.equal(100);
@@ -66,9 +64,7 @@ describe("UpgradeableBurnableCommunityToken", function () {
 
       expect(await erc20Token.owner()).to.equal(owner.address);
 
-      await erc20Token
-        .connect(minter1)
-        .mint(addr1.address, 100, "For services rendered in V2");
+      await erc20Token.connect(minter1).mint(addr1.address, 100);
 
       let ownerBalance = await erc20Token.balanceOf(addr1.address);
       expect(ownerBalance).to.equal(100);
@@ -108,17 +104,13 @@ describe("UpgradeableBurnableCommunityToken", function () {
     });
 
     it("Minter role should be able to burn any token", async function () {
-      await erc20Token
-        .connect(minter1)
-        .mint(addr1.address, 100, "Initial mint");
+      await erc20Token.connect(minter1).mint(addr1.address, 100);
       await erc20Token.connect(minter1).burnFrom(addr1.address, 50);
       const addr1Balance = await erc20Token.balanceOf(addr1.address);
       expect(addr1Balance).to.equal(50);
     });
     it("Non minter role cannot burn any token", async function () {
-      await erc20Token
-        .connect(minter1)
-        .mint(addr1.address, 100, "Initial mint");
+      await erc20Token.connect(minter1).mint(addr1.address, 100);
       await expect(erc20Token.connect(addr2).burnFrom(addr1.address, 50)).to.be
         .reverted;
       const addr1Balance = await erc20Token.balanceOf(addr1.address);
