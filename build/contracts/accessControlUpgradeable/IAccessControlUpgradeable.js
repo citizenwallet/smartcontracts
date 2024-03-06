@@ -1,0 +1,3 @@
+// IAccessControlUpgradeable.js
+
+module.exports = '';

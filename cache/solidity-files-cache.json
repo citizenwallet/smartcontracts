@@ -2938,8 +2938,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/tokens/UpgradeableCommunityToken.sol": {
-      "lastModificationDate": 1708525293163,
-      "contentHash": "6306f8a04656e51578e3c498d1044ce3",
+      "lastModificationDate": 1709711029359,
+      "contentHash": "6e293ec54c8334e19d52b3636b87fa0e",
       "sourceName": "contracts/tokens/UpgradeableCommunityToken.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3103,8 +3103,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/tokens/UpgradeableBurnableCommunityToken.sol": {
-      "lastModificationDate": 1708525293163,
-      "contentHash": "fc18668abc3ad129837a95836ca11628",
+      "lastModificationDate": 1709711029359,
+      "contentHash": "2f31b1b19310e0c032790cef0560ecd0",
       "sourceName": "contracts/tokens/UpgradeableBurnableCommunityToken.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3726,6 +3726,43 @@
       ],
       "artifacts": [
         "VoucherFactory"
+      ]
+    },
+    "/home/runner/work/smartcontracts/smartcontracts/contracts/standards/IAccessControlUpgradeable.sol": {
+      "lastModificationDate": 1709711029359,
+      "contentHash": "5d7b2bcef4552530e970f43eca3b11c3",
+      "sourceName": "contracts/standards/IAccessControlUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IAccessControlUpgradeable"
       ]
     }
   }
