@@ -12,7 +12,8 @@ typechain-types
 # cache
 *.dbg.json
 # artifacts
-
+artifacts
+cache
 # https://dart.dev/guides/libraries/private-files
 # Created by `dart pub`
 .dart_tool/
