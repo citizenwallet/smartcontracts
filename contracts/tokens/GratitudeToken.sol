@@ -69,8 +69,7 @@ contract GratitudeToken is
         uint256 amount
     ) public virtual override returns (bool) {
         _mint(sender, 1);
-        (amount);
-        return super.transferFrom(sender, recipient, 1);
+        return super.transferFrom(sender, recipient, amount);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
