@@ -96,6 +96,7 @@ const nativeCurrencySymbols: { [chainId: number]: string } = {
   44787: "CELO", // Alfajores Testnet (Celo)
   10: "ETH", // Optimism Mainnet
   69: "ETH", // Optimism Kovan Testnet
+  100: "xDAI", // xDai
   // Add other networks and their symbols as needed
 };
 

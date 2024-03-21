@@ -18,7 +18,12 @@ const listFiles = (directory: string, pattern: string): string[] => {
   }
 };
 
-async function verifyContract(networkName: string, contractName: string, deployedContractAddress: string, tokenDecimals: number) {
+async function verifyContract(
+  networkName: string,
+  contractName: string,
+  deployedContractAddress: string,
+  tokenDecimals: number
+) {
   execSync(
     `HARDHAT_NETWORK=${networkName} npx hardhat verify --contract contracts/tokens/${contractName}.sol:${contractName} ${deployedContractAddress} ${tokenDecimals}`,
     { stdio: "inherit" }
@@ -61,6 +66,7 @@ const nativeCurrencySymbols: { [chainId: number]: string } = {
   44787: "CELO", // Alfajores Testnet (Celo)
   10: "ETH", // Optimism Mainnet
   69: "ETH", // Optimism Kovan Testnet
+  100: "xDAI", // xDai
   // Add other networks and their symbols as needed
 };
 
@@ -117,13 +123,19 @@ async function main() {
   const contractName = response.selectedText.replace(".sol", "");
   term("\n");
 
-  let tokenDecimals: number, tokenSymbol: string, tokenName: string, deployedContractAddress: string;
+  let tokenDecimals: number,
+    tokenSymbol: string,
+    tokenName: string,
+    deployedContractAddress: string;
 
   if (!communityTokenAddress) {
     return;
   }
 
-  const contract = await ethers.getContractAt(contractName, communityTokenAddress);
+  const contract = await ethers.getContractAt(
+    contractName,
+    communityTokenAddress
+  );
   tokenDecimals = await contract.decimals();
   tokenSymbol = await contract.symbol();
   tokenName = await contract.name();
@@ -133,46 +145,54 @@ async function main() {
   term.green("  Token Symbol: %s\n", tokenSymbol);
   term.green("  Token Decimals: %s\n", tokenDecimals);
   term.green("  Token Address: %s\n", communityTokenAddress);
-  term("\n");  
+  term("\n");
 
   term
-      .green("I will now upgrade ")
-      .green.bold(tokenName)
-      .green(" to ")
-      .green.bold(contractName)
-      .green(" on ")
-      .green.bold(networkName)
-      .green("\n");
+    .green("I will now upgrade ")
+    .green.bold(tokenName)
+    .green(" to ")
+    .green.bold(contractName)
+    .green(" on ")
+    .green.bold(networkName)
+    .green("\n");
 
-      term("\n");
-      term("Continue? [Y/n]\n");
-  const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }).promise;
+  term("\n");
+  term("Continue? [Y/n]\n");
+  const confirm = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+    .promise;
   if (!confirm) {
     term("\n");
     process.exit();
     return;
-  }     
+  }
 
-  const tokenFactory = await ethers.getContractFactory("UpgradeableCommunityToken");
+  const tokenFactory = await ethers.getContractFactory(
+    "UpgradeableCommunityToken"
+  );
   const V2Factory = await ethers.getContractFactory(contractName);
 
   await upgrades.forceImport(communityTokenAddress, tokenFactory, {
-    kind: "uups"
+    kind: "uups",
   });
   // Upgrading the existing proxy to the new implementation
   await upgrades.upgradeProxy(communityTokenAddress, V2Factory, {
-    kind: "uups"
+    kind: "uups",
   });
-
 
   term("\n");
   term("Do you want to verify this new contract on etherscan? [Y/n]");
   term("\n");
 
-  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }).promise;
+  const confirmVerify = await term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] })
+    .promise;
   if (confirmVerify) {
     try {
-      await verifyContract(networkName, contractName, communityTokenAddress, tokenDecimals);
+      await verifyContract(
+        networkName,
+        contractName,
+        communityTokenAddress,
+        tokenDecimals
+      );
     } catch (error) {
       term.red("Error verifying contract: %s\n", error);
     }

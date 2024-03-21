@@ -37,7 +37,8 @@ CW_ACCOUNT_CONTRACTS=('account,Account' \
         'tokenEntryPoint,TokenEntryPoint' \
         'paymaster,Paymaster',
         'voucher,Voucher' \
-        'voucherFactory,VoucherFactory')
+        'voucherFactory,VoucherFactory', \
+        'communityFactory,CommunityFactory')
 
 CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
         'gratitude,GratitudeToken' \
