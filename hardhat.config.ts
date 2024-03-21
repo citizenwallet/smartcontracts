@@ -19,12 +19,12 @@ const hhconfig: HardhatUserConfig = {
   },
   networks: {
     ethereum_mainnet: {
-      url: process.env.ETHEREUM_MAINNET_RPC_URL,
+      url: process.env.ETHEREUM_MAINNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("90", "gwei").toNumber(), // this is 90 Gwei
     },
     polygon_mainnet: {
-      url: process.env.POLYGON_MAINNET_RPC_URL,
+      url: process.env.POLYGON_MAINNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("450", "gwei").toNumber(), // this is 150 Gwei
       timeout: 999999,
@@ -33,7 +33,7 @@ const hhconfig: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
     },
     polygon_testnet: {
-      url: process.env.POLYGON_TESTNET_RPC_URL,
+      url: process.env.POLYGON_TESTNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("5", "gwei").toNumber(), // this is 90 Gwei
       timeout: 999999,
@@ -43,27 +43,27 @@ const hhconfig: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
     },
     base_mainnet: {
-      url: process.env.BASE_MAINNET_RPC_URL,
+      url: process.env.BASE_MAINNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
     base_testnet: {
-      url: process.env.BASE_TESTNET_RPC_URL,
+      url: process.env.BASE_TESTNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
     celo_mainnet: {
-      url: process.env.CELO_MAINNET_RPC_URL,
+      url: process.env.CELO_MAINNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
     celo_testnet: {
-      url: process.env.CELO_TESTNET_RPC_URL,
+      url: process.env.CELO_TESTNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
     gnosis_mainnet: {
-      url: process.env.GNOSIS_MAINNET_RPC_URL,
+      url: process.env.GNOSIS_MAINNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
