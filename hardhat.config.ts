@@ -62,6 +62,11 @@ const hhconfig: HardhatUserConfig = {
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
+    gnosis_mainnet: {
+      url: process.env.GNOSIS_MAINNET_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+      gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
+    },
   },
   etherscan: {
     apiKey: {
@@ -73,6 +78,7 @@ const hhconfig: HardhatUserConfig = {
       base_testnet: process.env.BASE_TESTNET_ETHERSCAN_API_KEY || "",
       celo_mainnet: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
       celo_testnet: process.env.CELO_TESTNET_ETHERSCAN_API_KEY || "",
+      gnosis_mainnet: process.env.GNOSIS_MAINNET_ETHERSCAN_API_KEY || "",
     },
     customChains: [
       {
@@ -105,6 +111,14 @@ const hhconfig: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-alfajores.celoscan.io/api",
           browserURL: "https://alfajores.celoscan.io",
+        },
+      },
+      {
+        network: "gnosis_mainnet",
+        chainId: 100,
+        urls: {
+          apiURL: "https://api.gnosisscan.io/api",
+          browserURL: "https://gnosisscan.io",
         },
       },
     ],
