@@ -2,7 +2,7 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/runner/work/smartcontracts/smartcontracts/contracts/abstract/Linkable.sol": {
-      "lastModificationDate": 1708525293159,
+      "lastModificationDate": 1711148912869,
       "contentHash": "01441074993f6f10a66cc55c5e9f0e66",
       "sourceName": "contracts/abstract/Linkable.sol",
       "solcConfig": {
@@ -13,6 +13,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -39,8 +40,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/Account.sol": {
-      "lastModificationDate": 1708682414929,
-      "contentHash": "0cd1db23e5c6b3b77f835174d50c7f8d",
+      "lastModificationDate": 1711148912869,
+      "contentHash": "b30098be4805c7fbe79adadf59d9364e",
       "sourceName": "contracts/accounts/Account.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -50,6 +51,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -69,8 +71,9 @@
       },
       "imports": [
         "@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
-        "@openzeppelin/contracts/proxy/utils/Initializable.sol",
-        "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
         "@openzeppelin/contracts/interfaces/IERC1271.sol",
         "@account-abstraction/contracts/core/BaseAccount.sol",
         "@account-abstraction/contracts/interfaces/IEntryPoint.sol",
@@ -87,8 +90,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/interfaces/ITokenEntryPoint.sol": {
-      "lastModificationDate": 1708525293163,
-      "contentHash": "2e4b12e70af1dc20fef293e7062f442e",
+      "lastModificationDate": 1711148912869,
+      "contentHash": "3f926e9eb0cc4b5ddc53cd98e2756cbb",
       "sourceName": "contracts/accounts/interfaces/ITokenEntryPoint.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -98,6 +101,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -126,7 +130,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/interfaces/IOwnable.sol": {
-      "lastModificationDate": 1708525293159,
+      "lastModificationDate": 1711148912869,
       "contentHash": "7db197b7df754c25ce7a0a23bd0e4d4a",
       "sourceName": "contracts/accounts/interfaces/IOwnable.sol",
       "solcConfig": {
@@ -137,6 +141,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -163,7 +168,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/callback/TokenCallbackHandler.sol": {
-      "lastModificationDate": 1708525293159,
+      "lastModificationDate": 1711148912869,
       "contentHash": "fd2b22910e933282e5cfe0daaec904e7",
       "sourceName": "contracts/accounts/callback/TokenCallbackHandler.sol",
       "solcConfig": {
@@ -174,6 +179,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -205,7 +211,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/core/BaseAccount.sol": {
-      "lastModificationDate": 1708525310847,
+      "lastModificationDate": 1711148929133,
       "contentHash": "a53a173b72742916b9c1cfef610f64b1",
       "sourceName": "@account-abstraction/contracts/core/BaseAccount.sol",
       "solcConfig": {
@@ -216,6 +222,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -246,7 +253,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/interfaces/IERC1271.sol": {
-      "lastModificationDate": 1708525313371,
+      "lastModificationDate": 1711148931637,
       "contentHash": "8fe867b95c856b204f954a1910e28a1e",
       "sourceName": "@openzeppelin/contracts/interfaces/IERC1271.sol",
       "solcConfig": {
@@ -257,6 +264,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -283,7 +291,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/interfaces/INonceManager.sol": {
-      "lastModificationDate": 1708525311199,
+      "lastModificationDate": 1711148929505,
       "contentHash": "58293337a68c401ac395a955ab972702",
       "sourceName": "@account-abstraction/contracts/interfaces/INonceManager.sol",
       "solcConfig": {
@@ -294,6 +302,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -320,7 +329,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/interfaces/IEntryPoint.sol": {
-      "lastModificationDate": 1708525311187,
+      "lastModificationDate": 1711148929469,
       "contentHash": "f88a97ac988a378551551be9ea4ee65e",
       "sourceName": "@account-abstraction/contracts/interfaces/IEntryPoint.sol",
       "solcConfig": {
@@ -331,6 +340,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -362,7 +372,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol": {
-      "lastModificationDate": 1708525313083,
+      "lastModificationDate": 1711148931353,
       "contentHash": "d822a8a9468649cab463f29f5decf5cc",
       "sourceName": "@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
       "solcConfig": {
@@ -373,6 +383,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -401,7 +412,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol": {
-      "lastModificationDate": 1708525313567,
+      "lastModificationDate": 1711148931841,
       "contentHash": "ef5dcf877816ad119a42c741dd257d0a",
       "sourceName": "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol",
       "solcConfig": {
@@ -412,6 +423,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -441,7 +453,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/proxy/utils/Initializable.sol": {
-      "lastModificationDate": 1708525313475,
+      "lastModificationDate": 1711148931753,
       "contentHash": "5efeb93e6b1c83c754da2846c2da51a7",
       "sourceName": "@openzeppelin/contracts/proxy/utils/Initializable.sol",
       "solcConfig": {
@@ -452,6 +464,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -480,7 +493,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/interfaces/UserOperation.sol": {
-      "lastModificationDate": 1708525311251,
+      "lastModificationDate": 1711148929537,
       "contentHash": "e605ec59ee4889ea6ef8b5332e7da0d8",
       "sourceName": "@account-abstraction/contracts/interfaces/UserOperation.sol",
       "solcConfig": {
@@ -491,6 +504,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -519,7 +533,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/core/Helpers.sol": {
-      "lastModificationDate": 1708525310975,
+      "lastModificationDate": 1711148929277,
       "contentHash": "3cbc58efa815f026e5e180817b65c653",
       "sourceName": "@account-abstraction/contracts/core/Helpers.sol",
       "solcConfig": {
@@ -530,6 +544,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -554,7 +569,7 @@
       "artifacts": []
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol": {
-      "lastModificationDate": 1708525313387,
+      "lastModificationDate": 1711148931645,
       "contentHash": "03e6768535ac4da0e9756f1d8a4a018a",
       "sourceName": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
       "solcConfig": {
@@ -565,6 +580,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -591,7 +607,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol": {
-      "lastModificationDate": 1708525313443,
+      "lastModificationDate": 1711148931713,
       "contentHash": "c22d4395e33763de693fd440c6fd10e1",
       "sourceName": "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
       "solcConfig": {
@@ -602,6 +618,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -628,7 +645,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol": {
-      "lastModificationDate": 1708525313371,
+      "lastModificationDate": 1711148931633,
       "contentHash": "9f8822b72fe2702979e40160cb6d9636",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol",
       "solcConfig": {
@@ -639,6 +656,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -667,7 +685,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol": {
-      "lastModificationDate": 1708525313455,
+      "lastModificationDate": 1711148931725,
       "contentHash": "268af1696d7a83a7e78a1a8f5ba1c685",
       "sourceName": "@openzeppelin/contracts/token/ERC777/IERC777Recipient.sol",
       "solcConfig": {
@@ -678,6 +696,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -704,7 +723,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/interfaces/IAccount.sol": {
-      "lastModificationDate": 1708525311131,
+      "lastModificationDate": 1711148929433,
       "contentHash": "6d787a742dcf67af8bebad8a8db7b78e",
       "sourceName": "@account-abstraction/contracts/interfaces/IAccount.sol",
       "solcConfig": {
@@ -715,6 +734,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -743,7 +763,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/interfaces/IStakeManager.sol": {
-      "lastModificationDate": 1708525311235,
+      "lastModificationDate": 1711148929525,
       "contentHash": "e5c534a14fbf384a02ed5f007d54b1f0",
       "sourceName": "@account-abstraction/contracts/interfaces/IStakeManager.sol",
       "solcConfig": {
@@ -754,6 +774,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -780,7 +801,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/interfaces/IAggregator.sol": {
-      "lastModificationDate": 1708525311143,
+      "lastModificationDate": 1711148929445,
       "contentHash": "70c22a1f7e8ee0bd97fcabb493c4fca6",
       "sourceName": "@account-abstraction/contracts/interfaces/IAggregator.sol",
       "solcConfig": {
@@ -791,6 +812,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -819,7 +841,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/Strings.sol": {
-      "lastModificationDate": 1708525313551,
+      "lastModificationDate": 1711148931829,
       "contentHash": "48686fc32a22a3754b8e63321857dd2a",
       "sourceName": "@openzeppelin/contracts/utils/Strings.sol",
       "solcConfig": {
@@ -830,6 +852,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -859,7 +882,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/math/Math.sol": {
-      "lastModificationDate": 1708525313495,
+      "lastModificationDate": 1711148931773,
       "contentHash": "fe63409d8a06818b926cf89e0ea88b1b",
       "sourceName": "@openzeppelin/contracts/utils/math/Math.sol",
       "solcConfig": {
@@ -870,6 +893,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -896,7 +920,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol": {
-      "lastModificationDate": 1708525313547,
+      "lastModificationDate": 1711148931821,
       "contentHash": "9488ebd4daacfee8ad04811600d7d061",
       "sourceName": "@openzeppelin/contracts/utils/math/SignedMath.sol",
       "solcConfig": {
@@ -907,6 +931,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -933,7 +958,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol": {
-      "lastModificationDate": 1708525313075,
+      "lastModificationDate": 1711148931341,
       "contentHash": "2858d98e74e67987ec81b39605230b74",
       "sourceName": "@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
       "solcConfig": {
@@ -944,6 +969,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -970,7 +996,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol": {
-      "lastModificationDate": 1708525313175,
+      "lastModificationDate": 1711148931433,
       "contentHash": "a127706394bead18392601a20d44867a",
       "sourceName": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Upgrade.sol",
       "solcConfig": {
@@ -981,6 +1007,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1013,7 +1040,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/Address.sol": {
-      "lastModificationDate": 1708525312975,
+      "lastModificationDate": 1711148931221,
       "contentHash": "211ffd288c1588ba8c10eae668ca3c66",
       "sourceName": "@openzeppelin/contracts/utils/Address.sol",
       "solcConfig": {
@@ -1024,6 +1051,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1050,7 +1078,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/interfaces/IERC1967.sol": {
-      "lastModificationDate": 1708525313399,
+      "lastModificationDate": 1711148931657,
       "contentHash": "d0d060231a45da7a1eecbb5cd286fa40",
       "sourceName": "@openzeppelin/contracts/interfaces/IERC1967.sol",
       "solcConfig": {
@@ -1061,6 +1089,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1087,7 +1116,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol": {
-      "lastModificationDate": 1708525313551,
+      "lastModificationDate": 1711148931829,
       "contentHash": "682f7dd1f2e1147c8390e7575deceb2d",
       "sourceName": "@openzeppelin/contracts/utils/StorageSlot.sol",
       "solcConfig": {
@@ -1098,6 +1127,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1124,7 +1154,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol": {
-      "lastModificationDate": 1708525313347,
+      "lastModificationDate": 1711148931609,
       "contentHash": "b6bd23bf19e90b771337037706470933",
       "sourceName": "@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
       "solcConfig": {
@@ -1135,6 +1165,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1161,8 +1192,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/AccountFactory.sol": {
-      "lastModificationDate": 1708682414929,
-      "contentHash": "ddd2167fdff5289cee4256e88846540f",
+      "lastModificationDate": 1711148912869,
+      "contentHash": "151fdaf760a7ca69091650320ba51f9b",
       "sourceName": "contracts/accounts/AccountFactory.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -1172,6 +1203,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1190,6 +1222,9 @@
         }
       },
       "imports": [
+        "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
         "@openzeppelin/contracts/utils/Create2.sol",
         "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol",
         "@account-abstraction/contracts/interfaces/IEntryPoint.sol",
@@ -1204,7 +1239,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/Create2.sol": {
-      "lastModificationDate": 1708525313023,
+      "lastModificationDate": 1711148931281,
       "contentHash": "752ff0901adbdac182deace414d9e75f",
       "sourceName": "@openzeppelin/contracts/utils/Create2.sol",
       "solcConfig": {
@@ -1215,6 +1250,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1241,7 +1277,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol": {
-      "lastModificationDate": 1708525313171,
+      "lastModificationDate": 1711148931429,
       "contentHash": "3fc3c7c0a2956f36e766691bb9473b06",
       "sourceName": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol",
       "solcConfig": {
@@ -1252,6 +1288,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1281,7 +1318,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/proxy/Proxy.sol": {
-      "lastModificationDate": 1708525313515,
+      "lastModificationDate": 1711148931789,
       "contentHash": "40b3d81a836d50ff47e03893dcaaf204",
       "sourceName": "@openzeppelin/contracts/proxy/Proxy.sol",
       "solcConfig": {
@@ -1292,6 +1329,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1318,7 +1356,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/token/ERC1155/ERC1155.sol": {
-      "lastModificationDate": 1708525313111,
+      "lastModificationDate": 1711148931373,
       "contentHash": "65c9d9c87e2b4df70e723819774a0482",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/ERC1155.sol",
       "solcConfig": {
@@ -1329,6 +1367,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1362,7 +1401,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/Context.sol": {
-      "lastModificationDate": 1708525313015,
+      "lastModificationDate": 1711148931277,
       "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
       "sourceName": "@openzeppelin/contracts/utils/Context.sol",
       "solcConfig": {
@@ -1373,6 +1412,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1399,7 +1439,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol": {
-      "lastModificationDate": 1708525313147,
+      "lastModificationDate": 1711148931409,
       "contentHash": "0e7db055ce108f9da7bb6686a00287c0",
       "sourceName": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
       "solcConfig": {
@@ -1410,6 +1450,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1438,7 +1479,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol": {
-      "lastModificationDate": 1708525313363,
+      "lastModificationDate": 1711148931625,
       "contentHash": "93aa9af4f5d2d2095a71ccde917038bb",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/IERC1155.sol",
       "solcConfig": {
@@ -1449,6 +1490,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1477,7 +1519,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol": {
-      "lastModificationDate": 1708525313367,
+      "lastModificationDate": 1711148931629,
       "contentHash": "9148c2e10c4efb12c71a7f080da5559b",
       "sourceName": "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
       "solcConfig": {
@@ -1488,6 +1530,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1516,7 +1559,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/access/AccessControl.sol": {
-      "lastModificationDate": 1708525312947,
+      "lastModificationDate": 1711148931201,
       "contentHash": "a2b1ec38a8dad325a596f926890772b8",
       "sourceName": "@openzeppelin/contracts/access/AccessControl.sol",
       "solcConfig": {
@@ -1527,6 +1570,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1558,7 +1602,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/access/IAccessControl.sol": {
-      "lastModificationDate": 1708525313323,
+      "lastModificationDate": 1711148931581,
       "contentHash": "57c84298234411cea19c7c284d86be8b",
       "sourceName": "@openzeppelin/contracts/access/IAccessControl.sol",
       "solcConfig": {
@@ -1569,6 +1613,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1595,8 +1640,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/TokenEntryPoint.sol": {
-      "lastModificationDate": 1708682414929,
-      "contentHash": "6e31a3ff5258f90f92b1e5939d4d58f9",
+      "lastModificationDate": 1711148912869,
+      "contentHash": "aedb7da0814b5c4fecd2e22bd8b9497e",
       "sourceName": "contracts/accounts/TokenEntryPoint.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -1606,6 +1651,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1635,6 +1681,7 @@
         "@account-abstraction/contracts/interfaces/UserOperation.sol",
         "@account-abstraction/contracts/interfaces/IPaymaster.sol",
         "@account-abstraction/contracts/interfaces/INonceManager.sol",
+        "./interfaces/ITokenEntryPoint.sol",
         "./interfaces/IUserOpValidator.sol"
       ],
       "versionPragmas": [
@@ -1645,7 +1692,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/interfaces/IUserOpValidator.sol": {
-      "lastModificationDate": 1708525293163,
+      "lastModificationDate": 1711148912869,
       "contentHash": "4337756c66f6689eec999c557340167c",
       "sourceName": "contracts/accounts/interfaces/IUserOpValidator.sol",
       "solcConfig": {
@@ -1656,6 +1703,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1684,7 +1732,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol": {
-      "lastModificationDate": 1708525313499,
+      "lastModificationDate": 1711148931793,
       "contentHash": "efeffcf5034292d7ea635de588c95995",
       "sourceName": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol",
       "solcConfig": {
@@ -1695,6 +1743,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1723,7 +1772,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/core/SenderCreator.sol": {
-      "lastModificationDate": 1708525311015,
+      "lastModificationDate": 1711148929313,
       "contentHash": "4910181341b8875940c6ea89500377a0",
       "sourceName": "@account-abstraction/contracts/core/SenderCreator.sol",
       "solcConfig": {
@@ -1734,6 +1783,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1760,7 +1810,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol": {
-      "lastModificationDate": 1708525313491,
+      "lastModificationDate": 1711148931781,
       "contentHash": "db24b956904575cc79d02867ec03263c",
       "sourceName": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
       "solcConfig": {
@@ -1771,6 +1821,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1800,7 +1851,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@account-abstraction/contracts/interfaces/IPaymaster.sol": {
-      "lastModificationDate": 1708525311223,
+      "lastModificationDate": 1711148929513,
       "contentHash": "4737c1fae42666f1b91fdac6a612076b",
       "sourceName": "@account-abstraction/contracts/interfaces/IPaymaster.sol",
       "solcConfig": {
@@ -1811,6 +1862,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1839,7 +1891,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
-      "lastModificationDate": 1708525313463,
+      "lastModificationDate": 1711148931753,
       "contentHash": "b0970a564d121abf9adfff8d1a01eb16",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
       "solcConfig": {
@@ -1850,6 +1902,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1878,7 +1931,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol": {
-      "lastModificationDate": 1708525313535,
+      "lastModificationDate": 1711148931833,
       "contentHash": "52ef5d6c909d6f8ef3077445d3328eca",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
       "solcConfig": {
@@ -1889,6 +1942,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1919,7 +1973,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol": {
-      "lastModificationDate": 1708525312911,
+      "lastModificationDate": 1711148931201,
       "contentHash": "c30c805386fda8a42ff515da963d3a95",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol",
       "solcConfig": {
@@ -1930,6 +1984,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1956,7 +2011,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
-      "lastModificationDate": 1708525312951,
+      "lastModificationDate": 1711148931237,
       "contentHash": "6200b84950eb05b4a92a39fd1d6e0f9b",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
       "solcConfig": {
@@ -1967,6 +2022,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -1995,7 +2051,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol": {
-      "lastModificationDate": 1708525313019,
+      "lastModificationDate": 1711148931309,
       "contentHash": "a6883cfd85607b16c121a02728369eb3",
       "sourceName": "@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol",
       "solcConfig": {
@@ -2006,6 +2062,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2032,7 +2089,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol": {
-      "lastModificationDate": 1708525313123,
+      "lastModificationDate": 1711148931409,
       "contentHash": "2587366284baa690cce0accaca1a20f9",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol",
       "solcConfig": {
@@ -2043,6 +2100,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2076,7 +2134,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC1967Upgradeable.sol": {
-      "lastModificationDate": 1708525313371,
+      "lastModificationDate": 1711148931653,
       "contentHash": "a5421a5e611067b9202e83329fbf6fc7",
       "sourceName": "@openzeppelin/contracts-upgradeable/interfaces/IERC1967Upgradeable.sol",
       "solcConfig": {
@@ -2087,6 +2145,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2113,7 +2172,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol": {
-      "lastModificationDate": 1708525313527,
+      "lastModificationDate": 1711148931821,
       "contentHash": "02cf959b00ba5c650708472f195f8b29",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol",
       "solcConfig": {
@@ -2124,6 +2183,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2150,7 +2210,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol": {
-      "lastModificationDate": 1708525313323,
+      "lastModificationDate": 1711148931597,
       "contentHash": "21bffd733b4ca013e125a0ffe2e52254",
       "sourceName": "@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol",
       "solcConfig": {
@@ -2161,6 +2221,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2187,7 +2248,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol": {
-      "lastModificationDate": 1708525313215,
+      "lastModificationDate": 1711148931489,
       "contentHash": "523926739c7d64c61fd57080f4bbcb05",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol",
       "solcConfig": {
@@ -2198,6 +2259,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2233,7 +2295,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol": {
-      "lastModificationDate": 1708525313531,
+      "lastModificationDate": 1711148931821,
       "contentHash": "c221361be1c4953f5b71f47475b90266",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol",
       "solcConfig": {
@@ -2244,6 +2306,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2273,7 +2336,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol": {
-      "lastModificationDate": 1708525313115,
+      "lastModificationDate": 1711148931401,
       "contentHash": "5f2d8b81c0ff5bd2047b4846c20b998d",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol",
       "solcConfig": {
@@ -2284,6 +2347,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2313,7 +2377,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol": {
-      "lastModificationDate": 1708525313427,
+      "lastModificationDate": 1711148931717,
       "contentHash": "f6c6e71ba8413a4ba32871610dba0658",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721Upgradeable.sol",
       "solcConfig": {
@@ -2324,6 +2388,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2352,7 +2417,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol": {
-      "lastModificationDate": 1708525313423,
+      "lastModificationDate": 1711148931709,
       "contentHash": "ba28cf60b52b00d2b3a190bcdf0952bd",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol",
       "solcConfig": {
@@ -2363,6 +2428,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2389,7 +2455,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol": {
-      "lastModificationDate": 1708525313419,
+      "lastModificationDate": 1711148931705,
       "contentHash": "76212ca0265501d1eb3dd1175e6afca4",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/IERC721MetadataUpgradeable.sol",
       "solcConfig": {
@@ -2400,6 +2466,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2428,7 +2495,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol": {
-      "lastModificationDate": 1708525313483,
+      "lastModificationDate": 1711148931777,
       "contentHash": "5a2a749b45b6a8eb035f4bf75addcb27",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol",
       "solcConfig": {
@@ -2439,6 +2506,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2465,7 +2533,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/utils/math/SignedMathUpgradeable.sol": {
-      "lastModificationDate": 1708525313527,
+      "lastModificationDate": 1711148931817,
       "contentHash": "2a6b819b2e241091ada6d645df3e3929",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/math/SignedMathUpgradeable.sol",
       "solcConfig": {
@@ -2476,6 +2544,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2502,7 +2571,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol": {
-      "lastModificationDate": 1708525313359,
+      "lastModificationDate": 1711148931641,
       "contentHash": "d6ecf203a5e72c845be9bbf2f304a289",
       "sourceName": "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol",
       "solcConfig": {
@@ -2513,6 +2582,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2539,7 +2609,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC165Upgradeable.sol": {
-      "lastModificationDate": 1708525313355,
+      "lastModificationDate": 1711148931641,
       "contentHash": "0ce0dc23b57eb688403ad5169cc18a7d",
       "sourceName": "@openzeppelin/contracts-upgradeable/interfaces/IERC165Upgradeable.sol",
       "solcConfig": {
@@ -2550,6 +2620,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2576,7 +2647,7 @@
       "artifacts": []
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC4906Upgradeable.sol": {
-      "lastModificationDate": 1708525313407,
+      "lastModificationDate": 1711148931685,
       "contentHash": "fe5233feb20121d3fcadf24db464f5f8",
       "sourceName": "@openzeppelin/contracts-upgradeable/interfaces/IERC4906Upgradeable.sol",
       "solcConfig": {
@@ -2587,6 +2658,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2616,7 +2688,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC721Upgradeable.sol": {
-      "lastModificationDate": 1708525313423,
+      "lastModificationDate": 1711148931713,
       "contentHash": "b6d2f759a0c41967c68a26c21d5ecbe4",
       "sourceName": "@openzeppelin/contracts-upgradeable/interfaces/IERC721Upgradeable.sol",
       "solcConfig": {
@@ -2627,6 +2699,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2653,7 +2726,7 @@
       "artifacts": []
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol": {
-      "lastModificationDate": 1708525313215,
+      "lastModificationDate": 1711148931493,
       "contentHash": "47e0570153178b284d04fdc8947af91b",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol",
       "solcConfig": {
@@ -2664,6 +2737,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2694,7 +2768,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/Profile.sol": {
-      "lastModificationDate": 1708682414933,
+      "lastModificationDate": 1711148912869,
       "contentHash": "de1c02ad75d404642c8b38e8c0ed25b6",
       "sourceName": "contracts/apps/Profile.sol",
       "solcConfig": {
@@ -2705,6 +2779,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2736,7 +2811,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol": {
-      "lastModificationDate": 1708525313127,
+      "lastModificationDate": 1711148931413,
       "contentHash": "8c58ae2b48b49da0634bc2db620540cf",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol",
       "solcConfig": {
@@ -2747,6 +2822,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2777,7 +2853,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol": {
-      "lastModificationDate": 1708525313151,
+      "lastModificationDate": 1711148931441,
       "contentHash": "569edd57f8c6c7f5f750a3da1ed9c4c7",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol",
       "solcConfig": {
@@ -2788,6 +2864,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2819,7 +2896,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol": {
-      "lastModificationDate": 1708525313387,
+      "lastModificationDate": 1711148931669,
       "contentHash": "9a9398a7dbda9d014f04d5eb0fb581fd",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol",
       "solcConfig": {
@@ -2830,6 +2907,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2856,7 +2934,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol": {
-      "lastModificationDate": 1708525313375,
+      "lastModificationDate": 1711148931661,
       "contentHash": "9efcd5467a7f0bf533910ee8a267adb2",
       "sourceName": "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol",
       "solcConfig": {
@@ -2867,6 +2945,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2895,7 +2974,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/ERC20IOU.sol": {
-      "lastModificationDate": 1708682414929,
+      "lastModificationDate": 1711148912869,
       "contentHash": "7941d73c26b853353d690ac084055ce0",
       "sourceName": "contracts/apps/ERC20IOU.sol",
       "solcConfig": {
@@ -2906,6 +2985,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2938,7 +3018,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/tokens/UpgradeableCommunityToken.sol": {
-      "lastModificationDate": 1709711029359,
+      "lastModificationDate": 1711148912873,
       "contentHash": "6e293ec54c8334e19d52b3636b87fa0e",
       "sourceName": "contracts/tokens/UpgradeableCommunityToken.sol",
       "solcConfig": {
@@ -2949,6 +3029,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -2983,7 +3064,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol": {
-      "lastModificationDate": 1708525313491,
+      "lastModificationDate": 1711148931785,
       "contentHash": "cbe53d6b803c1102081e00b3a0418ea3",
       "sourceName": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
       "solcConfig": {
@@ -2994,6 +3075,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3023,7 +3105,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol": {
-      "lastModificationDate": 1708525312907,
+      "lastModificationDate": 1711148931193,
       "contentHash": "c88845618a815ef601f3f552c99d7ebb",
       "sourceName": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
       "solcConfig": {
@@ -3034,6 +3116,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3066,7 +3149,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol": {
-      "lastModificationDate": 1708525313299,
+      "lastModificationDate": 1711148931577,
       "contentHash": "21b43d1337ebc77c11da3cbe3fd65316",
       "sourceName": "@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol",
       "solcConfig": {
@@ -3077,6 +3160,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3103,7 +3187,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/tokens/UpgradeableBurnableCommunityToken.sol": {
-      "lastModificationDate": 1709711029359,
+      "lastModificationDate": 1711148912873,
       "contentHash": "2f31b1b19310e0c032790cef0560ecd0",
       "sourceName": "contracts/tokens/UpgradeableBurnableCommunityToken.sol",
       "solcConfig": {
@@ -3114,6 +3198,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3148,7 +3233,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/Paymaster.sol": {
-      "lastModificationDate": 1708682414929,
+      "lastModificationDate": 1711148912869,
       "contentHash": "03d3308234778302eac9163ef067c4e0",
       "sourceName": "contracts/accounts/Paymaster.sol",
       "solcConfig": {
@@ -3159,6 +3244,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3193,7 +3279,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/interfaces/IPaymaster.sol": {
-      "lastModificationDate": 1708525293159,
+      "lastModificationDate": 1711148912869,
       "contentHash": "e2446e7f0863ad8809e27c7b80d6dbd8",
       "sourceName": "contracts/accounts/interfaces/IPaymaster.sol",
       "solcConfig": {
@@ -3204,6 +3290,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3232,7 +3319,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/RegensUniteTokens.sol": {
-      "lastModificationDate": 1708525293163,
+      "lastModificationDate": 1711148912869,
       "contentHash": "af21ae6fa9261b90e9b072a443addfe8",
       "sourceName": "contracts/apps/RegensUniteTokens.sol",
       "solcConfig": {
@@ -3243,6 +3330,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3272,7 +3360,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/standards/ERC1155.sol": {
-      "lastModificationDate": 1708525293163,
+      "lastModificationDate": 1711148912873,
       "contentHash": "71c98c23a5539cbe53c4381f2e2a5410",
       "sourceName": "contracts/standards/ERC1155.sol",
       "solcConfig": {
@@ -3283,6 +3371,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3309,7 +3398,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/standards/ERC20.sol": {
-      "lastModificationDate": 1708525293163,
+      "lastModificationDate": 1711148912873,
       "contentHash": "e872c8e4259633e721cffe5ca1115906",
       "sourceName": "contracts/standards/ERC20.sol",
       "solcConfig": {
@@ -3320,6 +3409,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3346,7 +3436,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/standards/ERC721.sol": {
-      "lastModificationDate": 1708525293163,
+      "lastModificationDate": 1711148912873,
       "contentHash": "a13cb2ffb318bd289ff4106a76c8aead",
       "sourceName": "contracts/standards/ERC721.sol",
       "solcConfig": {
@@ -3357,6 +3447,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3383,7 +3474,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/SimpleFaucet.sol": {
-      "lastModificationDate": 1709330948082,
+      "lastModificationDate": 1711148912869,
       "contentHash": "1344c8307de9822d1cd344065efc5820",
       "sourceName": "contracts/apps/SimpleFaucet.sol",
       "solcConfig": {
@@ -3394,6 +3485,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3426,7 +3518,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/RedeemCodeFaucet.sol": {
-      "lastModificationDate": 1708859114747,
+      "lastModificationDate": 1711148912869,
       "contentHash": "33eb1ebb469e568b95931d607bd2f956",
       "sourceName": "contracts/apps/RedeemCodeFaucet.sol",
       "solcConfig": {
@@ -3437,6 +3529,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3469,7 +3562,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/FaucetFactory.sol": {
-      "lastModificationDate": 1709330948082,
+      "lastModificationDate": 1711148912869,
       "contentHash": "ef271f9282e17b8941adcf1d4472eb99",
       "sourceName": "contracts/apps/FaucetFactory.sol",
       "solcConfig": {
@@ -3480,6 +3573,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3514,7 +3608,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/Voucher.sol": {
-      "lastModificationDate": 1709330948082,
+      "lastModificationDate": 1711148912869,
       "contentHash": "73947d9b6faec47a2214a02976a2bed1",
       "sourceName": "contracts/accounts/Voucher.sol",
       "solcConfig": {
@@ -3525,6 +3619,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3563,7 +3658,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
-      "lastModificationDate": 1709330969517,
+      "lastModificationDate": 1711148931657,
       "contentHash": "df36f7051335cd1e748b1b6463b7fdd3",
       "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
       "solcConfig": {
@@ -3574,6 +3669,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3600,7 +3696,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/VoucherFactory.sol": {
-      "lastModificationDate": 1709331490575,
+      "lastModificationDate": 1711148912869,
       "contentHash": "2a659e0571d72ce0d1e4a9ccd17c67bf",
       "sourceName": "contracts/accounts/VoucherFactory.sol",
       "solcConfig": {
@@ -3611,6 +3707,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3644,7 +3741,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/standards/IAccessControlUpgradeable.sol": {
-      "lastModificationDate": 1709711029359,
+      "lastModificationDate": 1711148912873,
       "contentHash": "5d7b2bcef4552530e970f43eca3b11c3",
       "sourceName": "contracts/standards/IAccessControlUpgradeable.sol",
       "solcConfig": {
@@ -3655,6 +3752,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3681,7 +3779,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/tokens/GratitudeToken.sol": {
-      "lastModificationDate": 1709908373970,
+      "lastModificationDate": 1711148912873,
       "contentHash": "8cfac0b6306e9f806d7df977c841a865",
       "sourceName": "contracts/tokens/GratitudeToken.sol",
       "solcConfig": {
@@ -3692,6 +3790,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3726,8 +3825,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/CommunityFactory.sol": {
-      "lastModificationDate": 1711039037702,
-      "contentHash": "b4aa62c5722688a2e6d005468fbe6c67",
+      "lastModificationDate": 1711148912869,
+      "contentHash": "0dce932a9ac8f88350dde3b0fc37c5e9",
       "sourceName": "contracts/accounts/CommunityFactory.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3737,6 +3836,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "outputSelection": {
             "*": {
               "*": [
@@ -3760,6 +3860,8 @@
         "@account-abstraction/contracts/interfaces/IEntryPoint.sol",
         "./TokenEntryPoint.sol",
         "./Paymaster.sol",
+        "./AccountFactory.sol",
+        "../apps/Profile.sol",
         "./interfaces/ITokenEntryPoint.sol"
       ],
       "versionPragmas": [

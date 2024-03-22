@@ -69,7 +69,7 @@
         },
         {
           "internalType": "address payable",
-          "name": "",
+          "name": "beneficiary",
           "type": "address"
         }
       ],
