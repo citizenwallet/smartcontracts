@@ -40,9 +40,7 @@ CW_ACCOUNT_CONTRACTS=('account,Account' \
         'voucherFactory,VoucherFactory', \
         'communityFactory,CommunityFactory')
 
-CW_APP_CONTRACTS=('grfactory,GratitudeTokenFactory' \
-        'gratitude,GratitudeToken' \
-        'profile,Profile' \
+CW_APP_CONTRACTS=('profile,Profile' \
         'erc20IOU,ERC20IOU' \
         'simpleFaucet,SimpleFaucet' \
         'redeemCodeFaucet,RedeemCodeFaucet'\
@@ -145,7 +143,7 @@ for contract in ${CW_ACCOUNT_CONTRACTS[@]} ;
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
 
                 # https://ethereum.stackexchange.com/a/84719
-                docker run -v $(pwd):/root --platform linux/amd64  ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
+                docker run -v $(pwd):/root --platform linux/amd64  ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --via-ir --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_ACCOUNT_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_ACCOUNT_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
 
@@ -181,7 +179,7 @@ for contract in ${CW_APP_CONTRACTS[@]} ;
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
 
                 # https://ethereum.stackexchange.com/a/84719
-                docker run -v $(pwd):/root --platform linux/amd64 ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_APP_PATH/$file.sol"
+                docker run -v $(pwd):/root --platform linux/amd64 ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --via-ir --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_APP_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_APP_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
 
@@ -217,7 +215,7 @@ for contract in ${CW_STD_CONTRACTS[@]} ;
                 mkdir $CW_CONTRACT_OUTPUT_PATH/$pkg
 
                 # https://ethereum.stackexchange.com/a/84719
-                docker run -v $(pwd):/root --platform linux/amd64 ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_STD_PATH/$file.sol"
+                docker run -v $(pwd):/root --platform linux/amd64 ethereum/solc:0.8.20 --evm-version paris --abi --bin --optimize --optimize-runs 200 --via-ir --allow-paths . --include-path root/node_modules/ --base-path ./root --overwrite --output-dir "root/$CW_CONTRACT_OUTPUT_PATH/$pkg/" "root/$CW_CONTRACT_STD_PATH/$file.sol"
                 cp "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "lib/$CW_CONTRACT_DART_STD_OUTPUT_PATH/$file.abi.json"
                 mv "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi" "$CW_CONTRACT_OUTPUT_PATH/$pkg/$file.abi.json"
 
