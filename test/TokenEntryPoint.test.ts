@@ -309,16 +309,28 @@ describe("Account", function () {
       }
     );
 
-    const accountFactory = await AccountFactoryContract.deploy(
-      entrypoint.address,
-      tokenEntryPointContract.address
+    const accountFactory = await upgrades.deployProxy(
+      AccountFactoryContract,
+      [entrypoint.address, tokenEntryPointContract.address, owner.address],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        constructorArgs: [],
+        salt: "0x01",
+      }
     );
 
     await accountFactory.deployed();
 
-    const accountFactory2 = await AccountFactoryContract.deploy(
-      entrypoint.address,
-      tokenEntryPointContract.address
+    const accountFactory2 = await upgrades.deployProxy(
+      AccountFactoryContract,
+      [entrypoint.address, tokenEntryPointContract.address, owner.address],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        constructorArgs: [],
+        salt: "0x02",
+      }
     );
 
     await accountFactory2.deployed();

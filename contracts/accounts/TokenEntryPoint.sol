@@ -14,6 +14,8 @@ import "@account-abstraction/contracts/interfaces/UserOperation.sol";
 import "@account-abstraction/contracts/interfaces/IPaymaster.sol";
 import "@account-abstraction/contracts/interfaces/INonceManager.sol";
 
+import "./interfaces/ITokenEntryPoint.sol";
+
 import "./interfaces/IUserOpValidator.sol";
 
 /**
@@ -29,6 +31,7 @@ import "./interfaces/IUserOpValidator.sol";
  * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/interfaces/UserOperation.sol
  */
 contract TokenEntryPoint is
+    ITokenEntryPoint,
     INonceManager,
     Initializable,
     ReentrancyGuardUpgradeable,
@@ -57,6 +60,7 @@ contract TokenEntryPoint is
         address[] calldata addresses
     ) public virtual initializer {
         __Ownable_init();
+        __UUPSUpgradeable_init();
         __ReentrancyGuard_init();
         __Whitelist_init(addresses);
 

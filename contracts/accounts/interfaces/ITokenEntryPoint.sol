@@ -6,6 +6,6 @@ import "@account-abstraction/contracts/interfaces/UserOperation.sol";
 interface ITokenEntryPoint {
     function handleOps(
         UserOperation[] calldata ops,
-        address payable /*beneficiary*/
+        address payable beneficiary
     ) external;
 }

@@ -6,8 +6,9 @@ pragma solidity ^0.8.20;
 /* solhint-disable reason-string */
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 
 import "@account-abstraction/contracts/core/BaseAccount.sol";
@@ -30,12 +31,11 @@ contract Account is
     IERC1271,
     BaseAccount,
     TokenCallbackHandler,
-    UUPSUpgradeable,
-    Initializable
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
 {
     using ECDSA for bytes32;
-
-    address public owner;
 
     IEntryPoint private immutable _entryPoint;
 
@@ -54,7 +54,7 @@ contract Account is
 
     function _checkAccountOwner() internal view virtual {
         require(
-            owner == msg.sender || address(this) == msg.sender,
+            owner() == msg.sender || address(this) == msg.sender,
             "Ownable: caller is not the owner or the contract"
         );
     }
@@ -117,12 +117,15 @@ contract Account is
      * the implementation by calling `upgradeTo()`
      */
     function initialize(address anOwner) public virtual initializer {
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+
         migrateState(address(0));
         _initialize(anOwner);
     }
 
     function _initialize(address anOwner) internal virtual {
-        owner = anOwner;
+        transferOwnership(anOwner);
         emit AccountInitialized(_entryPoint, anOwner);
     }
 
@@ -130,7 +133,7 @@ contract Account is
     function _requireFromEntryPointOrOwnerOrTokenEntryPoint() internal view {
         require(
             msg.sender == address(entryPoint()) ||
-                msg.sender == owner ||
+                msg.sender == owner() ||
                 msg.sender == tokenEntryPoint(),
             "account: not Owner or EntryPoint or TokenEntryPoint"
         );
@@ -142,7 +145,7 @@ contract Account is
         bytes32 userOpHash
     ) internal view override returns (uint256 validationData) {
         bytes32 hash = userOpHash.toEthSignedMessageHash();
-        if (owner != hash.recover(userOp.signature))
+        if (owner() != hash.recover(userOp.signature))
             return SIG_VALIDATION_FAILED;
         return 0;
     }
@@ -218,7 +221,7 @@ contract Account is
         address signer = recoverSigner(_hash, _signature);
 
         // Validate signatures
-        if (signer == owner) {
+        if (signer == owner()) {
             return 0x1626ba7e;
         } else {
             return 0xffffffff;
@@ -310,7 +313,7 @@ contract Account is
 
     function transferOwnership(
         address newOwner
-    ) public virtual onlyAccountOwner {
+    ) public virtual override onlyAccountOwner {
         _transferOwnership(newOwner);
     }
 
@@ -323,15 +326,6 @@ contract Account is
         );
 
         _transferOwnership(newOwner);
-    }
-
-    function _transferOwnership(address newOwner) internal virtual {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
-
-        owner = newOwner;
     }
 
     // ************************

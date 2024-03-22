@@ -119,7 +119,7 @@ async function main() {
   try {
     chainId = await getChainId();
   } catch (e) {
-    term.red("Error fetching chain ID: %s\n", e && e.message);
+    term.red("Error fetching chain ID: %s\n", e);
     process.exit();
   }
 
@@ -131,7 +131,7 @@ async function main() {
   const nativeCurrencySymbol =
     nativeCurrencySymbols[chainId] || `Unknown chainId: ${chainId}`;
 
-  const wallet = new ethers.Wallet(pk, ethers.provider);
+  const wallet = new ethers.Wallet(pk!, ethers.provider);
   const balanceWei = await wallet.getBalance();
   term(
     `The balance of the deployer wallet on ${networkName} is: ${ethers.utils.formatEther(
@@ -255,7 +255,7 @@ async function main() {
     try {
       await verifyContract(deployedContractAddress);
     } catch (error) {
-      term.red("Error verifying contract: %s\n", error && error.message);
+      term.red("Error verifying contract: %s\n", error);
     }
   }
 

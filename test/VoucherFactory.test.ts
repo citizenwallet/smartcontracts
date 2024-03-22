@@ -303,9 +303,15 @@ describe("Voucher", function () {
       }
     );
 
-    const accountFactory = await AccountFactoryContract.deploy(
-      entrypoint.address,
-      tokenEntryPointContract.address
+    const accountFactory = await upgrades.deployProxy(
+      AccountFactoryContract,
+      [entrypoint.address, tokenEntryPointContract.address, owner.address],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        constructorArgs: [],
+        salt: "0x01",
+      }
     );
 
     await accountFactory.deployed();

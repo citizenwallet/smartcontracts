@@ -36,7 +36,22 @@ describe("CommunityFactory", function () {
     );
 
     const communityFactory = await CommunityFactoryContract.deploy(
-      await entrypoint.address
+      entrypoint.address
+    );
+
+    const TokenContract = await ethers.getContractFactory(
+      "UpgradeableCommunityToken",
+      {
+        signer: owner,
+      }
+    );
+    const token = await upgrades.deployProxy(
+      TokenContract,
+      [[owner.address], "My Token", "MT"],
+      {
+        kind: "uups",
+        initializer: "initialize",
+      }
     );
 
     return {
@@ -50,34 +65,54 @@ describe("CommunityFactory", function () {
       vendor2,
       vendor3,
       communityFactory,
+      token,
     };
   }
 
   async function deployCommunityFixture() {
-    const { owner, communityFactory, friend1, friend2, vendor1, vendor2 } =
-      await loadFixture(deployCommunityFactoryFixture);
+    const {
+      owner,
+      communityFactory,
+      token,
+      friend1,
+      friend2,
+      vendor1,
+      vendor2,
+    } = await loadFixture(deployCommunityFactoryFixture);
 
-    const tx = await communityFactory.create(friend1.address, 0);
+    const tx = await communityFactory.create(friend1.address, token.address, 0);
 
     await tx.wait();
 
-    const communityAddress = await communityFactory.get(friend1.address, 0);
+    const [
+      communityAddress,
+      paymasterAddress,
+      accountFactoryAddress,
+      profileAddress,
+    ] = await communityFactory.get(friend1.address, token.address, 0);
 
     const community = await ethers.getContractAt(
       "TokenEntryPoint",
       communityAddress
     );
 
-    const paymaster = await ethers.getContractAt(
-      "Paymaster",
-      await community.paymaster()
+    const paymaster = await ethers.getContractAt("Paymaster", paymasterAddress);
+
+    const accountFactory = await ethers.getContractAt(
+      "AccountFactory",
+      accountFactoryAddress
     );
+
+    const profile = await ethers.getContractAt("Profile", profileAddress);
 
     return {
       owner,
+      token,
       communityFactory,
       community,
       paymaster,
+      accountFactory,
+      profile,
       friend1,
       friend2,
       vendor1,
@@ -125,6 +160,42 @@ describe("CommunityFactory", function () {
       ).to.be.revertedWith("Ownable: caller is not the owner");
 
       expect(await paymaster.sponsor()).to.equal(friend1.address);
+    });
+
+    it("Should create the same address multiple times", async function () {
+      const {
+        friend1,
+        token,
+        communityFactory,
+        community,
+        paymaster,
+        accountFactory,
+        profile,
+      } = await loadFixture(deployCommunityFixture);
+
+      const [
+        communityAddress2,
+        paymasterAddress2,
+        accountFactoryAddress2,
+        profileAddress2,
+      ] = await communityFactory.get(friend1.address, token.address, 0);
+
+      expect(community.address).to.equal(communityAddress2);
+      expect(paymaster.address).to.equal(paymasterAddress2);
+      expect(accountFactory.address).to.equal(accountFactoryAddress2);
+      expect(profile.address).to.equal(profileAddress2);
+
+      const [
+        communityAddress3,
+        paymasterAddress3,
+        accountFactoryAddress3,
+        profileAddress3,
+      ] = await communityFactory.get(friend1.address, token.address, 1);
+
+      expect(community.address).to.not.equal(communityAddress3);
+      expect(paymaster.address).to.not.equal(paymasterAddress3);
+      expect(accountFactory.address).to.not.equal(accountFactoryAddress3);
+      expect(profile.address).to.not.equal(profileAddress3);
     });
   });
 });

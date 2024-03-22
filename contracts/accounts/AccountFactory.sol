@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
 import "@openzeppelin/contracts/utils/Create2.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
@@ -14,12 +18,27 @@ import "./interfaces/ITokenEntryPoint.sol";
  *
  * https://github.com/eth-infinitism/account-abstraction/blob/abff2aca61a8f0934e533d0d352978055fddbd96/contracts/samples/SimpleAccountFactory.sol
  */
-contract AccountFactory {
-    Account public immutable accountImplementation;
+contract AccountFactory is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    Account public accountImplementation;
 
     event AccountCreated(address indexed account);
 
-    constructor(IEntryPoint _entryPoint, ITokenEntryPoint _tokenEntryPoint) {
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
+        IEntryPoint _entryPoint,
+        ITokenEntryPoint _tokenEntryPoint,
+        address anOwner
+    ) public virtual initializer {
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+
+        transferOwnership(anOwner);
+
         accountImplementation = new Account(_entryPoint, _tokenEntryPoint);
     }
 
@@ -71,5 +90,11 @@ contract AccountFactory {
                     )
                 )
             );
+    }
+
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal view override onlyOwner {
+        (newImplementation);
     }
 }
