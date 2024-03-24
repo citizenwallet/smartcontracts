@@ -89,6 +89,8 @@ abstract contract ERC20 {
         uint256 amount
     ) external virtual returns (bool);
 
+    function name() external view virtual returns (string memory);
+
     function symbol() external view virtual returns (string memory);
 
     function decimals() external view virtual returns (uint8);
