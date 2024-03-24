@@ -1,3 +1,0 @@
-// GratitudeTokenFactory.js
-
-module.exports = '';
