@@ -162,7 +162,7 @@ describe("CommunityFactory", function () {
       expect(await paymaster.sponsor()).to.equal(friend1.address);
     });
 
-    it("Should create the same address multiple times", async function () {
+    it("Should create different addresses for different salts", async function () {
       const {
         friend1,
         token,
@@ -184,6 +184,79 @@ describe("CommunityFactory", function () {
       expect(paymaster.address).to.equal(paymasterAddress2);
       expect(accountFactory.address).to.equal(accountFactoryAddress2);
       expect(profile.address).to.equal(profileAddress2);
+
+      const [
+        communityAddress3,
+        paymasterAddress3,
+        accountFactoryAddress3,
+        profileAddress3,
+      ] = await communityFactory.get(friend1.address, token.address, 1);
+
+      expect(community.address).to.not.equal(communityAddress3);
+      expect(paymaster.address).to.not.equal(paymasterAddress3);
+      expect(accountFactory.address).to.not.equal(accountFactoryAddress3);
+      expect(profile.address).to.not.equal(profileAddress3);
+    });
+
+    it("Should return different addresses for different owners", async function () {
+      const {
+        friend2,
+        token,
+        communityFactory,
+        community,
+        paymaster,
+        accountFactory,
+        profile,
+      } = await loadFixture(deployCommunityFixture);
+
+      const [
+        communityAddress2,
+        paymasterAddress2,
+        accountFactoryAddress2,
+        profileAddress2,
+      ] = await communityFactory.get(friend2.address, token.address, 0);
+
+      expect(community.address).to.not.equal(communityAddress2);
+      expect(paymaster.address).to.not.equal(paymasterAddress2);
+      expect(accountFactory.address).to.not.equal(accountFactoryAddress2);
+      expect(profile.address).to.not.equal(profileAddress2);
+
+      const [
+        communityAddress3,
+        paymasterAddress3,
+        accountFactoryAddress3,
+        profileAddress3,
+      ] = await communityFactory.get(friend2.address, token.address, 0);
+
+      expect(communityAddress2).to.equal(communityAddress3);
+      expect(paymasterAddress2).to.equal(paymasterAddress3);
+      expect(accountFactoryAddress2).to.equal(accountFactoryAddress3);
+      expect(profileAddress2).to.equal(profileAddress3);
+    });
+
+    it("Creating multiple times should not affect other communities", async function () {
+      const {
+        friend1,
+        friend2,
+        token,
+        communityFactory,
+        community,
+        paymaster,
+        accountFactory,
+        profile,
+      } = await loadFixture(deployCommunityFixture);
+
+      let tx = await communityFactory.create(friend2.address, token.address, 0);
+
+      await tx.wait();
+
+      tx = await communityFactory.create(friend2.address, token.address, 0);
+
+      await tx.wait();
+
+      tx = await communityFactory.create(friend2.address, token.address, 1);
+
+      await tx.wait();
 
       const [
         communityAddress3,

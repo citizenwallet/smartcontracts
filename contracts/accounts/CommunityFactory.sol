@@ -74,16 +74,18 @@ contract CommunityFactory {
             _profile.code.length > 0
         ) {
             return (
-                TokenEntryPoint(payable(_tokenEntryPoint)),
-                Paymaster(payable(_paymaster)),
-                AccountFactory(payable(_accountFactory)),
-                Profile(payable(_profile))
+                TokenEntryPoint(address(_tokenEntryPoint)),
+                Paymaster(address(_paymaster)),
+                AccountFactory(address(_accountFactory)),
+                Profile(address(_profile))
             );
         }
 
+        bytes32 derivedSalt = keccak256(abi.encodePacked(owner, token, salt));
+
         paymaster = Paymaster(
-            payable(
-                new ERC1967Proxy{salt: bytes32(salt)}(
+            address(
+                new ERC1967Proxy{salt: derivedSalt}(
                     address(paymasterImplementation),
                     abi.encodeCall(Paymaster.initialize, (owner))
                 )
@@ -93,8 +95,8 @@ contract CommunityFactory {
         paymaster.transferOwnership(owner);
 
         profile = Profile(
-            payable(
-                new ERC1967Proxy{salt: bytes32(salt)}(
+            address(
+                new ERC1967Proxy{salt: derivedSalt}(
                     address(profileImplementation),
                     abi.encodeCall(Profile.initialize, ())
                 )
@@ -108,8 +110,8 @@ contract CommunityFactory {
         whitelistedAddresses[1] = token;
 
         tokenEntryPoint = TokenEntryPoint(
-            payable(
-                new ERC1967Proxy{salt: bytes32(salt)}(
+            address(
+                new ERC1967Proxy{salt: derivedSalt}(
                     address(tokenEntryPointImplementation),
                     abi.encodeCall(
                         TokenEntryPoint.initialize,
@@ -120,8 +122,8 @@ contract CommunityFactory {
         );
 
         accountFactory = AccountFactory(
-            payable(
-                new ERC1967Proxy{salt: bytes32(salt)}(
+            address(
+                new ERC1967Proxy{salt: derivedSalt}(
                     address(accountFactoryImplementation),
                     abi.encodeCall(
                         AccountFactory.initialize,
@@ -152,8 +154,10 @@ contract CommunityFactory {
         address token,
         uint256 salt
     ) public view returns (address, address, address, address) {
+        bytes32 derivedSalt = keccak256(abi.encodePacked(owner, token, salt));
+
         address paymaster = Create2.computeAddress(
-            bytes32(salt),
+            derivedSalt,
             keccak256(
                 abi.encodePacked(
                     type(ERC1967Proxy).creationCode,
@@ -166,7 +170,7 @@ contract CommunityFactory {
         );
 
         address profile = Create2.computeAddress(
-            bytes32(salt),
+            derivedSalt,
             keccak256(
                 abi.encodePacked(
                     type(ERC1967Proxy).creationCode,
@@ -183,7 +187,7 @@ contract CommunityFactory {
         whitelistedAddresses[1] = token;
 
         address tokenEntryPoint = Create2.computeAddress(
-            bytes32(salt),
+            derivedSalt,
             keccak256(
                 abi.encodePacked(
                     type(ERC1967Proxy).creationCode,
@@ -199,7 +203,7 @@ contract CommunityFactory {
         );
 
         address accountFactory = Create2.computeAddress(
-            bytes32(salt),
+            derivedSalt,
             keccak256(
                 abi.encodePacked(
                     type(ERC1967Proxy).creationCode,
