@@ -3825,8 +3825,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/CommunityFactory.sol": {
-      "lastModificationDate": 1711148912869,
-      "contentHash": "0dce932a9ac8f88350dde3b0fc37c5e9",
+      "lastModificationDate": 1712071083497,
+      "contentHash": "6992343fe1bd77d484f54454a660f6d7",
       "sourceName": "contracts/accounts/CommunityFactory.sol",
       "solcConfig": {
         "version": "0.8.20",
