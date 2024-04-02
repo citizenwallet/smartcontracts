@@ -75,6 +75,8 @@ const hhconfig: HardhatUserConfig = {
       polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
       base_mainnet: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
       base_testnet: process.env.BASE_TESTNET_ETHERSCAN_API_KEY || "",
+      gnosis: process.env.GNOSIS_MAINNET_ETHERSCAN_API_KEY || "",
+      gnosis_testnet: process.env.GNOSIS_TESTNET_ETHERSCAN_API_KEY || "",
       celo_mainnet: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
       celo_testnet: process.env.CELO_TESTNET_ETHERSCAN_API_KEY || "",
     },
