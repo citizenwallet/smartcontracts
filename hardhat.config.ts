@@ -42,25 +42,29 @@ const hhconfig: HardhatUserConfig = {
       throwOnCallFailures: true,
       allowUnlimitedContractSize: true,
     },
+    gnosis_mainnet: {
+      url: process.env.GNOSIS_MAINNET_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+    },
+    gnosis_testnet: {
+      url: process.env.GNOSIS_TESTNET_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+    },
     base_mainnet: {
       url: process.env.BASE_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
     base_testnet: {
       url: process.env.BASE_TESTNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
     celo_mainnet: {
       url: process.env.CELO_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
     celo_testnet: {
       url: process.env.CELO_TESTNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
-      gasPrice: ethers.utils.parseUnits("30", "gwei").toNumber(), // this is 30 Gwei
     },
   },
   etherscan: {
@@ -85,10 +89,10 @@ const hhconfig: HardhatUserConfig = {
       },
       {
         network: "base_testnet",
-        chainId: 8453,
+        chainId: 84532,
         urls: {
-          apiURL: "https://api.basescan.org/api",
-          browserURL: "https://basescan.org",
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org/",
         },
       },
       {

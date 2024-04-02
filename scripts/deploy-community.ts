@@ -88,9 +88,12 @@ const nativeCurrencySymbols: { [chainId: number]: string } = {
   42: "ETH", // Kovan
   56: "BNB", // Binance Smart Chain Mainnet
   97: "BNB", // Binance Smart Chain Testnet
+  100: "xDAI", // xDai
+  10200: "xDAI", // xDai (Chiado)
   137: "MATIC", // Polygon Mainnet
   8453: "ETH", // Base
-  84531: "ETH", // Base
+  84531: "ETH", // Base Goerli
+  84532: "ETH", // Base Sepolia
   80001: "MATIC", // Polygon Mumbai Testnet
   42220: "CELO", // Celo Mainnet
   44787: "CELO", // Alfajores Testnet (Celo)
