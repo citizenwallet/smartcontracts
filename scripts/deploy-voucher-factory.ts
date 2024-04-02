@@ -72,8 +72,8 @@ async function main() {
   console.log("🚀 request sent...");
   await deployedContract.deployed();
 
-  // wait 2 seconds for the transaction to be mined
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  // wait for the transaction to be mined
+  await deployedContract.deployTransaction.wait(5);
 
   console.log("🧐 verifying...\n");
 
