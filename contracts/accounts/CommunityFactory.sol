@@ -49,6 +49,7 @@ contract CommunityFactory {
      */
     function create(
         address owner,
+        address sponsor,
         address token,
         uint256 salt
     )
@@ -65,7 +66,7 @@ contract CommunityFactory {
             address _paymaster,
             address _accountFactory,
             address _profile
-        ) = get(owner, token, salt);
+        ) = get(owner, sponsor, token, salt);
 
         if (
             _tokenEntryPoint.code.length > 0 &&
@@ -81,13 +82,15 @@ contract CommunityFactory {
             );
         }
 
-        bytes32 derivedSalt = keccak256(abi.encodePacked(owner, token, salt));
+        bytes32 derivedSalt = keccak256(
+            abi.encodePacked(owner, sponsor, token, salt)
+        );
 
         paymaster = Paymaster(
             address(
                 new ERC1967Proxy{salt: derivedSalt}(
                     address(paymasterImplementation),
-                    abi.encodeCall(Paymaster.initialize, (owner))
+                    abi.encodeCall(Paymaster.initialize, (sponsor))
                 )
             )
         );
@@ -151,10 +154,13 @@ contract CommunityFactory {
      */
     function get(
         address owner,
+        address sponsor,
         address token,
         uint256 salt
     ) public view returns (address, address, address, address) {
-        bytes32 derivedSalt = keccak256(abi.encodePacked(owner, token, salt));
+        bytes32 derivedSalt = keccak256(
+            abi.encodePacked(owner, sponsor, token, salt)
+        );
 
         address paymaster = Create2.computeAddress(
             derivedSalt,
@@ -163,7 +169,7 @@ contract CommunityFactory {
                     type(ERC1967Proxy).creationCode,
                     abi.encode(
                         address(paymasterImplementation),
-                        abi.encodeCall(Paymaster.initialize, (owner))
+                        abi.encodeCall(Paymaster.initialize, (sponsor))
                     )
                 )
             )

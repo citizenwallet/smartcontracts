@@ -78,9 +78,16 @@ describe("CommunityFactory", function () {
       friend2,
       vendor1,
       vendor2,
+      sponsor,
+      sponsor2,
     } = await loadFixture(deployCommunityFactoryFixture);
 
-    const tx = await communityFactory.create(friend1.address, token.address, 0);
+    const tx = await communityFactory.create(
+      friend1.address,
+      sponsor.address,
+      token.address,
+      0
+    );
 
     await tx.wait();
 
@@ -89,7 +96,12 @@ describe("CommunityFactory", function () {
       paymasterAddress,
       accountFactoryAddress,
       profileAddress,
-    ] = await communityFactory.get(friend1.address, token.address, 0);
+    ] = await communityFactory.get(
+      friend1.address,
+      sponsor.address,
+      token.address,
+      0
+    );
 
     const community = await ethers.getContractAt(
       "TokenEntryPoint",
@@ -117,6 +129,8 @@ describe("CommunityFactory", function () {
       friend2,
       vendor1,
       vendor2,
+      sponsor,
+      sponsor2,
     };
   }
 
@@ -131,35 +145,35 @@ describe("CommunityFactory", function () {
     });
 
     it("Should be sponsored by what was set", async function () {
-      const { friend1, paymaster } = await loadFixture(deployCommunityFixture);
+      const { sponsor, paymaster } = await loadFixture(deployCommunityFixture);
 
-      expect(await paymaster.sponsor()).to.equal(friend1.address);
+      expect(await paymaster.sponsor()).to.equal(sponsor.address);
     });
 
     it("Owner should be able to modify the sponsor", async function () {
-      const { friend1, friend2, paymaster } = await loadFixture(
+      const { friend1, paymaster, sponsor, sponsor2 } = await loadFixture(
         deployCommunityFixture
       );
 
-      expect(await paymaster.sponsor()).to.equal(friend1.address);
+      expect(await paymaster.sponsor()).to.equal(sponsor.address);
 
-      await paymaster.connect(friend1).updateSponsor(friend2.address);
+      await paymaster.connect(friend1).updateSponsor(sponsor2.address);
 
-      expect(await paymaster.sponsor()).to.equal(friend2.address);
+      expect(await paymaster.sponsor()).to.equal(sponsor2.address);
     });
 
     it("Random account should not be able to modify the sponsor", async function () {
-      const { friend1, friend2, paymaster } = await loadFixture(
+      const { sponsor, friend2, paymaster } = await loadFixture(
         deployCommunityFixture
       );
 
-      expect(await paymaster.sponsor()).to.equal(friend1.address);
+      expect(await paymaster.sponsor()).to.equal(sponsor.address);
 
       await expect(
         paymaster.connect(friend2).updateSponsor(friend2.address)
       ).to.be.revertedWith("Ownable: caller is not the owner");
 
-      expect(await paymaster.sponsor()).to.equal(friend1.address);
+      expect(await paymaster.sponsor()).to.equal(sponsor.address);
     });
 
     it("Should create different addresses for different salts", async function () {
@@ -171,6 +185,7 @@ describe("CommunityFactory", function () {
         paymaster,
         accountFactory,
         profile,
+        sponsor,
       } = await loadFixture(deployCommunityFixture);
 
       const [
@@ -178,7 +193,12 @@ describe("CommunityFactory", function () {
         paymasterAddress2,
         accountFactoryAddress2,
         profileAddress2,
-      ] = await communityFactory.get(friend1.address, token.address, 0);
+      ] = await communityFactory.get(
+        friend1.address,
+        sponsor.address,
+        token.address,
+        0
+      );
 
       expect(community.address).to.equal(communityAddress2);
       expect(paymaster.address).to.equal(paymasterAddress2);
@@ -190,7 +210,12 @@ describe("CommunityFactory", function () {
         paymasterAddress3,
         accountFactoryAddress3,
         profileAddress3,
-      ] = await communityFactory.get(friend1.address, token.address, 1);
+      ] = await communityFactory.get(
+        friend1.address,
+        sponsor.address,
+        token.address,
+        1
+      );
 
       expect(community.address).to.not.equal(communityAddress3);
       expect(paymaster.address).to.not.equal(paymasterAddress3);
@@ -207,6 +232,7 @@ describe("CommunityFactory", function () {
         paymaster,
         accountFactory,
         profile,
+        sponsor,
       } = await loadFixture(deployCommunityFixture);
 
       const [
@@ -214,7 +240,12 @@ describe("CommunityFactory", function () {
         paymasterAddress2,
         accountFactoryAddress2,
         profileAddress2,
-      ] = await communityFactory.get(friend2.address, token.address, 0);
+      ] = await communityFactory.get(
+        friend2.address,
+        sponsor.address,
+        token.address,
+        0
+      );
 
       expect(community.address).to.not.equal(communityAddress2);
       expect(paymaster.address).to.not.equal(paymasterAddress2);
@@ -226,7 +257,12 @@ describe("CommunityFactory", function () {
         paymasterAddress3,
         accountFactoryAddress3,
         profileAddress3,
-      ] = await communityFactory.get(friend2.address, token.address, 0);
+      ] = await communityFactory.get(
+        friend2.address,
+        sponsor.address,
+        token.address,
+        0
+      );
 
       expect(communityAddress2).to.equal(communityAddress3);
       expect(paymasterAddress2).to.equal(paymasterAddress3);
@@ -244,17 +280,33 @@ describe("CommunityFactory", function () {
         paymaster,
         accountFactory,
         profile,
+        sponsor,
       } = await loadFixture(deployCommunityFixture);
 
-      let tx = await communityFactory.create(friend2.address, token.address, 0);
+      let tx = await communityFactory.create(
+        friend2.address,
+        sponsor.address,
+        token.address,
+        0
+      );
 
       await tx.wait();
 
-      tx = await communityFactory.create(friend2.address, token.address, 0);
+      tx = await communityFactory.create(
+        friend2.address,
+        sponsor.address,
+        token.address,
+        0
+      );
 
       await tx.wait();
 
-      tx = await communityFactory.create(friend2.address, token.address, 1);
+      tx = await communityFactory.create(
+        friend2.address,
+        sponsor.address,
+        token.address,
+        1
+      );
 
       await tx.wait();
 
@@ -263,7 +315,12 @@ describe("CommunityFactory", function () {
         paymasterAddress3,
         accountFactoryAddress3,
         profileAddress3,
-      ] = await communityFactory.get(friend1.address, token.address, 1);
+      ] = await communityFactory.get(
+        friend1.address,
+        sponsor.address,
+        token.address,
+        1
+      );
 
       expect(community.address).to.not.equal(communityAddress3);
       expect(paymaster.address).to.not.equal(paymasterAddress3);
