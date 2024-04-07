@@ -1,5 +1,5 @@
 import "@nomicfoundation/hardhat-toolbox";
-import { ethers, upgrades, run } from "hardhat";
+import { ethers, run } from "hardhat";
 import { terminal as term } from "terminal-kit";
 import { config } from "dotenv";
 
@@ -35,20 +35,31 @@ async function main() {
 
   const entryPoint: string = process.env.ENTRYPOINT_ADDR;
 
-  const contractName = "CommunityFactory";
+  const contractName = "TokenEntryPointFactory";
   term(`Preparing to deploy ${contractName}.sol\n`);
-  term("This will allow creating faucets.\n");
 
   term("\n");
 
-  const factory = await ethers.getContractFactory(contractName);
+  let factory = await ethers.getContractFactory(contractName);
 
-  console.log("⚙️ deploying CommunityFactory...");
+  console.log(`⚙️ deploying ${contractName}...`);
 
   const deployedContract = await factory.deploy(entryPoint);
 
   console.log("🚀 request sent...");
   await deployedContract.deployTransaction.wait(5);
+  console.log("deployed...");
+
+  const contract2Name = "ContractFactory";
+  const factory2 = await ethers.getContractFactory(contract2Name);
+
+  console.log(`⚙️ deploying ${contract2Name}...`);
+
+  const deployedContract2 = (await factory2.deploy(entryPoint)) as any;
+
+  console.log("🚀 request sent...");
+  await deployedContract2.deployTransaction.wait(5);
+  console.log("deployed...");
 
   console.log("🧐 verifying...\n");
 
@@ -57,11 +68,18 @@ async function main() {
       address: deployedContract.address,
       constructorArguments: [entryPoint],
     });
+
+    await run("verify:verify", {
+      address: deployedContract2.address,
+      constructorArguments: [entryPoint],
+    });
   } catch (error: any) {
     console.log("Error verifying contract: %s\n", error && error.message);
   }
 
-  console.log(`\nContract deployed at ${deployedContract.address}\n`);
+  console.log(`\nContracts deployed:`);
+  console.log(`\n${contractName} deployed at ${deployedContract.address}`);
+  console.log(`\n${contract2Name} deployed at ${deployedContract2.address}`);
 
   process.exit();
 }
