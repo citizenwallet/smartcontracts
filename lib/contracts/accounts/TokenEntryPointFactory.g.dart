@@ -4,7 +4,7 @@
 import 'package:web3dart/web3dart.dart' as _i1;
 
 final _contractAbi = _i1.ContractAbi.fromJson(
-  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"_entryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"address","name":"tokenEntryPoint","type":"address"},{"indexed":false,"internalType":"address","name":"paymaster","type":"address"}],"name":"EntryPointCreated","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"sponsor","type":"address"},{"internalType":"address","name":"token","type":"address"},{"internalType":"address[]","name":"whitelistedAddresses","type":"address[]"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"create","outputs":[{"internalType":"contract TokenEntryPoint","name":"tokenEntryPoint","type":"address"},{"internalType":"contract Paymaster","name":"paymaster","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"entryPoint","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"sponsor","type":"address"},{"internalType":"address","name":"token","type":"address"},{"internalType":"address[]","name":"whitelistedAddresses","type":"address[]"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"get","outputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"paymasterImplementation","outputs":[{"internalType":"contract Paymaster","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenEntryPointImplementation","outputs":[{"internalType":"contract TokenEntryPoint","name":"","type":"address"}],"stateMutability":"view","type":"function"}]',
+  '[{"inputs":[{"internalType":"contract IEntryPoint","name":"_entryPoint","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":false,"internalType":"address","name":"tokenEntryPoint","type":"address"},{"indexed":false,"internalType":"address","name":"paymaster","type":"address"}],"name":"EntryPointCreated","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"sponsor","type":"address"},{"internalType":"address[]","name":"whitelistedAddresses","type":"address[]"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"create","outputs":[{"internalType":"contract TokenEntryPoint","name":"tokenEntryPoint","type":"address"},{"internalType":"contract Paymaster","name":"paymaster","type":"address"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"entryPoint","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"sponsor","type":"address"},{"internalType":"address[]","name":"whitelistedAddresses","type":"address[]"},{"internalType":"uint256","name":"salt","type":"uint256"}],"name":"get","outputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"paymasterImplementation","outputs":[{"internalType":"contract Paymaster","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenEntryPointImplementation","outputs":[{"internalType":"contract TokenEntryPoint","name":"","type":"address"}],"stateMutability":"view","type":"function"}]',
   'TokenEntryPointFactory',
 );
 
@@ -28,18 +28,16 @@ class TokenEntryPointFactory extends _i1.GeneratedContract {
   Future<String> create(
     _i1.EthereumAddress owner,
     _i1.EthereumAddress sponsor,
-    _i1.EthereumAddress token,
     List<_i1.EthereumAddress> whitelistedAddresses,
     BigInt salt, {
     required _i1.Credentials credentials,
     _i1.Transaction? transaction,
   }) async {
     final function = self.abi.functions[1];
-    assert(checkSignature(function, 'a69b45ab'));
+    assert(checkSignature(function, '296c2efa'));
     final params = [
       owner,
       sponsor,
-      token,
       whitelistedAddresses,
       salt,
     ];
@@ -72,17 +70,15 @@ class TokenEntryPointFactory extends _i1.GeneratedContract {
   Future<Get> get(
     _i1.EthereumAddress owner,
     _i1.EthereumAddress sponsor,
-    _i1.EthereumAddress token,
     List<_i1.EthereumAddress> whitelistedAddresses,
     BigInt salt, {
     _i1.BlockNum? atBlock,
   }) async {
     final function = self.abi.functions[3];
-    assert(checkSignature(function, '6d605d70'));
+    assert(checkSignature(function, '9ee01b5f'));
     final params = [
       owner,
       sponsor,
-      token,
       whitelistedAddresses,
       salt,
     ];
