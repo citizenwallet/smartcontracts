@@ -59,7 +59,15 @@ contract TokenEntryPointFactory {
             );
         }
 
-        bytes32 derivedSalt = keccak256(abi.encodePacked(owner, sponsor, salt));
+        require(
+            whitelistedAddresses.length > 0,
+            "whitelistedAddresses is empty"
+        );
+        address firstWhitelistedAddress = whitelistedAddresses[0];
+
+        bytes32 derivedSalt = keccak256(
+            abi.encodePacked(owner, sponsor, firstWhitelistedAddress, salt)
+        );
 
         paymaster = Paymaster(
             address(
@@ -100,7 +108,15 @@ contract TokenEntryPointFactory {
         address[] memory whitelistedAddresses,
         uint256 salt
     ) public view returns (address, address) {
-        bytes32 derivedSalt = keccak256(abi.encodePacked(owner, sponsor, salt));
+        require(
+            whitelistedAddresses.length > 0,
+            "whitelistedAddresses is empty"
+        );
+        address firstWhitelistedAddress = whitelistedAddresses[0];
+
+        bytes32 derivedSalt = keccak256(
+            abi.encodePacked(owner, sponsor, firstWhitelistedAddress, salt)
+        );
 
         address paymaster = Create2.computeAddress(
             derivedSalt,
