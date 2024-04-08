@@ -38,7 +38,8 @@ CW_ACCOUNT_CONTRACTS=('account,Account' \
         'paymaster,Paymaster',
         'voucher,Voucher' \
         'voucherFactory,VoucherFactory', \
-        'communityFactory,CommunityFactory')
+        'tokenEntryPointFactory,TokenEntryPointFactory' \
+        'contractFactory,ContractFactory')
 
 CW_APP_CONTRACTS=('profile,Profile' \
         'erc20IOU,ERC20IOU' \
