@@ -50,7 +50,7 @@ async function main() {
   await deployedContract.deployTransaction.wait(5);
   console.log("deployed...");
 
-  const contract2Name = "ContractFactory";
+  const contract2Name = "AccountFactoryFactory";
   const factory2 = await ethers.getContractFactory(contract2Name);
 
   console.log(`⚙️ deploying ${contract2Name}...`);
@@ -59,6 +59,17 @@ async function main() {
 
   console.log("🚀 request sent...");
   await deployedContract2.deployTransaction.wait(5);
+  console.log("deployed...");
+
+  const contract3Name = "ProfileFactory";
+  const factory3 = await ethers.getContractFactory(contract3Name);
+
+  console.log(`⚙️ deploying ${contract3Name}...`);
+
+  const deployedContract3 = (await factory3.deploy()) as any;
+
+  console.log("🚀 request sent...");
+  await deployedContract3.deployTransaction.wait(5);
   console.log("deployed...");
 
   console.log("🧐 verifying...\n");
@@ -80,6 +91,7 @@ async function main() {
   console.log(`\nContracts deployed:`);
   console.log(`\n${contractName} deployed at ${deployedContract.address}`);
   console.log(`\n${contract2Name} deployed at ${deployedContract2.address}`);
+  console.log(`\n${contract3Name} deployed at ${deployedContract3.address}`);
 
   process.exit();
 }

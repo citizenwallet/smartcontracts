@@ -8,7 +8,6 @@
 // import "./TokenEntryPoint.sol";
 // import "./Paymaster.sol";
 // import "./AccountFactory.sol";
-// import "../apps/Profile.sol";
 
 // import "./interfaces/ITokenEntryPoint.sol";
 
@@ -23,14 +22,12 @@
 //     TokenEntryPoint public immutable tokenEntryPointImplementation;
 //     Paymaster public immutable paymasterImplementation;
 //     AccountFactory public immutable accountFactoryImplementation;
-//     Profile public immutable profileImplementation;
 
 //     event CommunityCreated(
 //         address indexed owner,
 //         address tokenEntryPoint,
 //         address paymaster,
-//         address accountFactory,
-//         address profile
+//         address accountFactory
 //     );
 
 //     constructor(IEntryPoint _entryPoint) {
@@ -38,7 +35,6 @@
 //         tokenEntryPointImplementation = new TokenEntryPoint(_entryPoint);
 //         paymasterImplementation = new Paymaster();
 //         accountFactoryImplementation = new AccountFactory();
-//         profileImplementation = new Profile();
 //     }
 
 //     /**
@@ -51,34 +47,31 @@
 //         address owner,
 //         address sponsor,
 //         address token,
+//         address profile,
 //         uint256 salt
 //     )
 //         public
 //         returns (
 //             TokenEntryPoint tokenEntryPoint,
 //             Paymaster paymaster,
-//             AccountFactory accountFactory,
-//             Profile profile
+//             AccountFactory accountFactory
 //         )
 //     {
 //         (
 //             address _tokenEntryPoint,
 //             address _paymaster,
-//             address _accountFactory,
-//             address _profile
-//         ) = get(owner, sponsor, token, salt);
+//             address _accountFactory
+//         ) = get(owner, sponsor, token, profile, salt);
 
 //         if (
 //             _tokenEntryPoint.code.length > 0 &&
 //             _paymaster.code.length > 0 &&
-//             _accountFactory.code.length > 0 &&
-//             _profile.code.length > 0
+//             _accountFactory.code.length > 0
 //         ) {
 //             return (
 //                 TokenEntryPoint(address(_tokenEntryPoint)),
 //                 Paymaster(address(_paymaster)),
-//                 AccountFactory(address(_accountFactory)),
-//                 Profile(address(_profile))
+//                 AccountFactory(address(_accountFactory))
 //             );
 //         }
 
@@ -97,19 +90,8 @@
 
 //         paymaster.transferOwnership(owner);
 
-//         profile = Profile(
-//             address(
-//                 new ERC1967Proxy{salt: derivedSalt}(
-//                     address(profileImplementation),
-//                     abi.encodeCall(Profile.initialize, ())
-//                 )
-//             )
-//         );
-
-//         profile.transferOwnership(owner);
-
 //         address[] memory whitelistedAddresses = new address[](2);
-//         whitelistedAddresses[0] = address(profile);
+//         whitelistedAddresses[0] = profile;
 //         whitelistedAddresses[1] = token;
 
 //         tokenEntryPoint = TokenEntryPoint(
@@ -144,8 +126,7 @@
 //             owner,
 //             address(tokenEntryPoint),
 //             address(paymaster),
-//             address(accountFactory),
-//             address(profile)
+//             address(accountFactory)
 //         );
 //     }
 
@@ -156,10 +137,11 @@
 //         address owner,
 //         address sponsor,
 //         address token,
+//         address profile,
 //         uint256 salt
-//     ) public view returns (address, address, address, address) {
+//     ) public view returns (address, address, address) {
 //         bytes32 derivedSalt = keccak256(
-//             abi.encodePacked(owner, sponsor, token, salt)
+//             abi.encodePacked(owner, sponsor, token, profile, salt)
 //         );
 
 //         address paymaster = Create2.computeAddress(
@@ -175,21 +157,8 @@
 //             )
 //         );
 
-//         address profile = Create2.computeAddress(
-//             derivedSalt,
-//             keccak256(
-//                 abi.encodePacked(
-//                     type(ERC1967Proxy).creationCode,
-//                     abi.encode(
-//                         address(profileImplementation),
-//                         abi.encodeCall(Profile.initialize, ())
-//                     )
-//                 )
-//             )
-//         );
-
 //         address[] memory whitelistedAddresses = new address[](2);
-//         whitelistedAddresses[0] = address(profile);
+//         whitelistedAddresses[0] = profile;
 //         whitelistedAddresses[1] = token;
 
 //         address tokenEntryPoint = Create2.computeAddress(
@@ -228,6 +197,6 @@
 //             )
 //         );
 
-//         return (tokenEntryPoint, paymaster, accountFactory, profile);
+//         return (tokenEntryPoint, paymaster, accountFactory);
 //     }
 // }
