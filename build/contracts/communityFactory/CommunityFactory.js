@@ -1,3 +1,0 @@
-// CommunityFactory.js
-
-module.exports = '';
