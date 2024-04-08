@@ -42,14 +42,12 @@ contract TokenEntryPointFactory {
     function create(
         address owner,
         address sponsor,
-        address token,
         address[] memory whitelistedAddresses,
         uint256 salt
     ) public returns (TokenEntryPoint tokenEntryPoint, Paymaster paymaster) {
         (address _tokenEntryPoint, address _paymaster) = get(
             owner,
             sponsor,
-            token,
             whitelistedAddresses,
             salt
         );
@@ -61,9 +59,7 @@ contract TokenEntryPointFactory {
             );
         }
 
-        bytes32 derivedSalt = keccak256(
-            abi.encodePacked(owner, sponsor, token, salt)
-        );
+        bytes32 derivedSalt = keccak256(abi.encodePacked(owner, sponsor, salt));
 
         paymaster = Paymaster(
             address(
@@ -101,13 +97,10 @@ contract TokenEntryPointFactory {
     function get(
         address owner,
         address sponsor,
-        address token,
         address[] memory whitelistedAddresses,
         uint256 salt
     ) public view returns (address, address) {
-        bytes32 derivedSalt = keccak256(
-            abi.encodePacked(owner, sponsor, token, salt)
-        );
+        bytes32 derivedSalt = keccak256(abi.encodePacked(owner, sponsor, salt));
 
         address paymaster = Create2.computeAddress(
             derivedSalt,
