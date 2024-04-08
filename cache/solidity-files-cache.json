@@ -3731,8 +3731,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/CommunityFactory.sol": {
-      "lastModificationDate": 1712528711770,
-      "contentHash": "68b50a7e8b07cc4a2fc1188bc9c08f65",
+      "lastModificationDate": 1712572522880,
+      "contentHash": "39ea25d3cf5b9ac243fad65a2992b63d",
       "sourceName": "contracts/accounts/CommunityFactory.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3762,50 +3762,6 @@
       "imports": [],
       "versionPragmas": [],
       "artifacts": []
-    },
-    "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/ContractFactory.sol": {
-      "lastModificationDate": 1712528711770,
-      "contentHash": "69819c03b51c86051e9028fa7cde354c",
-      "sourceName": "contracts/accounts/ContractFactory.sol",
-      "solcConfig": {
-        "version": "0.8.20",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": true,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/utils/Create2.sol",
-        "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol",
-        "@account-abstraction/contracts/interfaces/IEntryPoint.sol",
-        "./AccountFactory.sol",
-        "../apps/Profile.sol",
-        "./interfaces/ITokenEntryPoint.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ContractFactory"
-      ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/TokenEntryPointFactory.sol": {
       "lastModificationDate": 1712528711770,
@@ -3849,6 +3805,92 @@
       ],
       "artifacts": [
         "TokenEntryPointFactory"
+      ]
+    },
+    "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/AccountFactoryFactory.sol": {
+      "lastModificationDate": 1712572522880,
+      "contentHash": "f90d02714effd469c16772ec03551a16",
+      "sourceName": "contracts/accounts/AccountFactoryFactory.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/utils/Create2.sol",
+        "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol",
+        "@account-abstraction/contracts/interfaces/IEntryPoint.sol",
+        "./AccountFactory.sol",
+        "./interfaces/ITokenEntryPoint.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "AccountFactoryFactory"
+      ]
+    },
+    "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/ProfileFactory.sol": {
+      "lastModificationDate": 1712572522880,
+      "contentHash": "6d5d5122409a6862ae6bd61fed307c0b",
+      "sourceName": "contracts/accounts/ProfileFactory.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/utils/Create2.sol",
+        "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol",
+        "@account-abstraction/contracts/interfaces/IEntryPoint.sol",
+        "../apps/Profile.sol",
+        "./interfaces/ITokenEntryPoint.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ProfileFactory"
       ]
     }
   }

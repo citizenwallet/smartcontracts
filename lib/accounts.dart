@@ -10,4 +10,5 @@ export 'contracts/accounts/Paymaster.g.dart' hide AdminChanged, BeaconUpgraded, 
 export 'contracts/accounts/Voucher.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;
 export 'contracts/accounts/VoucherFactory.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;
 export 'contracts/accounts/TokenEntryPointFactory.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;
-export 'contracts/accounts/ContractFactory.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;
+export 'contracts/accounts/AccountFactoryFactory.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;
+export 'contracts/accounts/ProfileFactory.g.dart' hide AdminChanged, BeaconUpgraded, Initialized, Upgraded, OwnershipTransferred;
