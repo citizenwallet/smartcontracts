@@ -11,7 +11,12 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
  * @title SimpleFaucet
  * @dev A simple faucet contract that allows users to redeem tokens at a specified interval.
  */
-contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
+contract SimpleFaucet is
+    Initializable,
+    OwnableUpgradeable,
+    AccessControlUpgradeable,
+    UUPSUpgradeable
+{
     bytes32 public constant REDEEM_ADMIN_ROLE = keccak256("REDEEM_ADMIN_ROLE");
 
     IERC20Upgradeable public token;
@@ -25,7 +30,13 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
      */
     mapping(address receiver => uint48 time) public redeemed;
 
-    function initialize(address owner, IERC20Upgradeable _token, uint256 _amount, uint48 _redeemInterval, address _redeemAdmin) public initializer {
+    function initialize(
+        address owner,
+        IERC20Upgradeable _token,
+        uint256 _amount,
+        uint48 _redeemInterval,
+        address _redeemAdmin
+    ) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         token = _token;
@@ -69,6 +80,38 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
         );
 
         token.transfer(msg.sender, amount);
+
+        redeemed[msg.sender] = currentTime;
+    }
+
+    /**
+     * @dev Same as redeem except that you can choose who it should go to.
+     */
+    function redeemTo(address to) public {
+        uint48 currentTime = uint48(block.timestamp);
+
+        if (redeemInterval > 0) {
+            // if a redeem interval is set, check if the user can redeem based on interval
+            uint48 allowedTime = redeemed[msg.sender] + redeemInterval;
+
+            require(
+                currentTime >= allowedTime,
+                "SimpleFaucet: redeem interval not passed"
+            );
+        } else {
+            // if no interval is set, check if the user has redeemed before
+            require(
+                redeemed[msg.sender] == 0,
+                "SimpleFaucet: already redeemed"
+            );
+        }
+
+        require(
+            token.balanceOf(address(this)) >= amount,
+            "SimpleFaucet: insufficient balance"
+        );
+
+        token.transfer(to, amount);
 
         redeemed[msg.sender] = currentTime;
     }
