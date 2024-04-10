@@ -57,7 +57,8 @@ CW_EXTERNAL_CONTRACTS=('simpleaccountfactory,SimpleAccountFactory' \
         'derc20,DERC20' \
         'simpleaccount,SimpleAccount' \
         'entrypoint,EntryPoint' \
-        'erc1967Proxy,ERC1967Proxy')
+        'erc1967Proxy,ERC1967Proxy' \
+        'cardFactory,CardFactory')
 
 # Clean build folder
 echo "Cleaning build folder..."
