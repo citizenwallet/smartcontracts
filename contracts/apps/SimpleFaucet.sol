@@ -11,7 +11,12 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
  * @title SimpleFaucet
  * @dev A simple faucet contract that allows users to redeem tokens at a specified interval.
  */
-contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgradeable, UUPSUpgradeable {
+contract SimpleFaucet is
+    Initializable,
+    OwnableUpgradeable,
+    AccessControlUpgradeable,
+    UUPSUpgradeable
+{
     bytes32 public constant REDEEM_ADMIN_ROLE = keccak256("REDEEM_ADMIN_ROLE");
 
     IERC20Upgradeable public token;
@@ -25,7 +30,13 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
      */
     mapping(address receiver => uint48 time) public redeemed;
 
-    function initialize(address owner, IERC20Upgradeable _token, uint256 _amount, uint48 _redeemInterval, address _redeemAdmin) public initializer {
+    function initialize(
+        address owner,
+        IERC20Upgradeable _token,
+        uint256 _amount,
+        uint48 _redeemInterval,
+        address _redeemAdmin
+    ) public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
         token = _token;
@@ -44,12 +55,12 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
      * Upon successful redemption, the specified amount of tokens is transferred to the user's address.
      * The redemption time is recorded for future interval checks.
      */
-    function redeem() public {
+    function redeem(address recipient) public {
         uint48 currentTime = uint48(block.timestamp);
 
         if (redeemInterval > 0) {
             // if a redeem interval is set, check if the user can redeem based on interval
-            uint48 allowedTime = redeemed[msg.sender] + redeemInterval;
+            uint48 allowedTime = redeemed[recipient] + redeemInterval;
 
             require(
                 currentTime >= allowedTime,
@@ -57,10 +68,7 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
             );
         } else {
             // if no interval is set, check if the user has redeemed before
-            require(
-                redeemed[msg.sender] == 0,
-                "SimpleFaucet: already redeemed"
-            );
+            require(redeemed[recipient] == 0, "SimpleFaucet: already redeemed");
         }
 
         require(
@@ -68,9 +76,13 @@ contract SimpleFaucet is Initializable, OwnableUpgradeable, AccessControlUpgrade
             "SimpleFaucet: insufficient balance"
         );
 
-        token.transfer(msg.sender, amount);
+        token.transfer(recipient, amount);
 
-        redeemed[msg.sender] = currentTime;
+        redeemed[recipient] = currentTime;
+    }
+
+    function redeem() public {
+        return redeem(msg.sender);
     }
 
     /**
