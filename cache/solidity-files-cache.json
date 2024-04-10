@@ -3388,8 +3388,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/SimpleFaucet.sol": {
-      "lastModificationDate": 1712528711770,
-      "contentHash": "1344c8307de9822d1cd344065efc5820",
+      "lastModificationDate": 1712788053828,
+      "contentHash": "3f8eb82bdfc76f0281f28182873c7f1f",
       "sourceName": "contracts/apps/SimpleFaucet.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3474,7 +3474,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/FaucetFactory.sol": {
-      "lastModificationDate": 1712528711770,
+      "lastModificationDate": 1712788053828,
       "contentHash": "ef271f9282e17b8941adcf1d4472eb99",
       "sourceName": "contracts/apps/FaucetFactory.sol",
       "solcConfig": {
