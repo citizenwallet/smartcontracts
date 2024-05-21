@@ -4,15 +4,19 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract Profile is
     Initializable,
     ERC721URIStorageUpgradeable,
     OwnableUpgradeable,
+    AccessControlUpgradeable,
     UUPSUpgradeable
 {
     bytes32 constant NULL = "";
+    bytes32 public constant PROFILE_ADMIN_ROLE =
+        keccak256("PROFILE_ADMIN_ROLE");
 
     /// only a single username per address
     ///
@@ -32,7 +36,10 @@ contract Profile is
     function initialize() public initializer {
         __ERC721_init("Profile", "PRF");
         __Ownable_init();
+        __AccessControl_init();
         __UUPSUpgradeable_init();
+
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     function set(
@@ -40,7 +47,12 @@ contract Profile is
         bytes32 _username,
         string memory _uri
     ) public returns (uint256) {
-        require(owner() == msg.sender || profile == msg.sender, "Only the profile owner or contract owner can set it.");
+        require(
+            owner() == msg.sender ||
+                profile == msg.sender ||
+                hasRole(PROFILE_ADMIN_ROLE, msg.sender),
+            "Only the profile owner or contract owner can set it."
+        );
 
         bytes32 currentUsername = usernames[profile];
 
@@ -88,7 +100,9 @@ contract Profile is
     function burn(uint256 tokenId) external {
         address profileOwner = _fromIdToAddress(tokenId);
         require(
-            owner() == msg.sender || profileOwner == msg.sender,
+            owner() == msg.sender ||
+                profileOwner == msg.sender ||
+                hasRole(PROFILE_ADMIN_ROLE, msg.sender),
             "Only the owner of the token or profile can burn it."
         );
         _burn(tokenId);
@@ -143,4 +157,15 @@ contract Profile is
     function _authorizeUpgrade(
         address newImplementation
     ) internal override onlyOwner {}
+
+    function supportsInterface(
+        bytes4 interfaceId
+    )
+        public
+        view
+        override(ERC721URIStorageUpgradeable, AccessControlUpgradeable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
 }

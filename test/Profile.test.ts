@@ -72,9 +72,32 @@ describe("Profile", function () {
         "Only the profile owner or contract owner can set it."
       );
 
+      expect(
+        await profile
+          .connect(owner)
+          .set(friend1.address, friend1UsernameA, "https://test.com")
+      ).to.be.ok;
+    });
+
+    it("Should allow the profile admin to set", async function () {
+      const { profile, owner, friend1, friend2 } = await loadFixture(
+        deployProfileFixture
+      );
       await expect(
         profile
-          .connect(owner)
+          .connect(friend2)
+          .set(friend1.address, friend1UsernameA, "https://test.com")
+      ).to.be.revertedWith(
+        "Only the profile owner or contract owner can set it."
+      );
+
+      await profile
+        .connect(owner)
+        .grantRole(await profile.PROFILE_ADMIN_ROLE(), friend2.address);
+
+      expect(
+        await profile
+          .connect(friend2)
           .set(friend1.address, friend1UsernameA, "https://test.com")
       ).to.be.ok;
     });
@@ -152,6 +175,29 @@ describe("Profile", function () {
 
       await profile
         .connect(friend1)
+        .burn(ethers.BigNumber.from(friend1.address));
+      expect(await profile.balanceOf(friend1.address)).to.equal(0);
+    });
+
+    it("Should allow the profile admin to burn", async function () {
+      const { profile, owner, friend1, friend2 } = await loadFixture(
+        deployProfileFixture
+      );
+      await profile
+        .connect(friend1)
+        .set(friend1.address, friend1UsernameA, "https://test.com");
+      await expect(
+        profile.connect(friend2).burn(ethers.BigNumber.from(friend1.address))
+      ).to.be.revertedWith(
+        "Only the owner of the token or profile can burn it."
+      );
+
+      await profile
+        .connect(owner)
+        .grantRole(await profile.PROFILE_ADMIN_ROLE(), friend2.address);
+
+      await profile
+        .connect(friend2)
         .burn(ethers.BigNumber.from(friend1.address));
       expect(await profile.balanceOf(friend1.address)).to.equal(0);
     });
