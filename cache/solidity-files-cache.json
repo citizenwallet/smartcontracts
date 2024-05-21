@@ -2699,8 +2699,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/Profile.sol": {
-      "lastModificationDate": 1712528711770,
-      "contentHash": "de1c02ad75d404642c8b38e8c0ed25b6",
+      "lastModificationDate": 1716306848082,
+      "contentHash": "3ae45552cd01b5350e86d560d06af8f1",
       "sourceName": "contracts/apps/Profile.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -2731,6 +2731,7 @@
         "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol",
         "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
         "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+        "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
         "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol"
       ],
       "versionPragmas": [
@@ -3851,7 +3852,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/ProfileFactory.sol": {
-      "lastModificationDate": 1712572522880,
+      "lastModificationDate": 1716306848082,
       "contentHash": "6d5d5122409a6862ae6bd61fed307c0b",
       "sourceName": "contracts/accounts/ProfileFactory.sol",
       "solcConfig": {
