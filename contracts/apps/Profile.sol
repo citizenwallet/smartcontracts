@@ -65,7 +65,7 @@ contract Profile is
             "This username is already taken."
         );
 
-        uint256 newProfileId = _fromAddressToId(profile);
+        uint256 newProfileId = fromAddressToId(profile);
         if (!_exists(newProfileId)) {
             _mint(profile, newProfileId);
         }
@@ -83,7 +83,7 @@ contract Profile is
     }
 
     function get(address profile) public view returns (string memory) {
-        uint256 profileId = _fromAddressToId(profile);
+        uint256 profileId = fromAddressToId(profile);
         return tokenURI(profileId);
     }
 
@@ -93,12 +93,12 @@ contract Profile is
         address profile = profiles[username];
         require(profile != address(0), "This username does not exist.");
 
-        uint256 profileId = _fromAddressToId(profile);
+        uint256 profileId = fromAddressToId(profile);
         return tokenURI(profileId);
     }
 
     function burn(uint256 tokenId) external {
-        address profileOwner = _fromIdToAddress(tokenId);
+        address profileOwner = fromIdToAddress(tokenId);
         require(
             owner() == msg.sender ||
                 profileOwner == msg.sender ||
@@ -125,7 +125,7 @@ contract Profile is
     function _burn(
         uint256 tokenId
     ) internal override(ERC721URIStorageUpgradeable) {
-        _unsetUsername(_fromIdToAddress(tokenId));
+        _unsetUsername(fromIdToAddress(tokenId));
         super._burn(tokenId);
     }
 
@@ -146,11 +146,11 @@ contract Profile is
         delete usernames[_profile];
     }
 
-    function _fromIdToAddress(uint256 tokenId) internal pure returns (address) {
+    function fromIdToAddress(uint256 tokenId) public pure returns (address) {
         return address(uint160(uint256(tokenId)));
     }
 
-    function _fromAddressToId(address profile) internal pure returns (uint256) {
+    function fromAddressToId(address profile) public pure returns (uint256) {
         return uint256(uint160(profile));
     }
 
