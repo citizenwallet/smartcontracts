@@ -2699,8 +2699,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/Profile.sol": {
-      "lastModificationDate": 1716306848082,
-      "contentHash": "3ae45552cd01b5350e86d560d06af8f1",
+      "lastModificationDate": 1716494364243,
+      "contentHash": "c079af1933e2c5088aa1e99d3e8669cb",
       "sourceName": "contracts/apps/Profile.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3852,7 +3852,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/ProfileFactory.sol": {
-      "lastModificationDate": 1716306848082,
+      "lastModificationDate": 1716494364243,
       "contentHash": "6d5d5122409a6862ae6bd61fed307c0b",
       "sourceName": "contracts/accounts/ProfileFactory.sol",
       "solcConfig": {
