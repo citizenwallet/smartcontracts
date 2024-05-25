@@ -108,6 +108,14 @@ contract Profile is
         _burn(tokenId);
     }
 
+    function fromIdToAddress(uint256 tokenId) public pure returns (address) {
+        return address(uint160(uint256(tokenId)));
+    }
+
+    function fromAddressToId(address profile) public pure returns (uint256) {
+        return uint256(uint160(profile));
+    }
+
     function _beforeTokenTransfer(
         address from,
         address to,
@@ -144,14 +152,6 @@ contract Profile is
 
         delete profiles[username];
         delete usernames[_profile];
-    }
-
-    function fromIdToAddress(uint256 tokenId) public pure returns (address) {
-        return address(uint160(uint256(tokenId)));
-    }
-
-    function fromAddressToId(address profile) public pure returns (uint256) {
-        return uint256(uint160(profile));
     }
 
     function _authorizeUpgrade(
