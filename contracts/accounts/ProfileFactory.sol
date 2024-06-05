@@ -30,10 +30,7 @@ contract ProfileFactory {
      * Note that during UserOperation execution, this method is called only if the account is not deployed.
      * This method returns an existing account address so that entryPoint.getSenderAddress() would work even after account creation
      */
-    function create(
-        address owner,
-        uint256 salt
-    ) public returns (Profile profile) {
+    function create(address owner, uint256 salt) public returns (Profile profile) {
         address _profile = get(owner, salt);
 
         if (_profile.code.length > 0) {
@@ -45,13 +42,10 @@ contract ProfileFactory {
         profile = Profile(
             address(
                 new ERC1967Proxy{salt: derivedSalt}(
-                    address(profileImplementation),
-                    abi.encodeCall(Profile.initialize, ())
+                    address(profileImplementation), abi.encodeCall(Profile.initialize, (owner))
                 )
             )
         );
-
-        profile.transferOwnership(owner);
 
         emit ProfileCreated(owner, address(profile));
     }
@@ -67,10 +61,7 @@ contract ProfileFactory {
             keccak256(
                 abi.encodePacked(
                     type(ERC1967Proxy).creationCode,
-                    abi.encode(
-                        address(profileImplementation),
-                        abi.encodeCall(Profile.initialize, ())
-                    )
+                    abi.encode(address(profileImplementation), abi.encodeCall(Profile.initialize, (owner)))
                 )
             )
         );

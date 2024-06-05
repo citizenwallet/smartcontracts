@@ -15,8 +15,7 @@ contract Profile is
     UUPSUpgradeable
 {
     bytes32 constant NULL = "";
-    bytes32 public constant PROFILE_ADMIN_ROLE =
-        keccak256("PROFILE_ADMIN_ROLE");
+    bytes32 public constant PROFILE_ADMIN_ROLE = keccak256("PROFILE_ADMIN_ROLE");
 
     /// only a single username per address
     ///
@@ -33,35 +32,26 @@ contract Profile is
         _disableInitializers();
     }
 
-    function initialize() public initializer {
+    function initialize(address _owner) public initializer {
         __ERC721_init("Profile", "PRF");
         __Ownable_init();
         __AccessControl_init();
         __UUPSUpgradeable_init();
 
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(DEFAULT_ADMIN_ROLE, _owner);
     }
 
-    function set(
-        address profile,
-        bytes32 _username,
-        string memory _uri
-    ) public returns (uint256) {
+    function set(address profile, bytes32 _username, string memory _uri) public returns (uint256) {
         require(
-            owner() == msg.sender ||
-                profile == msg.sender ||
-                hasRole(PROFILE_ADMIN_ROLE, msg.sender),
+            owner() == msg.sender || profile == msg.sender || hasRole(PROFILE_ADMIN_ROLE, msg.sender),
             "Only the profile owner or contract owner can set it."
         );
 
         bytes32 currentUsername = usernames[profile];
 
         require(
-            (currentUsername == NULL &&
-                (profiles[_username] == address(0) ||
-                    profiles[_username] == profile)) || // username is not set and is also not reserved
-                (currentUsername != NULL &&
-                    profiles[currentUsername] == profile), // username is set but belongs to the profile
+            (currentUsername == NULL && (profiles[_username] == address(0) || profiles[_username] == profile)) // username is not set and is also not reserved
+                || (currentUsername != NULL && profiles[currentUsername] == profile), // username is set but belongs to the profile
             "This username is already taken."
         );
 
@@ -72,10 +62,7 @@ contract Profile is
         if (currentUsername != _username) {
             _setUsername(profile, _username);
         }
-        if (
-            keccak256(abi.encodePacked(tokenURI(newProfileId))) !=
-            keccak256(abi.encodePacked(_uri))
-        ) {
+        if (keccak256(abi.encodePacked(tokenURI(newProfileId))) != keccak256(abi.encodePacked(_uri))) {
             _setTokenURI(newProfileId, _uri);
         }
 
@@ -87,9 +74,7 @@ contract Profile is
         return tokenURI(profileId);
     }
 
-    function getFromUsername(
-        bytes32 username
-    ) public view returns (string memory) {
+    function getFromUsername(bytes32 username) public view returns (string memory) {
         address profile = profiles[username];
         require(profile != address(0), "This username does not exist.");
 
@@ -100,9 +85,7 @@ contract Profile is
     function burn(uint256 tokenId) external {
         address profileOwner = fromIdToAddress(tokenId);
         require(
-            owner() == msg.sender ||
-                profileOwner == msg.sender ||
-                hasRole(PROFILE_ADMIN_ROLE, msg.sender),
+            owner() == msg.sender || profileOwner == msg.sender || hasRole(PROFILE_ADMIN_ROLE, msg.sender),
             "Only the owner of the token or profile can burn it."
         );
         _burn(tokenId);
@@ -116,12 +99,11 @@ contract Profile is
         return uint256(uint160(profile));
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 firstTokenId,
-        uint256 batchSize
-    ) internal pure override {
+    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize)
+        internal
+        pure
+        override
+    {
         (firstTokenId);
         (batchSize);
         require(
@@ -130,9 +112,7 @@ contract Profile is
         );
     }
 
-    function _burn(
-        uint256 tokenId
-    ) internal override(ERC721URIStorageUpgradeable) {
+    function _burn(uint256 tokenId) internal override(ERC721URIStorageUpgradeable) {
         _unsetUsername(fromIdToAddress(tokenId));
         super._burn(tokenId);
     }
@@ -154,13 +134,9 @@ contract Profile is
         delete usernames[_profile];
     }
 
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal override onlyOwner {}
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
-    function supportsInterface(
-        bytes4 interfaceId
-    )
+    function supportsInterface(bytes4 interfaceId)
         public
         view
         override(ERC721URIStorageUpgradeable, AccessControlUpgradeable)

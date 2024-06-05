@@ -35,15 +35,21 @@ if (!networkName) {
   process.exit();
 }
 
+const ownerAddress = process.env.OWNER_ADDRESS || "";
+if (!ownerAddress) {
+  term.red("OWNER_ADDRESS missing in your environment");
+  term("\n");
+  process.exit();
+}
+
 async function main() {
-  console.log("reading config...");
   config();
 
   const profileFactory = await ethers.getContractFactory("Profile");
 
   console.log("⚙️ deploying Profile...");
 
-  const profile = await upgrades.deployProxy(profileFactory, [], {
+  const profile = await upgrades.deployProxy(profileFactory, [ownerAddress], {
     kind: "uups",
     initializer: "initialize",
     timeout: 60000,
