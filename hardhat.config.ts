@@ -30,6 +30,14 @@ const hhconfig: HardhatUserConfig = {
       url: process.env.POLYGON_TESTNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
     },
+    gnosis_mainnet: {
+      url: process.env.GNOSIS_MAINNET_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+    },
+    gnosis_testnet: {
+      url: process.env.GNOSIS_TESTNET_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+    },
     base_mainnet: {
       url: process.env.BASE_MAINNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
@@ -59,6 +67,8 @@ const hhconfig: HardhatUserConfig = {
       polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
       base_mainnet: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
       base_testnet: process.env.BASE_TESTNET_ETHERSCAN_API_KEY || "",
+      gnosis: process.env.GNOSIS_MAINNET_ETHERSCAN_API_KEY || "",
+      gnosis_testnet: process.env.GNOSIS_TESTNET_ETHERSCAN_API_KEY || "",
       celo_mainnet: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
       celo_testnet: process.env.CELO_TESTNET_ETHERSCAN_API_KEY || "",
       gnosis_mainnet: process.env.GNOSIS_MAINNET_ETHERSCAN_API_KEY || "",
@@ -76,8 +86,8 @@ const hhconfig: HardhatUserConfig = {
         network: "base_testnet",
         chainId: 84532,
         urls: {
-          apiURL: "https://api.basescan.org/api",
-          browserURL: "https://basescan.org",
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org/",
         },
       },
       {
