@@ -13,6 +13,7 @@
     "deploy:profile": "ts-node scripts/selectNetwork.ts deploy-profile",
     "deploy:erc20-iou": "ts-node scripts/selectNetwork.ts deploy-erc20-iou",
     "deploy:voucher-factory": "ts-node scripts/selectNetwork.ts deploy-voucher-factory",
+    "deploy:simple-faucet": "ts-node scripts/selectNetwork.ts deploy-simple-faucet",
     "deploy:faucet-factory": "ts-node scripts/selectNetwork.ts deploy-faucet-factory",
     "deploy:community-factory": "ts-node scripts/selectNetwork.ts deploy-community-factory",
     "deploy:community": "ts-node scripts/selectNetwork.ts deploy-community",
