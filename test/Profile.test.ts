@@ -12,10 +12,14 @@ describe("Profile", function () {
     const [owner, friend1, friend2] = await ethers.getSigners();
 
     const ProfileContract = await ethers.getContractFactory("Profile");
-    const profile = await upgrades.deployProxy(ProfileContract, [], {
-      kind: "uups",
-      initializer: "initialize",
-    });
+    const profile = await upgrades.deployProxy(
+      ProfileContract,
+      [owner.address],
+      {
+        kind: "uups",
+        initializer: "initialize",
+      }
+    );
 
     return { profile, owner, friend1, friend2 };
   }
