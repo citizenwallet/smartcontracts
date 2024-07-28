@@ -30,6 +30,10 @@ const hhconfig: HardhatUserConfig = {
       url: process.env.POLYGON_TESTNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
     },
+    arbitrum_mainnet: {
+      url: process.env.ARBITRUM_MAINNET_RPC_URL || "",
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+    },
     base_mainnet: {
       url: process.env.BASE_MAINNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
@@ -57,6 +61,7 @@ const hhconfig: HardhatUserConfig = {
       sepolia: process.env.ETHEREUM_TESTNET_ETHERSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYGON_TESTNET_ETHERSCAN_API_KEY || "",
       polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
+      arbitrum_mainnet: process.env.ARBITRUM_MAINNET_ETHERSCAN_API_KEY || "",
       base_mainnet: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
       base_testnet: process.env.BASE_TESTNET_ETHERSCAN_API_KEY || "",
       celo_mainnet: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
@@ -64,6 +69,14 @@ const hhconfig: HardhatUserConfig = {
       gnosis_mainnet: process.env.GNOSIS_MAINNET_ETHERSCAN_API_KEY || "",
     },
     customChains: [
+      {
+        network: "arbitrum_mainnet",
+        chainId: 42161,
+        urls: {
+          apiURL: "https://api.arbiscan.io/api",
+          browserURL: "https://arbiscan.io",
+        },
+      },
       {
         network: "base_mainnet",
         chainId: 8453,
