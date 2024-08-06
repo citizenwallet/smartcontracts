@@ -89,8 +89,8 @@ const hhconfig: HardhatUserConfig = {
         network: "base_testnet",
         chainId: 84532,
         urls: {
-          apiURL: "https://api.basescan.org/api",
-          browserURL: "https://basescan.org",
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org/",
         },
       },
       {

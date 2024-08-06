@@ -3,16 +3,22 @@ import { ethers, upgrades, run } from "hardhat";
 import "@nomicfoundation/hardhat-toolbox";
 import { config } from "dotenv";
 
+/**
+ * @notice This script deploys the following contracts:
+ * - Profile (unless process.env.PROFILE_ADDR is set, or a custom address is provided at the prompt)
+ * - Paymaster (unless process.env.PAYMASTER_ADDR is set)
+ * - TokenEntryPoint (unless process.env.TOKEN_ENTRYPOINT_ADDR is set)
+ * - AccountFactory (unless process.env.ACCOUNT_FACTORY_ADDR is set)
+ */
 
 async function main() {
-
   const whiteListedAddresses = [];
-  const { COMMUNITY_TOKEN_ADDRESS } = process.env;
-  if (COMMUNITY_TOKEN_ADDRESS && COMMUNITY_TOKEN_ADDRESS.startsWith("0x")) {
-    whiteListedAddresses.push(COMMUNITY_TOKEN_ADDRESS);
+  const { TOKEN_ADDR } = process.env;
+  if (TOKEN_ADDR && TOKEN_ADDR.startsWith("0x")) {
+    whiteListedAddresses.push(TOKEN_ADDR);
   }
 
-  console.log("🏃🏻‍♂️ Running...\n");
+  console.log("⚙️ Running...\n");
   config();
 
   if (
@@ -22,46 +28,55 @@ async function main() {
     throw Error("ENTRYPOINT_ADDR is not set");
   }
 
-  const profileResponse = new Promise<string | undefined>((resolve) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
-    rl.question(
-      "Custom profile contract address (leave empty if you want to create a new one): ",
-      (answer) => {
-        if (answer === "" || answer === undefined || !answer.startsWith("0x")) {
-          resolve(undefined);
-        }
-
-        resolve(answer);
-        rl.close();
-      }
-    );
-  });
-
-  const customProfile = await profileResponse;
-
-  console.log("\n");
-
-  if (whiteListedAddresses.length === 0) {
-    const addressResponse = new Promise<string>((resolve) => {
+  const profileResponse = async () => {
+    return new Promise<string | undefined>((resolve) => {
       const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
       });
 
       rl.question(
-        "Community Token Address: ",
+        "Custom profile contract address (leave empty if you want to create a new one): ",
         (answer) => {
-          resolve(answer.trim());
+          if (
+            answer === "" ||
+            answer === undefined ||
+            !answer.startsWith("0x")
+          ) {
+            resolve(undefined);
+          }
+
+          resolve(answer);
           rl.close();
         }
       );
     });
-    const contractAddress = await addressResponse;
-    whiteListedAddresses.push(contractAddress);
+  };
+
+  const customProfile = process.env.PROFILE_ADDR
+    ? process.env.PROFILE_ADDR
+    : await profileResponse();
+
+  console.log("\n");
+
+  if (whiteListedAddresses.length === 0) {
+    if (process.env.TOKEN_ADDR) {
+      whiteListedAddresses.push(process.env.TOKEN_ADDR);
+    } else {
+      const addressResponse = new Promise<string>((resolve) => {
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout,
+        });
+
+        rl.question("Community Token Address: ", (answer) => {
+          resolve(answer.trim());
+          rl.close();
+        });
+      });
+      const contractAddress = await addressResponse;
+      whiteListedAddresses.push(contractAddress);
+    }
   }
 
   console.log("\n");
@@ -74,11 +89,15 @@ async function main() {
 
     const profileFactory = await ethers.getContractFactory("Profile");
 
-    const profile = await upgrades.deployProxy(profileFactory, [], {
-      kind: "uups",
-      initializer: "initialize",
-      timeout: 999999,
-    });
+    const profile = await upgrades.deployProxy(
+      profileFactory,
+      [process.env.DEPLOYER_ADDRESS],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        timeout: 999999,
+      }
+    );
 
     console.log("🚀 request sent...");
     await profile.deployed();
@@ -102,68 +121,103 @@ async function main() {
     console.log("\n");
   }
 
-  console.log("⚙️ deploying Paymaster...");
+  let paymaster;
+  if (process.env.PAYMASTER_ADDR) {
+    paymaster = {
+      address: process.env.PAYMASTER_ADDR,
+    };
+    console.log(
+      `✅ Using Paymaster contract deployed at: ${paymaster.address}`
+    );
+  } else {
+    console.log("⚙️ deploying Paymaster...");
 
-  const paymasterFactory = await ethers.getContractFactory("Paymaster");
+    const paymasterFactory = await ethers.getContractFactory("Paymaster");
 
-  const paymaster = await upgrades.deployProxy(
-    paymasterFactory,
-    [sponsor.address],
-    {
-      kind: "uups",
-      initializer: "initialize",
-      timeout: 999999,
-    }
-  );
+    paymaster = await upgrades.deployProxy(
+      paymasterFactory,
+      [sponsor.address],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        timeout: 999999,
+      }
+    );
 
-  console.log("🚀 request sent...");
+    console.log("🚀 request sent...");
 
-  await paymaster.deployed();
+    await paymaster.deployed();
 
-  console.log(`✅ Paymaster contract deployed to: ${paymaster.address}`);
-
-  console.log("\n");
-
-  console.log("⚙️ deploying TokenEntryPoint...");
-
-  const tokenEntryPointFactory = await ethers.getContractFactory(
-    "TokenEntryPoint"
-  );
-  const tokenEntryPoint = await upgrades.deployProxy(
-    tokenEntryPointFactory,
-    [
-      sponsor.address,
-      paymaster.address,
-      [...whiteListedAddresses, profileAddress],
-    ],
-    {
-      kind: "uups",
-      initializer: "initialize",
-      constructorArgs: [process.env.ENTRYPOINT_ADDR],
-      timeout: 999999,
-    }
-  );
-
-  console.log("🚀 request sent...");
-
-  await tokenEntryPoint.deployed();
-
-  console.log(`✅ TokenEntryPoint deployed to: ${tokenEntryPoint.address}`);
+    console.log(`✅ Paymaster contract deployed to: ${paymaster.address}`);
+  }
 
   console.log("\n");
 
-  console.log("⚙️ deploying AccountFactory...");
+  let tokenEntryPoint;
+  if (process.env.TOKEN_ENTRYPOINT_ADDR) {
+    tokenEntryPoint = { address: process.env.TOKEN_ENTRYPOINT_ADDR };
+    console.log(
+      `✅ Using TokenEntryPoint deployed at: ${tokenEntryPoint.address}`
+    );
+  } else {
+    console.log("⚙️ deploying TokenEntryPoint...");
 
-  const accFactory = await ethers.deployContract("AccountFactory", [
-    process.env.ENTRYPOINT_ADDR,
-    tokenEntryPoint.address,
-  ]);
+    const tokenEntryPointFactory = await ethers.getContractFactory(
+      "TokenEntryPoint"
+    );
+    tokenEntryPoint = await upgrades.deployProxy(
+      tokenEntryPointFactory,
+      [
+        sponsor.address,
+        paymaster.address,
+        [...whiteListedAddresses, profileAddress],
+      ],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        constructorArgs: [process.env.ENTRYPOINT_ADDR],
+        timeout: 999999,
+      }
+    );
 
-  console.log("🚀 request sent...");
+    console.log("🚀 request sent...");
 
-  await accFactory.deployed();
+    await tokenEntryPoint.deployed();
 
-  console.log(`✅ Account Factory deployed to: ${accFactory.address}`);
+    console.log(`✅ TokenEntryPoint deployed to: ${tokenEntryPoint.address}`);
+  }
+
+  console.log("\n");
+
+  let accFactory;
+  if (process.env.ACCOUNT_FACTORY_ADDR) {
+    accFactory = { address: process.env.ACCOUNT_FACTORY_ADDR };
+    console.log(`✅ Account Factory deployed at: ${accFactory.address}`);
+  } else {
+    console.log("⚙️ deploying AccountFactory...");
+
+    const accountFactory = await ethers.getContractFactory("AccountFactory");
+    accFactory = await upgrades.deployProxy(
+      accountFactory,
+      [
+        process.env.ENTRYPOINT_ADDR,
+        process.env.TOKEN_ENTRYPOINT_ADDR,
+        tokenEntryPoint.address,
+      ],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        constructorArgs: [],
+        timeout: 999999,
+      }
+    );
+
+    console.log("🚀 request sent...");
+
+    await accFactory.deployed();
+
+    console.log(`✅ Account Factory deployed to: ${accFactory.address}`);
+  }
 
   console.log("\n");
 
@@ -287,10 +341,13 @@ async function main() {
   console.log("DEPLOYMENT COMPLETE 🎉");
   console.log(" ");
   console.log(" ");
-  console.log("Community token address: ", COMMUNITY_TOKEN_ADDRESS);
+  console.log("Community token address: ", TOKEN_ADDR);
   console.log(" ");
   console.log("Paymaster contract address: ", paymaster.address);
-  console.log("Paymaster sponsor address (EOA to top up to sponsor gas fees): ", sponsor.address);
+  console.log(
+    "Paymaster sponsor address (EOA to top up to sponsor gas fees): ",
+    sponsor.address
+  );
   console.log(
     "Paymaster sponsor private key: ",
     sponsor.privateKey.replace("0x", "")
