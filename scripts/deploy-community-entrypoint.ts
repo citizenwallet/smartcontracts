@@ -197,12 +197,20 @@ async function main() {
     console.log("⚙️ deploying AccountFactory...");
 
     const accountFactory = await ethers.getContractFactory("AccountFactory");
-    accFactory = await upgrades.deployProxy(accountFactory, [], {
-      kind: "uups",
-      initializer: "initialize",
-      constructorArgs: [process.env.ENTRYPOINT_ADDR, tokenEntryPoint.address],
-      timeout: 999999,
-    });
+    accFactory = await upgrades.deployProxy(
+      accountFactory,
+      [
+        process.env.ENTRYPOINT_ADDR,
+        process.env.TOKEN_ENTRYPOINT_ADDR,
+        tokenEntryPoint.address,
+      ],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        constructorArgs: [],
+        timeout: 999999,
+      }
+    );
 
     console.log("🚀 request sent...");
 
