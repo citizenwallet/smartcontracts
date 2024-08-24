@@ -7,7 +7,7 @@ config();
 
 const hhconfig: HardhatUserConfig = {
   solidity: {
-    version: "0.8.20",
+    version: "0.8.23",
     settings: {
       evmVersion: "paris",
       optimizer: {
@@ -18,29 +18,29 @@ const hhconfig: HardhatUserConfig = {
   },
   networks: {
     mainnet: {
-      url: process.env.ETHEREUM_RPC_URL,
+      url: process.env.ETHEREUM_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 9000000000, // this is 30 Gwei
     },
     polygon: {
-      url: process.env.POLYGON_RPC_URL,
+      url: process.env.POLYGON_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 90000000000, // this is 30 Gwei
     },
     base: {
-      url: process.env.BASE_RPC_URL,
+      url: process.env.BASE_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 30000000, // this is 30 Gwei
     },
     celo: {
-      url: process.env.CELO_RPC_URL,
+      url: process.env.CELO_MAINNET_RPC_URL,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
       gasPrice: 30000000, // this is 30 Gwei
     },
   },
   etherscan: {
     apiKey: {
-      mainnet: process.env.ETEHREUM_MAINNET_ETHERSCAN_API_KEY || "",
+      mainnet: process.env.ETHEREUM_MAINNET_ETHERSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYGON_MUMBAI_ETHERSCAN_API_KEY || "",
       polygon: process.env.POLYGON_MAINNET_ETHERSCAN_API_KEY || "",
       base: process.env.BASE_MAINNET_ETHERSCAN_API_KEY || "",
@@ -59,7 +59,7 @@ const hhconfig: HardhatUserConfig = {
         network: "celo",
         chainId: 42220,
         urls: {
-          apiURL: "https://api.celoscan.io",
+          apiURL: "https://api.celoscan.io/api",
           browserURL: "https://celoscan.io",
         },
       },
