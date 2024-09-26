@@ -148,9 +148,9 @@ describe("SimpleFaucet", function () {
       expect(await token.balanceOf(friend1.address)).to.equal(0);
       expect(await token.balanceOf(friend2.address)).to.equal(0);
 
-      await singleRedeemFaucet.connect(friend1).redeem();
+      await singleRedeemFaucet.connect(friend1)["redeem()"]();
 
-      await singleRedeemFaucet.connect(friend2).redeem();
+      await singleRedeemFaucet.connect(friend2)["redeem()"]();
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
       expect(await token.balanceOf(friend2.address)).to.equal(10);
@@ -161,18 +161,18 @@ describe("SimpleFaucet", function () {
         deployOnboardingFaucetFixture
       );
 
-      await singleRedeemFaucet.connect(friend1).redeem();
+      await singleRedeemFaucet.connect(friend1)["redeem()"]();
 
-      await singleRedeemFaucet.connect(friend2).redeem();
+      await singleRedeemFaucet.connect(friend2)["redeem()"]();
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
       expect(await token.balanceOf(friend2.address)).to.equal(10);
 
       await expect(
-        singleRedeemFaucet.connect(friend1).redeem()
+        singleRedeemFaucet.connect(friend1)["redeem()"]()
       ).to.be.revertedWith("SimpleFaucet: already redeemed");
       await expect(
-        singleRedeemFaucet.connect(friend2).redeem()
+        singleRedeemFaucet.connect(friend2)["redeem()"]()
       ).to.be.revertedWith("SimpleFaucet: already redeemed");
     });
   });
@@ -185,8 +185,8 @@ describe("SimpleFaucet", function () {
       expect(await token.balanceOf(friend1.address)).to.equal(0);
       expect(await token.balanceOf(friend2.address)).to.equal(0);
 
-      await intervalRedeemFaucet.connect(friend1).redeem();
-      await intervalRedeemFaucet.connect(friend2).redeem();
+      await intervalRedeemFaucet.connect(friend1)["redeem()"]();
+      await intervalRedeemFaucet.connect(friend2)["redeem()"]();
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
       expect(await token.balanceOf(friend2.address)).to.equal(10);
@@ -196,17 +196,17 @@ describe("SimpleFaucet", function () {
       const { friend1, friend2, token, intervalRedeemFaucet } =
         await loadFixture(deployOnboardingFaucetFixture);
 
-      await intervalRedeemFaucet.connect(friend1).redeem();
-      await intervalRedeemFaucet.connect(friend2).redeem();
+      await intervalRedeemFaucet.connect(friend1)["redeem()"]();
+      await intervalRedeemFaucet.connect(friend2)["redeem()"]();
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
       expect(await token.balanceOf(friend2.address)).to.equal(10);
 
       await expect(
-        intervalRedeemFaucet.connect(friend1).redeem()
+        intervalRedeemFaucet.connect(friend1)["redeem()"]()
       ).to.be.revertedWith("SimpleFaucet: redeem interval not passed");
       await expect(
-        intervalRedeemFaucet.connect(friend2).redeem()
+        intervalRedeemFaucet.connect(friend2)["redeem()"]()
       ).to.be.revertedWith("SimpleFaucet: redeem interval not passed");
     });
 
@@ -214,41 +214,41 @@ describe("SimpleFaucet", function () {
       const { friend1, friend2, token, intervalRedeemFaucet, redeemInterval } =
         await loadFixture(deployOnboardingFaucetFixture);
 
-      await intervalRedeemFaucet.connect(friend1).redeem();
+      await intervalRedeemFaucet.connect(friend1)["redeem()"]();
 
-      await intervalRedeemFaucet.connect(friend2).redeem();
+      await intervalRedeemFaucet.connect(friend2)["redeem()"]();
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
       expect(await token.balanceOf(friend2.address)).to.equal(10);
 
       await time.increase(redeemInterval);
 
-      await intervalRedeemFaucet.connect(friend1).redeem();
-      await intervalRedeemFaucet.connect(friend2).redeem();
+      await intervalRedeemFaucet.connect(friend1)["redeem()"]();
+      await intervalRedeemFaucet.connect(friend2)["redeem()"]();
     });
 
     it("Should not allow redeeming if there are no more tokens", async function () {
       const { friend1, friend2, token, intervalRedeemFaucet, redeemInterval } =
         await loadFixture(deployOnboardingFaucetFixture);
 
-      await intervalRedeemFaucet.connect(friend1).redeem();
-      await intervalRedeemFaucet.connect(friend2).redeem();
+      await intervalRedeemFaucet.connect(friend1)["redeem()"]();
+      await intervalRedeemFaucet.connect(friend2)["redeem()"]();
 
       expect(await token.balanceOf(friend1.address)).to.equal(10);
       expect(await token.balanceOf(friend2.address)).to.equal(10);
 
       await time.increase(redeemInterval);
 
-      await intervalRedeemFaucet.connect(friend1).redeem();
-      await intervalRedeemFaucet.connect(friend2).redeem();
+      await intervalRedeemFaucet.connect(friend1)["redeem()"]();
+      await intervalRedeemFaucet.connect(friend2)["redeem()"]();
 
       await time.increase(redeemInterval);
 
       await expect(
-        intervalRedeemFaucet.connect(friend1).redeem()
+        intervalRedeemFaucet.connect(friend1)["redeem()"]()
       ).to.be.revertedWith("SimpleFaucet: insufficient balance");
       await expect(
-        intervalRedeemFaucet.connect(friend2).redeem()
+        intervalRedeemFaucet.connect(friend2)["redeem()"]()
       ).to.be.revertedWith("SimpleFaucet: insufficient balance");
     });
   });
