@@ -3416,8 +3416,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/tokens/UpgradeableBurnableCommunityToken.sol": {
-      "lastModificationDate": 1722206213830,
-      "contentHash": "2f31b1b19310e0c032790cef0560ecd0",
+      "lastModificationDate": 1736872070814,
+      "contentHash": "00e09d8019c7090a6ba3af6846e96412",
       "sourceName": "contracts/tokens/UpgradeableBurnableCommunityToken.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3506,8 +3506,8 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/apps/Profile.sol": {
-      "lastModificationDate": 1722206213826,
-      "contentHash": "1d4452c7d1ef97a52c86635541173b86",
+      "lastModificationDate": 1736872070814,
+      "contentHash": "481ed38efc07dd7ac1eb9b103b50acef",
       "sourceName": "contracts/apps/Profile.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -3549,7 +3549,7 @@
       ]
     },
     "/home/runner/work/smartcontracts/smartcontracts/contracts/accounts/ProfileFactory.sol": {
-      "lastModificationDate": 1722206213826,
+      "lastModificationDate": 1736872070814,
       "contentHash": "772c712bbcb4aa49383581c0186e1bdd",
       "sourceName": "contracts/accounts/ProfileFactory.sol",
       "solcConfig": {
