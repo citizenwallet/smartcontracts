@@ -21,16 +21,7 @@ contract UpgradeableBurnableCommunityToken is
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
-    event Minted(address indexed to, uint256 amount);
-
-    function initialize(
-        address[] memory minters,
-        string memory name,
-        string memory symbol
-    )
-        public
-        initializer
-    {
+    function initialize(address[] memory minters, string memory name, string memory symbol) public initializer {
         __ERC20_init(name, symbol);
         __ERC20Burnable_init();
         __Ownable_init();
@@ -48,16 +39,9 @@ contract UpgradeableBurnableCommunityToken is
         return 6;
     }
 
-    function mint(
-        address to,
-        uint256 amount
-    ) public {
-        require(
-            hasRole(MINTER_ROLE, msg.sender),
-            "Must have minter role to mint"
-        );
+    function mint(address to, uint256 amount) public {
+        require(hasRole(MINTER_ROLE, msg.sender), "Must have minter role to mint");
         _mint(to, amount);
-        emit Minted(to, amount);
     }
 
     // Allow the minter to also burn tokens from any account
@@ -65,10 +49,7 @@ contract UpgradeableBurnableCommunityToken is
     // without impacting the totalSupply
     // Given that all community accounts can be recovered, this is only useful for old accounts.abi
     // Therefore, we should remove this function as soon as possible.
-    function burnFrom(
-        address account,
-        uint256 amount
-    ) public override onlyRole(MINTER_ROLE) {
+    function burnFrom(address account, uint256 amount) public override onlyRole(MINTER_ROLE) {
         _burn(account, amount);
     }
 
@@ -80,7 +61,5 @@ contract UpgradeableBurnableCommunityToken is
         _unpause();
     }
 
-    function _authorizeUpgrade(
-        address newImplementation
-    ) internal override onlyOwner {}
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }

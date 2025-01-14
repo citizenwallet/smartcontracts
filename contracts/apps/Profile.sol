@@ -39,6 +39,8 @@ contract Profile is
         __UUPSUpgradeable_init();
 
         _setupRole(DEFAULT_ADMIN_ROLE, _owner);
+
+        transferOwnership(_owner);
     }
 
     function set(address profile, bytes32 _username, string memory _uri) public returns (uint256) {
