@@ -54,7 +54,7 @@ async function deployCommunityEntrypoint(
   deployedContractAddress: string
 ) {
   execSync(
-    `HARDHAT_NETWORK=${networkName} COMMUNITY_TOKEN_ADDRESS=${deployedContractAddress} npx hardhat run ./scripts/deploy-community-entrypoint.ts`,
+    `HARDHAT_NETWORK=${networkName} TOKEN_ADDR=${deployedContractAddress} npx hardhat run ./scripts/deploy-community-entrypoint.ts`,
     { stdio: "inherit" }
   );
 }
@@ -91,6 +91,7 @@ const nativeCurrencySymbols: { [chainId: number]: string } = {
   137: "MATIC", // Polygon Mainnet
   8453: "ETH", // Base
   84531: "ETH", // Base
+  84532: "ETH", // Base Testnet
   80001: "MATIC", // Polygon Mumbai Testnet
   42220: "CELO", // Celo Mainnet
   44787: "CELO", // Alfajores Testnet (Celo)
@@ -134,7 +135,9 @@ async function main() {
   const wallet = new ethers.Wallet(pk!, ethers.provider);
   const balanceWei = await wallet.getBalance();
   term(
-    `The balance of the deployer wallet on ${networkName} is: ${ethers.utils.formatEther(
+    `The balance of the deployer wallet (${
+      wallet.address
+    }) on ${networkName} is: ${ethers.utils.formatEther(
       balanceWei
     )} ${nativeCurrencySymbol}\n\n`
   );
@@ -235,13 +238,18 @@ async function main() {
         contractName,
         networkName
       );
-      deployedContractAddress = await deployContract(
-        contractName,
-        minter1,
-        minter2,
-        tokenName,
-        tokenSymbol
-      );
+      try {
+        deployedContractAddress = await deployContract(
+          contractName,
+          minter1,
+          minter2,
+          tokenName,
+          tokenSymbol
+        );
+      } catch (e) {
+        console.log("Error deploying contract: ", e?.reason);
+        process.exit();
+      }
     }
   }
 
