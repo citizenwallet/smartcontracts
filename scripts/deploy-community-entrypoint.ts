@@ -3,9 +3,7 @@ import { ethers, upgrades, run } from "hardhat";
 import "@nomicfoundation/hardhat-toolbox";
 import { config } from "dotenv";
 
-
 async function main() {
-
   const whiteListedAddresses = [];
   const { COMMUNITY_TOKEN_ADDRESS } = process.env;
   if (COMMUNITY_TOKEN_ADDRESS && COMMUNITY_TOKEN_ADDRESS.startsWith("0x")) {
@@ -52,13 +50,10 @@ async function main() {
         output: process.stdout,
       });
 
-      rl.question(
-        "Community Token Address: ",
-        (answer) => {
-          resolve(answer.trim());
-          rl.close();
-        }
-      );
+      rl.question("Community Token Address: ", (answer) => {
+        resolve(answer.trim());
+        rl.close();
+      });
     });
     const contractAddress = await addressResponse;
     whiteListedAddresses.push(contractAddress);
@@ -74,11 +69,15 @@ async function main() {
 
     const profileFactory = await ethers.getContractFactory("Profile");
 
-    const profile = await upgrades.deployProxy(profileFactory, [], {
-      kind: "uups",
-      initializer: "initialize",
-      timeout: 999999,
-    });
+    const profile = await upgrades.deployProxy(
+      profileFactory,
+      [sponsor.address],
+      {
+        kind: "uups",
+        initializer: "initialize",
+        timeout: 999999,
+      }
+    );
 
     console.log("🚀 request sent...");
     await profile.deployed();
@@ -154,10 +153,16 @@ async function main() {
 
   console.log("⚙️ deploying AccountFactory...");
 
-  const accFactory = await ethers.deployContract("AccountFactory", [
-    process.env.ENTRYPOINT_ADDR,
-    tokenEntryPoint.address,
-  ]);
+  const accFactoryFactory = await ethers.getContractFactory("AccountFactory");
+  const accFactory = await upgrades.deployProxy(
+    accFactoryFactory,
+    [process.env.ENTRYPOINT_ADDR, tokenEntryPoint.address, sponsor.address],
+    {
+      kind: "uups",
+      initializer: "initialize",
+      timeout: 999999,
+    }
+  );
 
   console.log("🚀 request sent...");
 
@@ -227,10 +232,6 @@ async function main() {
   try {
     await run("verify:verify", {
       address: accFactory.address,
-      constructorArguments: [
-        process.env.ENTRYPOINT_ADDR,
-        tokenEntryPoint.address,
-      ],
     });
 
     console.log("verified!");
@@ -290,7 +291,10 @@ async function main() {
   console.log("Community token address: ", COMMUNITY_TOKEN_ADDRESS);
   console.log(" ");
   console.log("Paymaster contract address: ", paymaster.address);
-  console.log("Paymaster sponsor address (EOA to top up to sponsor gas fees): ", sponsor.address);
+  console.log(
+    "Paymaster sponsor address (EOA to top up to sponsor gas fees): ",
+    sponsor.address
+  );
   console.log(
     "Paymaster sponsor private key: ",
     sponsor.privateKey.replace("0x", "")

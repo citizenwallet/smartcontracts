@@ -54,6 +54,10 @@ const hhconfig: HardhatUserConfig = {
       url: process.env.GNOSIS_MAINNET_RPC_URL || "",
       accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
     },
+    berachain: {
+      url: process.env.BERACHAIN_RPC_URL || "",
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || "0x0"],
+    },
   },
   etherscan: {
     apiKey: {
@@ -67,6 +71,7 @@ const hhconfig: HardhatUserConfig = {
       celo_mainnet: process.env.CELO_MAINNET_ETHERSCAN_API_KEY || "",
       celo_testnet: process.env.CELO_TESTNET_ETHERSCAN_API_KEY || "",
       gnosis_mainnet: process.env.GNOSIS_MAINNET_ETHERSCAN_API_KEY || "",
+      berachain: process.env.ETHEREUM_MAINNET_ETHERSCAN_API_KEY || "",
     },
     customChains: [
       {
@@ -115,6 +120,14 @@ const hhconfig: HardhatUserConfig = {
         urls: {
           apiURL: "https://api.gnosisscan.io/api",
           browserURL: "https://gnosisscan.io",
+        },
+      },
+      {
+        network: "berachain",
+        chainId: 80094,
+        urls: {
+          apiURL: "https://api.berascan.com/api",
+          browserURL: "https://berascan.com",
         },
       },
     ],
